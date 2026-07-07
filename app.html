@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkedIn Control Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #030303; color: #e1e1e3; min-height: 100vh; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3a3a3e; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes slideOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(100%); } }
+    @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .animate-fadeIn { animation: fadeIn 0.35s ease forwards; }
+    .animate-slideIn { animation: slideIn 0.3s ease forwards; }
+    .animate-slideOut { animation: slideOut 0.25s ease forwards; }
+    .animate-pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+    .animate-spin-slow { animation: spin 1.2s linear infinite; }
+    .skeleton { background: linear-gradient(90deg, #1a1a1e 25%, #24242a 50%, #1a1a1e 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px; }
+    .toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none; }
+    .toast { pointer-events: auto; display: flex; align-items: center; gap: 0.625rem; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.8125rem; font-weight: 500; line-height: 1.4; min-width: 280px; max-width: 380px; border: 1px solid; backdrop-filter: blur(12px); }
+    .toast-success { background: rgba(6, 150, 80, 0.15); border-color: rgba(6, 150, 80, 0.3); color: #4ade80; }
+    .toast-error { background: rgba(220, 38, 38, 0.15); border-color: rgba(220, 38, 38, 0.3); color: #f87171; }
+    .toast-info { background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); color: #60a5fa; }
+    .glow-accent { box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.15), 0 1px 2px rgba(0, 0, 0, 0.4); }
+    .glow-accent:focus-within { box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5), 0 0 20px rgba(99, 102, 241, 0.1); }
+    .glow-purple { box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.2), 0 1px 2px rgba(0, 0, 0, 0.4); }
+    select, input, textarea { outline: none; }
+    .status-badge { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.25rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; border: 1px solid; }
+    .status-live { background: rgba(6, 150, 80, 0.12); border-color: rgba(6, 150, 80, 0.25); color: #4ade80; }
+    .timeline-line { position: absolute; left: 11px; top: 28px; bottom: 0; width: 2px; background: linear-gradient(to bottom, #25252b, transparent); }
+    .timeline-card:last-child .timeline-line { display: none; }
+    .btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8125rem; font-weight: 600; color: #fff; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: 1px solid rgba(139, 92, 246, 0.25); transition: all 0.15s ease; cursor: pointer; }
+    .btn-primary:hover { background: linear-gradient(135deg, #7c7cf8, #a07bfe); border-color: rgba(139, 92, 246, 0.4); }
+    .btn-primary:active { transform: scale(0.975); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-trigger { display: inline-flex; align-items: center; justify-content: center; gap: 0.625rem; padding: 0.75rem 1.5rem; border-radius: 10px; font-size: 0.9375rem; font-weight: 700; color: #fff; background: linear-gradient(135deg, #a855f7, #d946ef); border: 1px solid rgba(217, 70, 239, 0.3); transition: all 0.15s ease; cursor: pointer; width: 100%; box-shadow: 0 4px 24px rgba(168, 85, 247, 0.2); }
+    .btn-trigger:hover { background: linear-gradient(135deg, #c084fc, #e879f9); border-color: rgba(217, 70, 239, 0.5); box-shadow: 0 6px 32px rgba(168, 85, 247, 0.35); }
+    .btn-trigger:active { transform: scale(0.98); }
+    .btn-trigger:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+    .segmented-btn { flex: 1; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8125rem; font-weight: 500; transition: all 0.15s ease; border: 1px solid; cursor: pointer; }
+    .segmented-btn-inactive { background: #141416; border-color: #25252b; color: #a1a1aa; }
+    .segmented-btn-inactive:hover { border-color: #52525b; color: #e1e1e3; }
+    .segmented-btn-active { background: rgba(139, 92, 246, 0.12); border-color: rgba(139, 92, 246, 0.45); color: #c4b5fd; box-shadow: 0 0 12px rgba(139, 92, 246, 0.08); }
+    .loader-ring { width: 1.25rem; height: 1.25rem; border: 2px solid rgba(255,255,255,0.15); border-top-color: #fff; border-radius: 50%; }
+    input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus { -webkit-text-fill-color: #e1e1e3; -webkit-box-shadow: 0 0 0 30px #141416 inset; caret-color: #e1e1e3; }
+  </style>
+</head>
+<body>
+  <!-- ── Full-page loading overlay (hidden by JS on init or error) ───── -->
+  <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#030303]">
+    <div class="loader-ring animate-spin-slow w-8 h-8 mb-4"></div>
+    <p class="text-sm text-zinc-400">Initializing dashboard...</p>
+  </div>
+
+  <div class="min-h-screen flex flex-col">
+
+    <!-- ── Header ─────────────────────────────────────────────────────── -->
+    <header class="border-b border-[#1e1e22] bg-[#08080a]">
+      <div class="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 12H4M12 4v16"/></svg>
+          </div>
+          <span class="text-sm font-semibold text-white tracking-tight">LinkedIn Control Panel</span>
+          <span class="status-badge status-live">
+            <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse-dot"></span>
+            Connected
+          </span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-zinc-500" id="liveTimestamp"></span>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 max-w-5xl mx-auto w-full px-6 py-8 space-y-7">
+
+      <!-- ── Card 1: Dynamic Topic & Schedule Settings ──────────────── -->
+      <section class="animate-fadeIn" style="animation-delay: 0.05s">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-base font-semibold text-white">Topic &amp; Schedule</h2>
+            <p class="text-xs text-zinc-500 mt-0.5">Set the search topic and daily posting frequency</p>
+          </div>
+          <span class="text-xs text-zinc-600" id="configStatus">Loading...</span>
+        </div>
+        <div class="rounded-xl border border-[#25252b] bg-[#0c0c0e] p-6 glow-accent">
+          <div id="configSkeleton" class="space-y-5">
+            <div class="skeleton h-10 w-full"></div>
+            <div class="skeleton h-10 w-56"></div>
+          </div>
+          <div id="configForm" class="hidden space-y-5">
+            <div>
+              <label for="topicInput" class="block text-xs font-medium text-zinc-400 mb-1.5 tracking-wide uppercase">Trending Topic</label>
+              <input id="topicInput" type="text" class="block w-full bg-[#141416] border border-[#25252b] rounded-lg px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 transition-all focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20" placeholder='"Artificial Intelligence" OR "DevOps"' spellcheck="false" />
+              <p class="text-[11px] text-zinc-600 mt-1.5">Uses boolean search syntax &mdash; <code class="text-zinc-400 bg-[#1a1a1e] px-1 rounded">AND</code>, <code class="text-zinc-400 bg-[#1a1a1e] px-1 rounded">OR</code>, and quoted phrases supported.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-zinc-400 mb-1.5 tracking-wide uppercase">Posts Per Day</label>
+              <div class="flex gap-2" id="postsPerDayGroup">
+                <button type="button" data-value="1" class="segmented-btn segmented-btn-inactive">1 Post</button>
+                <button type="button" data-value="2" class="segmented-btn segmented-btn-inactive">2 Posts</button>
+                <button type="button" data-value="3" class="segmented-btn segmented-btn-inactive">3 Posts</button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between pt-1">
+              <span class="text-xs text-zinc-600" id="configUnsaved"></span>
+              <button type="button" class="btn-primary" id="saveConfigBtn">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                Save Settings
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Card 2: Instant Execution Command ───────────────────────── -->
+      <section class="animate-fadeIn" style="animation-delay: 0.1s">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-base font-semibold text-white">Manual Trigger</h2>
+            <p class="text-xs text-zinc-500 mt-0.5">Instantly generate and publish a LinkedIn post</p>
+          </div>
+        </div>
+        <div class="rounded-xl border border-[#25252b] bg-[#0c0c0e] p-6 glow-purple" id="triggerCard">
+          <div id="triggerReady">
+            <button type="button" class="btn-trigger" id="triggerBtn">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              Trigger Instant Post Now
+            </button>
+            <p class="text-[11px] text-zinc-600 mt-3 text-center">The n8n workflow will generate content using the saved topic and publish it to LinkedIn.</p>
+          </div>
+          <div id="triggerLoading" class="hidden">
+            <div class="flex flex-col items-center py-6">
+              <div class="loader-ring animate-spin-slow mb-4"></div>
+              <p class="text-sm font-medium text-purple-300">AI is generating and posting to LinkedIn...</p>
+              <p class="text-xs text-zinc-500 mt-1.5">Please wait&hellip;</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Card 3: Live Activity Stream ────────────────────────────── -->
+      <section class="animate-fadeIn" style="animation-delay: 0.15s">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-base font-semibold text-white">Activity Stream</h2>
+            <p class="text-xs text-zinc-500 mt-0.5">Your 3 most recent LinkedIn posts</p>
+          </div>
+          <span class="text-xs text-zinc-600" id="historyCount"></span>
+        </div>
+        <div class="rounded-xl border border-[#25252b] bg-[#0c0c0e] p-6 glow-accent">
+          <div id="historySkeleton" class="space-y-4">
+            <div class="skeleton h-24 w-full"></div>
+            <div class="skeleton h-24 w-full"></div>
+            <div class="skeleton h-24 w-full"></div>
+          </div>
+          <div id="historyContent" class="hidden">
+            <div id="historyEmpty" class="text-center py-12">
+              <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-[#141416] border border-[#25252b] flex items-center justify-center">
+                <svg class="w-6 h-6 text-zinc-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+              </div>
+              <p class="text-sm text-zinc-500 font-medium">No posts yet</p>
+              <p class="text-xs text-zinc-600 mt-1">Published posts will appear here in real time.</p>
+            </div>
+            <div id="historyTimeline" class="space-y-0"></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ── Footer ─────────────────────────────────────────────────────── -->
+    <footer class="border-t border-[#1e1e22] bg-[#08080a] mt-auto">
+      <div class="max-w-5xl mx-auto px-6 h-10 flex items-center justify-between">
+        <span class="text-[11px] text-zinc-600">LinkedIn Control Panel &middot; n8n &middot; Supabase</span>
+        <span class="text-[11px] text-zinc-700" id="footerTimestamp"></span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ── Toast container ─────────────────────────────────────────────── -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ── Single script block ─────────────────────────────────────────── -->
+  <script>
+    // ═════════════════════════════════════════════════════════════════════
+    //  1. GLOBALS — declared exactly ONCE, uses window. prefix to avoid
+    //     any possible collision with the Supabase CDN bundle's own scope.
+    // ═════════════════════════════════════════════════════════════════════
+    window.supabaseClient = null;
+
+    const N8N_WEBHOOK_URL = 'https://techjunction.app.n8n.cloud/webhook/trigger-linkedin-v3';
+    const supabaseUrl = 'https://sjjybpydkwvgqfyqliod.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqanlicHlka3d2Z3FmeXFsaW9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMTE0MDYsImV4cCI6MjA5ODg4NzQwNn0.T3GOm9IR3BTl1bFFcfbaYznraj0G-AlJRNb8H2MReDU';
+
+    const CONFIG_ID = 1;
+    const HISTORY_LIMIT = 3;
+
+    // ── DOM refs ────────────────────────────────────────────────────────
+    const overlay = document.getElementById('loading-overlay');
+    const configSkel = document.getElementById('configSkeleton');
+    const configForm = document.getElementById('configForm');
+    const configStatus = document.getElementById('configStatus');
+    const configUnsaved = document.getElementById('configUnsaved');
+    const topicInput = document.getElementById('topicInput');
+    const saveBtn = document.getElementById('saveConfigBtn');
+    const ppdOptions = document.querySelectorAll('#postsPerDayGroup button');
+    const histSkel = document.getElementById('historySkeleton');
+    const histContent = document.getElementById('historyContent');
+    const histEmpty = document.getElementById('historyEmpty');
+    const histTimeline = document.getElementById('historyTimeline');
+    const histCount = document.getElementById('historyCount');
+    const triggerBtn = document.getElementById('triggerBtn');
+    const triggerReady = document.getElementById('triggerReady');
+    const triggerLoading = document.getElementById('triggerLoading');
+
+    // ── State ───────────────────────────────────────────────────────────
+    let savedTopic = '';
+    let savedPpd = 1;
+    let dirty = false;
+    let dataLoaded = false;
+
+    // ═════════════════════════════════════════════════════════════════════
+    //  2. HELPERS
+    // ═════════════════════════════════════════════════════════════════════
+    function toast(msg, type) {
+      type = type || 'info';
+      const c = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = 'toast toast-' + type + ' animate-slideIn';
+      var icons = {
+        success: '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>',
+        error: '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>',
+        info: '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+      };
+      el.innerHTML = (icons[type] || icons.info) + '<span>' + msg + '</span>';
+      c.appendChild(el);
+      setTimeout(function () {
+        el.className = el.className.replace('animate-slideIn', 'animate-slideOut');
+        setTimeout(function () { el.remove(); }, 260);
+      }, 3000);
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '';
+      var d = new Date(iso);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function fmtRel(iso) {
+      if (!iso) return '';
+      var m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+      if (m < 1) return 'Just now';
+      if (m < 60) return m + 'm ago';
+      var h = Math.floor(m / 60);
+      if (h < 24) return h + 'h ago';
+      return Math.floor(h / 24) + 'd ago';
+    }
+
+    function esc(s) {
+      if (typeof s !== 'string') return '';
+      return s.replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; });
+    }
+
+    function revealConfig() {
+      configSkel.classList.add('hidden');
+      configForm.classList.remove('hidden');
+    }
+
+    function revealHistory(posts) {
+      histSkel.classList.add('hidden');
+      histContent.classList.remove('hidden');
+      renderHistory(posts || []);
+    }
+
+    function setPpdUI(val) {
+      ppdOptions.forEach(function (el) {
+        var v = parseInt(el.dataset.value, 10);
+        el.className = v === val ? 'segmented-btn segmented-btn-active' : 'segmented-btn segmented-btn-inactive';
+      });
+    }
+
+    function refreshStatusLabel() {
+      if (dirty) {
+        configStatus.textContent = 'Unsaved changes';
+        configStatus.className = 'text-xs text-amber-400/80';
+      } else {
+        configStatus.textContent = 'All saved';
+        configStatus.className = 'text-xs text-zinc-600';
+      }
+    }
+
+    // ── Render history cards ────────────────────────────────────────────
+    function renderHistory(posts) {
+      histTimeline.innerHTML = '';
+      if (!posts.length) {
+        histEmpty.classList.remove('hidden');
+        histCount.textContent = '0 posts';
+        return;
+      }
+      histEmpty.classList.add('hidden');
+      histCount.textContent = posts.length + ' post' + (posts.length !== 1 ? 's' : '');
+      var frag = document.createDocumentFragment();
+      posts.forEach(function (p, i) {
+        var card = document.createElement('div');
+        card.className = 'timeline-card relative pl-8 pb-5 animate-fadeIn';
+        card.style.animationDelay = (i * 0.08) + 's';
+        var dot = document.createElement('div');
+        dot.className = 'absolute left-0 top-1 w-6 h-6 rounded-full bg-[#141416] border-2 border-[#2a2a2e] flex items-center justify-center ring-1 ring-black/30';
+        dot.innerHTML = '<svg class="w-3 h-3 text-zinc-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z"/></svg>';
+        var badge = p.topic_used
+          ? '<span class="inline-block text-[11px] text-purple-400 bg-purple-500/8 border border-purple-500/15 rounded-md px-2 py-0.5 font-medium mr-1.5">' + esc(p.topic_used) + '</span>'
+          : '';
+        var body = document.createElement('div');
+        body.className = 'rounded-lg border border-[#1e1e22] bg-[#0e0e12] p-4 hover:border-[#2a2a2e] transition-colors';
+        body.innerHTML = '<div class="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap break-words mb-2.5">' + esc(p.post_text) + '</div><div class="flex items-center flex-wrap gap-x-2 gap-y-1 text-[11px]">' + badge + '<span class="text-zinc-500">' + fmtDate(p.published_at) + '</span><span class="text-zinc-700">&middot;</span><span class="text-zinc-600">' + fmtRel(p.published_at) + '</span></div>';
+        card.appendChild(dot);
+        if (i < posts.length - 1) {
+          var ln = document.createElement('div');
+          ln.className = 'timeline-line';
+          card.appendChild(ln);
+        }
+        card.appendChild(body);
+        frag.appendChild(card);
+      });
+      histTimeline.appendChild(frag);
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    //  3. SUPABASE OPERATIONS
+    // ═════════════════════════════════════════════════════════════════════
+    async function loadDashboardData() {
+      if (!window.supabaseClient) {
+        console.error('[Panel] supabase-js client not available.');
+        revealConfig();
+        revealHistory([]);
+        toast('Supabase SDK failed to load – check console (F12)', 'error');
+        return;
+      }
+      var sb = window.supabaseClient;
+
+      // ── settings ────────────────────────────────────────────────────
+      try {
+        var r1 = await sb.from('settings').select('topic, posts_per_day').eq('id', CONFIG_ID).maybeSingle();
+        if (r1.error) throw r1.error;
+        if (r1.data === null) {
+          console.log('[Panel] No settings row found – applying defaults.');
+          savedTopic = 'Default Topic';
+          savedPpd = 1;
+        } else {
+          savedTopic = r1.data.topic || '';
+          savedPpd = r1.data.posts_per_day != null ? r1.data.posts_per_day : 1;
+        }
+        topicInput.value = savedTopic;
+        setPpdUI(savedPpd);
+        dirty = false;
+        refreshStatusLabel();
+        revealConfig();
+        console.log('[Panel] Settings loaded:', { topic: savedTopic, posts_per_day: savedPpd });
+      } catch (err) {
+        console.error('[Panel] Failed to load settings table:', err);
+        savedTopic = 'Default Topic';
+        savedPpd = 1;
+        topicInput.value = savedTopic;
+        setPpdUI(savedPpd);
+        dirty = false;
+        refreshStatusLabel();
+        revealConfig();
+      }
+
+      // ── posts_history ──────────────────────────────────────────────
+      try {
+        var r2 = await sb.from('posts_history').select('id, post_text, topic_used, published_at').order('published_at', { ascending: false }).limit(HISTORY_LIMIT);
+        if (r2.error) throw r2.error;
+        revealHistory(r2.data || []);
+        console.log('[Panel] History loaded:', (r2.data ? r2.data.length : 0) + ' posts');
+      } catch (err) {
+        console.error('[Panel] Failed to load posts_history table:', err);
+        revealHistory([]);
+        toast('Could not load post history – empty state shown', 'error');
+      }
+    }
+
+    async function updateSettings() {
+      if (!window.supabaseClient) { toast('Supabase SDK unavailable – cannot save', 'error'); return; }
+      var sb = window.supabaseClient;
+      var topic = topicInput.value.trim();
+      var ppd = savedPpd;
+
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span class="loader-ring animate-spin-slow"></span> Saving...';
+
+      try {
+        var r = await sb.from('settings').update({ topic: topic, posts_per_day: ppd }).eq('id', CONFIG_ID);
+        if (r.error) throw r.error;
+        savedTopic = topic;
+        savedPpd = ppd;
+        dirty = false;
+        refreshStatusLabel();
+        toast('Settings saved successfully', 'success');
+        console.log('[Panel] Settings updated:', { topic: topic, posts_per_day: ppd });
+      } catch (err) {
+        console.error('[Panel] Failed to update settings table:', err);
+        toast(err && err.message ? err.message : 'Failed to save settings', 'error');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg> Save Settings';
+      }
+    }
+
+    async function triggerN8nWorkflow() {
+      if (!N8N_WEBHOOK_URL) {
+        toast('Set N8N_WEBHOOK_URL in the script to enable this feature', 'error');
+        return;
+      }
+
+      var topic = topicInput ? topicInput.value.trim() : '';
+      var ppd = savedPpd != null ? savedPpd : 1;
+      if (topic === '') {
+        toast('Please set a topic before triggering', 'error');
+        return;
+      }
+
+      triggerReady.classList.add('hidden');
+      triggerLoading.classList.remove('hidden');
+
+      try {
+        var payload = JSON.stringify({
+          trigger: 'linkedin-post',
+          topic: topic,
+          posts_per_day: ppd,
+          timestamp: new Date().toISOString()
+        });
+
+try {
+    const response = await fetch(N8N_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            topic: "DevOps", // Or whatever variable holds your topic
+            posts_per_day: 1
+        })
+    });
+    
+    console.log("Response status:", response.status);
+    const data = await response.json();
+    console.log("Response data:", data);
+} catch (error) {
+    console.error("Fetch failed:", error);
+}
+        console.log('[Panel] n8n trigger sent with payload:', payload);
+        toast('Post generated and published successfully!', 'success');
+      } catch (err) {
+        console.error('[Panel] n8n webhook request failed:', err);
+        toast('Trigger failed – check console (F12) for details', 'error');
+      } finally {
+        triggerLoading.classList.add('hidden');
+        triggerReady.classList.remove('hidden');
+      }
+      try {
+        if (!window.supabaseClient) return;
+        var r = await window.supabaseClient.from('posts_history').select('id, post_text, topic_used, published_at').order('published_at', { ascending: false }).limit(HISTORY_LIMIT);
+        if (r.error) throw r.error;
+        renderHistory(r.data || []);
+        console.log('[Panel] History refreshed after trigger');
+      } catch (err) {
+        console.error('[Panel] History refresh after trigger failed:', err);
+      }
+    }
+
+    function wireEvents() {
+      ppdOptions.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var val = parseInt(btn.dataset.value, 10);
+          if (val === savedPpd && topicInput.value.trim() === savedTopic) return;
+          savedPpd = val;
+          setPpdUI(val);
+          dirty = true;
+          refreshStatusLabel();
+        });
+      });
+      topicInput.addEventListener('input', function () {
+        var changed = topicInput.value.trim() !== savedTopic;
+        if (changed !== dirty) { dirty = changed; refreshStatusLabel(); }
+      });
+      saveBtn.addEventListener('click', updateSettings);
+      triggerBtn.addEventListener('click', triggerN8nWorkflow);
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    //  4. BOOT — runs after the DOM is fully parsed
+    // ═════════════════════════════════════════════════════════════════════
+    window.addEventListener('DOMContentLoaded', function () {
+      // ── Live clock ─────────────────────────────────────────────────
+      function tick() {
+        var s = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        var a = document.getElementById('liveTimestamp');
+        var b = document.getElementById('footerTimestamp');
+        if (a) a.textContent = s;
+        if (b) b.textContent = s;
+      }
+      tick();
+      setInterval(tick, 30000);
+
+      // ── 3s fallback ────────────────────────────────────────────────
+      var fallbackTimer = setTimeout(function () {
+        if (!dataLoaded) {
+          console.warn('[Panel] 3s timeout – forcing UI reveal.');
+          if (overlay) overlay.style.display = 'none';
+          revealConfig();
+          revealHistory([]);
+          toast('Could not reach database – showing empty state', 'error');
+        }
+      }, 3000);
+
+      // ── Try initialising Supabase and loading data ────────────────
+      try {
+        var supabaseLib = window.supabase;
+        if (!supabaseLib) throw new Error('Supabase CDN script not loaded yet');
+        window.supabaseClient = supabaseLib.createClient(supabaseUrl, supabaseKey, {
+          auth: { persistSession: false }
+        });
+        console.log('[Panel] Supabase client initialised');
+
+        wireEvents();
+
+        (async function () {
+          try {
+            if (supabaseKey && supabaseKey !== 'YOUR_SUPABASE_ANON_KEY') {
+              await loadDashboardData();
+            } else {
+              revealConfig();
+              topicInput.value = '"Artificial Intelligence" OR "DevOps"';
+              savedTopic = topicInput.value;
+              savedPpd = 2;
+              setPpdUI(2);
+              dirty = false;
+              refreshStatusLabel();
+              var demo = [
+                { id: 3, post_text: 'AI is reshaping how we think about infrastructure. Here are 3 lessons from migrating 500+ microservices to a Kubernetes-native platform.', topic_used: 'Artificial Intelligence', published_at: new Date(Date.now() - 3600000 * 2).toISOString() },
+                { id: 2, post_text: 'DevOps is not about tools — it is about culture. A quick thread on building psychological safety in high-performance engineering teams.', topic_used: 'DevOps', published_at: new Date(Date.now() - 3600000 * 26).toISOString() },
+                { id: 1, post_text: 'Just published my deep dive on event-driven architecture with Kafka and Supabase. Real-time streams at scale have never been more accessible.', topic_used: 'Artificial Intelligence', published_at: new Date(Date.now() - 3600000 * 72).toISOString() }
+              ];
+              revealHistory(demo);
+              toast('Demo mode – set supabaseKey and N8N_WEBHOOK_URL for live mode', 'info');
+            }
+            dataLoaded = true;
+            clearTimeout(fallbackTimer);
+            if (overlay) overlay.style.display = 'none';
+
+            if (supabaseKey && supabaseKey !== 'YOUR_SUPABASE_ANON_KEY') {
+              setInterval(async function () {
+                try {
+                  if (!window.supabaseClient) return;
+                  var r = await window.supabaseClient.from('posts_history').select('id, post_text, topic_used, published_at').order('published_at', { ascending: false }).limit(HISTORY_LIMIT);
+                  if (r.error) throw r.error;
+                  renderHistory(r.data || []);
+                } catch (err) { console.error('[Panel] Auto-refresh failed:', err); }
+              }, 30000);
+            }
+          } catch (err) {
+            console.error('[Panel] Data-loading error:', err);
+            if (overlay) overlay.style.display = 'none';
+            revealConfig();
+            revealHistory([]);
+            clearTimeout(fallbackTimer);
+            dataLoaded = true;
+          }
+        })();
+
+      } catch (error) {
+        console.error('[Panel] Initialization failed:', error);
+        if (overlay) overlay.style.display = 'none';
+        revealConfig();
+        revealHistory([]);
+        clearTimeout(fallbackTimer);
+        dataLoaded = true;
+        toast('Initialization failed – see console (F12) for details', 'error');
+      }
+    });
+  </script>
+</body>
+</html>
