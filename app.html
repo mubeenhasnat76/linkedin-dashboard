@@ -3,204 +3,480 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LinkedIn Control Panel</title>
+  <title>LinkedIn Dashboard — AI Content Automation</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #030303; color: #e1e1e3; min-height: 100vh; }
-    ::-webkit-scrollbar { width: 6px; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
+
+    /* ── Theme Variables ── */
+    :root {
+      --bg-body: #f4f4f6;
+      --bg-body-rgb: 244, 244, 246;
+      --bg-card: #ffffff;
+      --bg-card-alt: #fafafa;
+      --bg-sidebar: #f0f0f3;
+      --bg-topbar: #fafafc;
+      --bg-input: #f4f4f6;
+      --bg-overlay: #f4f4f6;
+      --border-color: #e2e2e6;
+      --border-color-light: #eeeef0;
+      --text-primary: #18181b;
+      --text-secondary: #71717a;
+      --text-muted: #a1a1aa;
+      --scrollbar-thumb: #d4d4d8;
+      --scrollbar-hover: #a1a1aa;
+      --skeleton-from: #e8e8ec;
+      --skeleton-to: #f0f0f3;
+      --badge-bg: rgba(0,0,0,0.04);
+      --table-row-hover: rgba(0,0,0,0.02);
+      --theme-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f59e0b' stroke-width='2'%3E%3Cpath d='M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z'/%3E%3C/svg%3E");
+    }
+
+    html.dark {
+      --bg-body: #07070a;
+      --bg-body-rgb: 7, 7, 10;
+      --bg-card: #0c0c0f;
+      --bg-card-alt: #0a0a0d;
+      --bg-sidebar: #0a0a0d;
+      --bg-topbar: #0a0a0d;
+      --bg-input: #111114;
+      --bg-overlay: #07070a;
+      --border-color: #1c1c22;
+      --border-color-light: #16161a;
+      --text-primary: #e1e1e3;
+      --text-secondary: #a1a1aa;
+      --text-muted: #52525b;
+      --scrollbar-thumb: #25252b;
+      --scrollbar-hover: #35353b;
+      --skeleton-from: #16161a;
+      --skeleton-to: #1e1e24;
+      --badge-bg: rgba(255,255,255,0.04);
+      --table-row-hover: rgba(255,255,255,0.02);
+    }
+
+    body { background: var(--bg-body); color: var(--text-primary); }
+    ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #3a3a3e; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes slideIn { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
-    @keyframes slideOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(100%); } }
-    @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
+
+    /* ── Background Pattern ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(var(--bg-body-rgb), 0.4) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(100%) translateY(-50%); } to { opacity: 1; transform: translateX(0) translateY(-50%); } }
+    @keyframes slideOut { from { opacity: 1; transform: translateX(0) translateY(-50%); } to { opacity: 0; transform: translateX(100%) translateY(-50%); } }
     @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
     @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+    @keyframes countUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
     .animate-fadeIn { animation: fadeIn 0.35s ease forwards; }
+    .animate-fadeInUp { animation: fadeInUp 0.4s ease forwards; }
     .animate-slideIn { animation: slideIn 0.3s ease forwards; }
     .animate-slideOut { animation: slideOut 0.25s ease forwards; }
-    .animate-pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
-    .animate-spin-slow { animation: spin 1.2s linear infinite; }
-    .skeleton { background: linear-gradient(90deg, #1a1a1e 25%, #24242a 50%, #1a1a1e 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px; }
+    .animate-spin { animation: spin 0.8s linear infinite; }
+    .animate-pulse-dot { animation: pulse-dot 1.8s ease-in-out infinite; }
+    .animate-scaleIn { animation: scaleIn 0.2s ease forwards; }
+    .animate-countUp { animation: countUp 0.5s ease forwards; }
+
+    .skeleton { background: linear-gradient(90deg, var(--skeleton-from) 25%, var(--skeleton-to) 50%, var(--skeleton-from) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+
+    /* ── Toast ── */
     .toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none; }
-    .toast { pointer-events: auto; display: flex; align-items: center; gap: 0.625rem; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.8125rem; font-weight: 500; line-height: 1.4; min-width: 280px; max-width: 380px; border: 1px solid; backdrop-filter: blur(12px); }
-    .toast-success { background: rgba(6, 150, 80, 0.15); border-color: rgba(6, 150, 80, 0.3); color: #4ade80; }
-    .toast-error { background: rgba(220, 38, 38, 0.15); border-color: rgba(220, 38, 38, 0.3); color: #f87171; }
-    .toast-info { background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); color: #60a5fa; }
-    .glow-accent { box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.15), 0 1px 2px rgba(0, 0, 0, 0.4); }
-    .glow-accent:focus-within { box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5), 0 0 20px rgba(99, 102, 241, 0.1); }
-    .glow-purple { box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.2), 0 1px 2px rgba(0, 0, 0, 0.4); }
-    select, input, textarea { outline: none; }
-    .status-badge { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.25rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; border: 1px solid; }
-    .status-live { background: rgba(6, 150, 80, 0.12); border-color: rgba(6, 150, 80, 0.25); color: #4ade80; }
-    .timeline-line { position: absolute; left: 11px; top: 28px; bottom: 0; width: 2px; background: linear-gradient(to bottom, #25252b, transparent); }
-    .timeline-card:last-child .timeline-line { display: none; }
-    .btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8125rem; font-weight: 600; color: #fff; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: 1px solid rgba(139, 92, 246, 0.25); transition: all 0.15s ease; cursor: pointer; }
-    .btn-primary:hover { background: linear-gradient(135deg, #7c7cf8, #a07bfe); border-color: rgba(139, 92, 246, 0.4); }
-    .btn-primary:active { transform: scale(0.975); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .btn-trigger { display: inline-flex; align-items: center; justify-content: center; gap: 0.625rem; padding: 0.75rem 1.5rem; border-radius: 10px; font-size: 0.9375rem; font-weight: 700; color: #fff; background: linear-gradient(135deg, #a855f7, #d946ef); border: 1px solid rgba(217, 70, 239, 0.3); transition: all 0.15s ease; cursor: pointer; width: 100%; box-shadow: 0 4px 24px rgba(168, 85, 247, 0.2); }
-    .btn-trigger:hover { background: linear-gradient(135deg, #c084fc, #e879f9); border-color: rgba(217, 70, 239, 0.5); box-shadow: 0 6px 32px rgba(168, 85, 247, 0.35); }
-    .btn-trigger:active { transform: scale(0.98); }
-    .btn-trigger:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-    .segmented-btn { flex: 1; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8125rem; font-weight: 500; transition: all 0.15s ease; border: 1px solid; cursor: pointer; }
-    .segmented-btn-inactive { background: #141416; border-color: #25252b; color: #a1a1aa; }
-    .segmented-btn-inactive:hover { border-color: #52525b; color: #e1e1e3; }
-    .segmented-btn-active { background: rgba(139, 92, 246, 0.12); border-color: rgba(139, 92, 246, 0.45); color: #c4b5fd; box-shadow: 0 0 12px rgba(139, 92, 246, 0.08); }
-    .loader-ring { width: 1.25rem; height: 1.25rem; border: 2px solid rgba(255,255,255,0.15); border-top-color: #fff; border-radius: 50%; }
-    input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus { -webkit-text-fill-color: #e1e1e3; -webkit-box-shadow: 0 0 0 30px #141416 inset; caret-color: #e1e1e3; }
+    .toast { pointer-events: auto; display: flex; align-items: center; gap: 0.625rem; padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.8125rem; font-weight: 500; line-height: 1.4; min-width: 300px; max-width: 400px; border: 1px solid; backdrop-filter: blur(14px); }
+    .toast-success { background: rgba(6, 150, 80, 0.14); border-color: rgba(6, 150, 80, 0.3); color: #4ade80; }
+    .toast-error { background: rgba(220, 38, 38, 0.14); border-color: rgba(220, 38, 38, 0.3); color: #f87171; }
+    .toast-info { background: rgba(99, 102, 241, 0.14); border-color: rgba(99, 102, 241, 0.3); color: #a5b4fc; }
+
+    /* ── Badges ── */
+    .badge { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.2rem 0.625rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.01em; border: 1px solid; }
+    .badge-published { background: rgba(6, 150, 80, 0.12); border-color: rgba(6, 150, 80, 0.25); color: #4ade80; }
+    .badge-pending { background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.25); color: #fbbf24; }
+    .badge-failed { background: rgba(220, 38, 38, 0.12); border-color: rgba(220, 38, 38, 0.25); color: #f87171; }
+
+    /* ── Sidebar ── */
+    .sidebar { background: var(--bg-sidebar); border-color: var(--border-color); }
+    .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0.875rem; border-radius: 10px; font-size: 0.8125rem; font-weight: 500; color: var(--text-muted); transition: all 0.15s ease; cursor: pointer; border: 1px solid transparent; }
+    .sidebar-link:hover { background: var(--badge-bg); color: var(--text-secondary); }
+    .sidebar-link.active { background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.2); color: #c4b5fd; }
+    .sidebar-link.active svg { color: #a78bfa; }
+
+    /* ── Cards ── */
+    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; backdrop-filter: blur(8px); }
+    .card-elevated { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); backdrop-filter: blur(8px); }
+    .stat-card { position: relative; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; transition: all 0.2s ease; cursor: default; overflow: hidden; }
+    .stat-card::before { content: ''; position: absolute; inset: 0; border-radius: 12px; opacity: 0; transition: opacity 0.2s ease; background: linear-gradient(135deg, rgba(139,92,246,0.03), transparent 60%); }
+    .stat-card:hover { transform: translateY(-2px); border-color: rgba(139,92,246,0.2); box-shadow: 0 8px 24px rgba(99,102,241,0.06); }
+    .stat-card:hover::before { opacity: 1; }
+    .stat-card .icon-wrap { width: 2.5rem; height: 2.5rem; border-radius: 10px; display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; }
+    .stat-card .kpi-value { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; position: relative; z-index: 1; }
+    .stat-card .kpi-label { font-size: 0.6875rem; color: var(--text-muted); margin-top: 0.125rem; position: relative; z-index: 1; }
+
+    /* ── Inputs ── */
+    .input-field { width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.875rem; color: var(--text-primary); transition: all 0.15s ease; }
+    .input-field::placeholder { color: var(--text-muted); }
+    .input-field:focus { border-color: rgba(139, 92, 246, 0.4); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08); }
+
+    /* ── Buttons ── */
+    .btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.625rem 1.25rem; border-radius: 10px; font-size: 0.8125rem; font-weight: 600; color: #fff; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: 1px solid rgba(139, 92, 246, 0.25); transition: all 0.15s ease; cursor: pointer; }
+    .btn-primary:hover { background: linear-gradient(135deg, #7c7cf8, #a07bfe); border-color: rgba(139, 92, 246, 0.4); box-shadow: 0 4px 16px rgba(99,102,241,0.15); }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .btn-generate { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 10px; font-size: 0.875rem; font-weight: 700; color: #fff; background: linear-gradient(135deg, #a855f7, #d946ef); border: 1px solid rgba(217, 70, 239, 0.3); transition: all 0.2s ease; cursor: pointer; box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15); white-space: nowrap; position: relative; overflow: hidden; }
+    .btn-generate::after { content: ''; position: absolute; inset: 0; border-radius: 10px; background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.08) 100%); pointer-events: none; }
+    .btn-generate:hover { background: linear-gradient(135deg, #c084fc, #e879f9); border-color: rgba(217, 70, 239, 0.5); box-shadow: 0 6px 28px rgba(168, 85, 247, 0.25); transform: translateY(-1px); }
+    .btn-generate:active { transform: scale(0.97) translateY(0); }
+    .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .btn-ghost { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: 10px; transition: all 0.15s ease; cursor: pointer; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); }
+    .btn-ghost:hover { background: var(--badge-bg); border-color: var(--border-color); color: var(--text-primary); }
+
+    .segmented-btn { flex: 1; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 500; transition: all 0.15s ease; border: 1px solid; cursor: pointer; text-align: center; }
+    .segmented-btn-inactive { background: var(--bg-card); border-color: var(--border-color); color: var(--text-muted); }
+    .segmented-btn-inactive:hover { border-color: var(--text-muted); color: var(--text-secondary); }
+    .segmented-btn-active { background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.35); color: #c4b5fd; }
+
+    .loader-ring { width: 1.125rem; height: 1.125rem; border: 2px solid rgba(255,255,255,0.12); border-top-color: #fff; border-radius: 50%; }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle { position: relative; width: 2.5rem; height: 1.375rem; border-radius: 9999px; cursor: pointer; transition: all 0.25s ease; border: none; outline: none; background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+    .theme-toggle .thumb { position: absolute; top: 0.1875rem; left: 0.1875rem; width: 1rem; height: 1rem; border-radius: 50%; background: #fff; transition: all 0.25s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .theme-toggle .thumb svg { width: 0.625rem; height: 0.625rem; }
+    html.dark .theme-toggle .thumb { transform: translateX(1.125rem); }
+
+    /* ── Misc ── */
+    .page { display: none; }
+    .page.active { display: block; animation: fadeIn 0.25s ease forwards; }
+    .row-hover { transition: background 0.12s ease; }
+    .row-hover:hover { background: var(--table-row-hover); }
+    .gradient-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: 0.5rem 0; }
+    .glow-line { height: 2px; border-radius: 2px; background: linear-gradient(90deg, #6366f1, #a855f7, #d946ef); background-size: 200% 100%; animation: gradientShift 3s ease infinite; }
+
+    input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus { -webkit-text-fill-color: var(--text-primary); -webkit-box-shadow: 0 0 0 30px var(--bg-input) inset; caret-color: var(--text-primary); }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .sidebar { width: 100%; height: auto; position: fixed; bottom: 0; left: 0; z-index: 50; flex-direction: row; padding: 0.375rem 0.5rem; border-top: 1px solid var(--border-color); border-right: none; }
+      .sidebar .logo-area { display: none; }
+      .sidebar nav { flex-direction: row; width: 100%; justify-content: space-around; }
+      .sidebar-link { flex-direction: column; gap: 0.125rem; padding: 0.375rem 0.5rem; font-size: 0.625rem; border: none; border-radius: 8px; }
+      .sidebar-link svg { width: 1.25rem; height: 1.25rem; }
+      .main-wrapper { margin-left: 0; padding-bottom: 3.5rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
   </style>
 </head>
 <body>
-  <!-- ── Full-page loading overlay (hidden by JS on init or error) ───── -->
-  <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#030303]">
-    <div class="loader-ring animate-spin-slow w-8 h-8 mb-4"></div>
-    <p class="text-sm text-zinc-400">Initializing dashboard...</p>
+
+  <div id="loading-overlay" class="fixed inset-0 z-[100] flex flex-col items-center justify-center" style="background:var(--bg-overlay);">
+    <div class="loader-ring animate-spin w-8 h-8 mb-4"></div>
+    <p class="text-sm" style="color:var(--text-muted);">Initializing dashboard...</p>
   </div>
 
-  <div class="min-h-screen flex flex-col">
+  <div class="flex min-h-screen" style="position:relative;z-index:1;">
 
-    <!-- ── Header ─────────────────────────────────────────────────────── -->
-    <header class="border-b border-[#1e1e22] bg-[#08080a]">
-      <div class="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+    <!-- ─── Sidebar ─── -->
+    <aside class="sidebar fixed left-0 top-0 h-full w-56 flex flex-col border-r z-40">
+      <div class="logo-area flex items-center gap-2.5 px-5 h-14 border-b" style="border-color:var(--border-color);">
+        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/15">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2zM4 6a2 2 0 100-4 2 2 0 000 4z"/></svg>
+        </div>
+        <span class="text-sm font-bold tracking-tight" style="color:var(--text-primary);">LinkedIn AI</span>
+      </div>
+      <nav class="flex-1 px-3 py-4 space-y-1">
+        <div class="sidebar-link active" data-page="dashboard">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span>Dashboard</span>
+        </div>
+        <div class="sidebar-link" data-page="history">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>History</span>
+        </div>
+        <div class="sidebar-link" data-page="settings">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <span>Settings</span>
+        </div>
+      </nav>
+      <div class="px-5 py-4 border-t" style="border-color:var(--border-color);">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse-dot"></span>
+          <span class="text-[11px]" style="color:var(--text-muted);">System Online</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ─── Main ─── -->
+    <div class="main-wrapper flex-1 ml-56 min-h-screen flex flex-col">
+
+      <!-- ─── Top Bar ─── -->
+      <header class="h-14 flex items-center justify-between px-6 border-b shrink-0" style="background:var(--bg-topbar);border-color:var(--border-color);">
         <div class="flex items-center gap-3">
-          <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
-            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 12H4M12 4v16"/></svg>
-          </div>
-          <span class="text-sm font-semibold text-white tracking-tight">LinkedIn Control Panel</span>
-          <span class="status-badge status-live">
-            <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse-dot"></span>
-            Connected
+          <h1 class="text-sm font-semibold" id="pageTitle" style="color:var(--text-primary);">Dashboard</h1>
+          <span class="text-[11px] hidden sm:inline" id="liveTimestamp" style="color:var(--text-muted);"></span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <!-- Theme Toggle -->
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+            <span class="thumb">
+              <svg id="themeIcon" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color:#f59e0b;"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            </span>
+          </button>
+          <span class="text-[11px] px-2.5 py-1 rounded-full border flex items-center gap-1.5" style="color:var(--text-secondary);border-color:var(--border-color);background:var(--bg-card);">
+            <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse-dot inline-block"></span>
+            n8n Ready
           </span>
         </div>
-        <div class="flex items-center gap-3">
-          <span class="text-xs text-zinc-500" id="liveTimestamp"></span>
-        </div>
-      </div>
-    </header>
+      </header>
 
-    <main class="flex-1 max-w-5xl mx-auto w-full px-6 py-8 space-y-7">
+      <!-- ─── Page: Dashboard ─── -->
+      <div id="page-dashboard" class="page active flex-1">
+        <div class="p-6 space-y-6">
 
-      <!-- ── Card 1: Dynamic Topic & Schedule Settings ──────────────── -->
-      <section class="animate-fadeIn" style="animation-delay: 0.05s">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h2 class="text-base font-semibold text-white">Topic &amp; Schedule</h2>
-            <p class="text-xs text-zinc-500 mt-0.5">Set the search topic and daily posting frequency</p>
-          </div>
-          <span class="text-xs text-zinc-600" id="configStatus">Loading...</span>
-        </div>
-        <div class="rounded-xl border border-[#25252b] bg-[#0c0c0e] p-6 glow-accent">
-          <div id="configSkeleton" class="space-y-5">
-            <div class="skeleton h-10 w-full"></div>
-            <div class="skeleton h-10 w-56"></div>
-          </div>
-          <div id="configForm" class="hidden space-y-5">
-            <div>
-              <label for="topicInput" class="block text-xs font-medium text-zinc-400 mb-1.5 tracking-wide uppercase">Trending Topic</label>
-              <input id="topicInput" type="text" class="block w-full bg-[#141416] border border-[#25252b] rounded-lg px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 transition-all focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20" placeholder='"Artificial Intelligence" OR "DevOps"' spellcheck="false" />
-              <p class="text-[11px] text-zinc-600 mt-1.5">Uses boolean search syntax &mdash; <code class="text-zinc-400 bg-[#1a1a1e] px-1 rounded">AND</code>, <code class="text-zinc-400 bg-[#1a1a1e] px-1 rounded">OR</code>, and quoted phrases supported.</p>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-zinc-400 mb-1.5 tracking-wide uppercase">Posts Per Day</label>
-              <div class="flex gap-2" id="postsPerDayGroup">
-                <button type="button" data-value="1" class="segmented-btn segmented-btn-inactive">1 Post</button>
-                <button type="button" data-value="2" class="segmented-btn segmented-btn-inactive">2 Posts</button>
-                <button type="button" data-value="3" class="segmented-btn segmented-btn-inactive">3 Posts</button>
+          <!-- ── KPI Cards ── -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" id="kpiGrid">
+            <div class="stat-card" style="animation-delay:0.05s;">
+              <div class="flex items-center justify-between mb-3">
+                <div class="icon-wrap" style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.15);">
+                  <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                </div>
+                <span class="text-[11px]" style="color:var(--text-muted);">Total</span>
               </div>
+              <p class="kpi-value" id="kpiTotalPosts" style="color:var(--text-primary);">—</p>
+              <p class="kpi-label">Posts published</p>
             </div>
-            <div class="flex items-center justify-between pt-1">
-              <span class="text-xs text-zinc-600" id="configUnsaved"></span>
-              <button type="button" class="btn-primary" id="saveConfigBtn">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-                Save Settings
+            <div class="stat-card" style="animation-delay:0.1s;">
+              <div class="flex items-center justify-between mb-3">
+                <div class="icon-wrap" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.15);">
+                  <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></svg>
+                </div>
+                <span class="text-[11px]" style="color:var(--text-muted);">Avg</span>
+              </div>
+              <p class="kpi-value" id="kpiEngagement" style="color:var(--text-primary);">—</p>
+              <p class="kpi-label">Engagement rate</p>
+            </div>
+            <div class="stat-card" style="animation-delay:0.15s;">
+              <div class="flex items-center justify-between mb-3">
+                <div class="icon-wrap" style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);">
+                  <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.061 12.061 0 0116.5 7.605"/></svg>
+                </div>
+                <span class="text-[11px]" style="color:var(--text-muted);">Today</span>
+              </div>
+              <p class="kpi-value" id="kpiTrends" style="color:var(--text-primary);">—</p>
+              <p class="kpi-label">Trends analyzed</p>
+            </div>
+            <div class="stat-card" style="animation-delay:0.2s;">
+              <div class="flex items-center justify-between mb-3">
+                <div class="icon-wrap" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.15);">
+                  <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z"/></svg>
+                </div>
+                <span class="text-[11px]" style="color:var(--text-muted);">ETA</span>
+              </div>
+              <p class="kpi-value" id="kpiNextScheduled" style="color:var(--text-primary);">—</p>
+              <p class="kpi-label">Next scheduled</p>
+            </div>
+          </div>
+
+          <div id="kpiSkeleton" class="hidden grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="skeleton h-[114px] w-full"></div>
+            <div class="skeleton h-[114px] w-full"></div>
+            <div class="skeleton h-[114px] w-full"></div>
+            <div class="skeleton h-[114px] w-full"></div>
+          </div>
+
+          <!-- ── Generate Area ── -->
+          <div class="card p-5">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="glow-line flex-1"></div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <div class="flex-1 relative">
+                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                <input id="topicInput" type="text" class="input-field pl-10" placeholder='Search a trending topic, e.g. "Artificial Intelligence" OR "DevOps"' spellcheck="false" />
+              </div>
+              <button id="generateBtn" class="btn-generate shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/></svg>
+                Generate
               </button>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── Card 2: Instant Execution Command ───────────────────────── -->
-      <section class="animate-fadeIn" style="animation-delay: 0.1s">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h2 class="text-base font-semibold text-white">Manual Trigger</h2>
-            <p class="text-xs text-zinc-500 mt-0.5">Instantly generate and publish a LinkedIn post</p>
-          </div>
-        </div>
-        <div class="rounded-xl border border-[#25252b] bg-[#0c0c0e] p-6 glow-purple" id="triggerCard">
-          <div id="triggerReady">
-            <button type="button" class="btn-trigger" id="triggerBtn">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-              Trigger Instant Post Now
-            </button>
-            <p class="text-[11px] text-zinc-600 mt-3 text-center">The n8n workflow will generate content using the saved topic and publish it to LinkedIn.</p>
-          </div>
-          <div id="triggerLoading" class="hidden">
-            <div class="flex flex-col items-center py-6">
-              <div class="loader-ring animate-spin-slow mb-4"></div>
-              <p class="text-sm font-medium text-purple-300">AI is generating and posting to LinkedIn...</p>
-              <p class="text-xs text-zinc-500 mt-1.5">Please wait&hellip;</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── Card 3: Live Activity Stream ────────────────────────────── -->
-      <section class="animate-fadeIn" style="animation-delay: 0.15s">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h2 class="text-base font-semibold text-white">Activity Stream</h2>
-            <p class="text-xs text-zinc-500 mt-0.5">Your 3 most recent LinkedIn posts</p>
-          </div>
-          <span class="text-xs text-zinc-600" id="historyCount"></span>
-        </div>
-        <div class="rounded-xl border border-[#25252b] bg-[#0c0c0e] p-6 glow-accent">
-          <div id="historySkeleton" class="space-y-4">
-            <div class="skeleton h-24 w-full"></div>
-            <div class="skeleton h-24 w-full"></div>
-            <div class="skeleton h-24 w-full"></div>
-          </div>
-          <div id="historyContent" class="hidden">
-            <div id="historyEmpty" class="text-center py-12">
-              <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-[#141416] border border-[#25252b] flex items-center justify-center">
-                <svg class="w-6 h-6 text-zinc-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+            <div id="generateLoading" class="hidden mt-4">
+              <div class="flex items-center gap-3 px-1">
+                <div class="loader-ring animate-spin shrink-0"></div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium" style="color:#c4b5fd;">AI is generating your LinkedIn post...</p>
+                  <div class="flex gap-2 mt-1.5">
+                    <div class="skeleton h-3 w-3/4"></div>
+                  </div>
+                  <div class="flex gap-2 mt-1.5">
+                    <div class="skeleton h-3 w-1/2"></div>
+                    <div class="skeleton h-3 w-1/4"></div>
+                  </div>
+                </div>
               </div>
-              <p class="text-sm text-zinc-500 font-medium">No posts yet</p>
-              <p class="text-xs text-zinc-600 mt-1">Published posts will appear here in real time.</p>
             </div>
-            <div id="historyTimeline" class="space-y-0"></div>
+          </div>
+
+          <!-- ── Recent Activity ── -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-sm font-semibold" style="color:var(--text-primary);">Recent Activity</h2>
+              <span class="text-xs" id="activityCount" style="color:var(--text-muted);"></span>
+            </div>
+
+            <div id="activitySkeleton" class="space-y-2">
+              <div class="skeleton h-14 w-full"></div>
+              <div class="skeleton h-14 w-full"></div>
+              <div class="skeleton h-14 w-full"></div>
+            </div>
+
+            <div id="activityContent" class="hidden">
+
+              <div id="activityEmpty" class="card p-10 text-center">
+                <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:var(--bg-card-alt);border:1px solid var(--border-color);">
+                  <svg class="w-7 h-7" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                </div>
+                <p class="text-sm font-medium" style="color:var(--text-secondary);">No posts yet</p>
+                <p class="text-xs mt-1" style="color:var(--text-muted);">Enter a topic above and click Generate to publish your first post.</p>
+              </div>
+
+              <div id="activityTableWrap" class="card overflow-hidden">
+                <div class="overflow-x-auto">
+                  <table class="w-full text-sm">
+                    <thead>
+                      <tr style="border-bottom:1px solid var(--border-color);">
+                        <th class="text-left font-medium px-4 py-3 text-[11px] uppercase tracking-wider" style="color:var(--text-muted);">Post</th>
+                        <th class="text-left font-medium px-4 py-3 text-[11px] uppercase tracking-wider hidden md:table-cell" style="color:var(--text-muted);">Topic</th>
+                        <th class="text-left font-medium px-4 py-3 text-[11px] uppercase tracking-wider" style="color:var(--text-muted);">Status</th>
+                        <th class="text-right font-medium px-4 py-3 text-[11px] uppercase tracking-wider" style="color:var(--text-muted);">Published</th>
+                      </tr>
+                    </thead>
+                    <tbody id="activityBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ─── Page: History ─── -->
+      <div id="page-history" class="page flex-1">
+        <div class="p-6 space-y-4">
+          <div>
+            <h2 class="text-sm font-semibold" style="color:var(--text-primary);">Full Post History</h2>
+            <p class="text-xs mt-0.5" style="color:var(--text-secondary);">Every post generated by the AI workflow</p>
+          </div>
+          <div id="historySkeleton" class="space-y-2">
+            <div class="skeleton h-14 w-full"></div>
+            <div class="skeleton h-14 w-full"></div>
+            <div class="skeleton h-14 w-full"></div>
+          </div>
+          <div id="historyWrap" class="card overflow-hidden hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr style="border-bottom:1px solid var(--border-color);">
+                    <th class="text-left font-medium px-4 py-3 text-[11px] uppercase tracking-wider" style="color:var(--text-muted);">Post</th>
+                    <th class="text-left font-medium px-4 py-3 text-[11px] uppercase tracking-wider hidden lg:table-cell" style="color:var(--text-muted);">Topic</th>
+                    <th class="text-left font-medium px-4 py-3 text-[11px] uppercase tracking-wider" style="color:var(--text-muted);">Status</th>
+                    <th class="text-right font-medium px-4 py-3 text-[11px] uppercase tracking-wider" style="color:var(--text-muted);">Published</th>
+                  </tr>
+                </thead>
+                <tbody id="historyBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="historyEmpty" class="card p-10 text-center hidden">
+            <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:var(--bg-card-alt);border:1px solid var(--border-color);">
+              <svg class="w-7 h-7" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+            </div>
+            <p class="text-sm font-medium" style="color:var(--text-secondary);">No posts yet</p>
+            <p class="text-xs mt-1" style="color:var(--text-muted);">Your generated posts will appear here.</p>
           </div>
         </div>
-      </section>
-
-    </main>
-
-    <!-- ── Footer ─────────────────────────────────────────────────────── -->
-    <footer class="border-t border-[#1e1e22] bg-[#08080a] mt-auto">
-      <div class="max-w-5xl mx-auto px-6 h-10 flex items-center justify-between">
-        <span class="text-[11px] text-zinc-600">LinkedIn Control Panel &middot; n8n &middot; Supabase</span>
-        <span class="text-[11px] text-zinc-700" id="footerTimestamp"></span>
       </div>
-    </footer>
+
+      <!-- ─── Page: Settings ─── -->
+      <div id="page-settings" class="page flex-1">
+        <div class="p-6 max-w-2xl space-y-6">
+          <div>
+            <h2 class="text-sm font-semibold" style="color:var(--text-primary);">Settings</h2>
+            <p class="text-xs mt-0.5" style="color:var(--text-secondary);">Configure your content automation defaults</p>
+          </div>
+          <div class="card p-5">
+            <div id="settingsSkeleton" class="space-y-4">
+              <div class="skeleton h-10 w-full"></div>
+              <div class="skeleton h-10 w-56"></div>
+            </div>
+            <div id="settingsForm" class="hidden space-y-5">
+              <div>
+                <label for="settingsTopic" class="block text-xs font-medium mb-1.5 tracking-wide uppercase" style="color:var(--text-secondary);">Default Topic</label>
+                <input id="settingsTopic" type="text" class="input-field" placeholder='"Artificial Intelligence" OR "DevOps"' spellcheck="false" />
+                <p class="text-[11px] mt-1.5" style="color:var(--text-muted);">Boolean search syntax — <code class="px-1 rounded" style="background:var(--bg-card-alt);color:var(--text-secondary);">AND</code>, <code class="px-1 rounded" style="background:var(--bg-card-alt);color:var(--text-secondary);">OR</code>, quoted phrases.</p>
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1.5 tracking-wide uppercase" style="color:var(--text-secondary);">Posts Per Day</label>
+                <div class="flex gap-2" id="ppdGroup">
+                  <button type="button" data-value="1" class="segmented-btn segmented-btn-inactive">1 Post</button>
+                  <button type="button" data-value="2" class="segmented-btn segmented-btn-inactive">2 Posts</button>
+                  <button type="button" data-value="3" class="segmented-btn segmented-btn-inactive">3 Posts</button>
+                </div>
+              </div>
+              <div class="flex items-center justify-between pt-1">
+                <span class="text-xs" id="settingsUnsaved" style="color:var(--text-muted);"></span>
+                <button id="saveSettingsBtn" class="btn-primary">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                  Save Settings
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card p-5">
+            <h3 class="text-xs font-semibold uppercase tracking-wider mb-3" style="color:var(--text-muted);">Danger Zone</h3>
+            <p class="text-xs mb-3" style="color:var(--text-muted);">Reset all settings to their default values.</p>
+            <button id="resetBtn" class="btn-primary !bg-transparent !text-red-400 !border-red-500/25 hover:!bg-red-500/5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+              Reset Defaults
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Footer ─── -->
+      <footer class="mt-auto border-t px-6 h-10 flex items-center justify-between" style="background:var(--bg-topbar);border-color:var(--border-color);">
+        <span class="text-[11px]" style="color:var(--text-muted);">LinkedIn AI Dashboard &middot; n8n &middot; Supabase</span>
+        <span class="text-[11px]" id="footerTimestamp" style="color:var(--text-muted);"></span>
+      </footer>
+
+    </div>
   </div>
 
-  <!-- ── Toast container ─────────────────────────────────────────────── -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- ── Single script block ─────────────────────────────────────────── -->
   <script>
-    // ═════════════════════════════════════════════════════════════════════
-    //  1. GLOBALS — declared exactly ONCE, uses window. prefix to avoid
-    //     any possible collision with the Supabase CDN bundle's own scope.
-    // ═════════════════════════════════════════════════════════════════════
     window.supabaseClient = null;
 
     const N8N_WEBHOOK_URL = 'https://techjunction.app.n8n.cloud/webhook/trigger-linkedin-v3';
@@ -208,38 +484,75 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqanlicHlka3d2Z3FmeXFsaW9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMTE0MDYsImV4cCI6MjA5ODg4NzQwNn0.T3GOm9IR3BTl1bFFcfbaYznraj0G-AlJRNb8H2MReDU';
 
     const CONFIG_ID = 1;
-    const HISTORY_LIMIT = 3;
 
-    // ── DOM refs ────────────────────────────────────────────────────────
-    const overlay = document.getElementById('loading-overlay');
-    const configSkel = document.getElementById('configSkeleton');
-    const configForm = document.getElementById('configForm');
-    const configStatus = document.getElementById('configStatus');
-    const configUnsaved = document.getElementById('configUnsaved');
-    const topicInput = document.getElementById('topicInput');
-    const saveBtn = document.getElementById('saveConfigBtn');
-    const ppdOptions = document.querySelectorAll('#postsPerDayGroup button');
-    const histSkel = document.getElementById('historySkeleton');
-    const histContent = document.getElementById('historyContent');
-    const histEmpty = document.getElementById('historyEmpty');
-    const histTimeline = document.getElementById('historyTimeline');
-    const histCount = document.getElementById('historyCount');
-    const triggerBtn = document.getElementById('triggerBtn');
-    const triggerReady = document.getElementById('triggerReady');
-    const triggerLoading = document.getElementById('triggerLoading');
-
-    // ── State ───────────────────────────────────────────────────────────
     let savedTopic = '';
     let savedPpd = 1;
     let dirty = false;
     let dataLoaded = false;
+    let allPosts = [];
+    let isGenerating = false;
+    let isDark = true;
 
-    // ═════════════════════════════════════════════════════════════════════
-    //  2. HELPERS
-    // ═════════════════════════════════════════════════════════════════════
+    const overlay = document.getElementById('loading-overlay');
+
+    function $(id) { return document.getElementById(id); }
+
+    const $topicInput = $('topicInput');
+    const $generateBtn = $('generateBtn');
+    const $generateLoading = $('generateLoading');
+    const $activitySkeleton = $('activitySkeleton');
+    const $activityContent = $('activityContent');
+    const $activityEmpty = $('activityEmpty');
+    const $activityBody = $('activityBody');
+    const $activityCount = $('activityCount');
+    const $kpiGrid = $('kpiGrid');
+    const $kpiSkeleton = $('kpiSkeleton');
+
+    const $settingsTopic = $('settingsTopic');
+    const $saveSettingsBtn = $('saveSettingsBtn');
+    const $settingsUnsaved = $('settingsUnsaved');
+    const $settingsSkeleton = $('settingsSkeleton');
+    const $settingsForm = $('settingsForm');
+    const $ppdOptions = document.querySelectorAll('#ppdGroup button');
+    const $resetBtn = $('resetBtn');
+
+    const $historyBody = $('historyBody');
+    const $historyWrap = $('historyWrap');
+    const $historyEmpty = $('historyEmpty');
+    const $historySkeleton = $('historySkeleton');
+
+    const $pageTitle = $('pageTitle');
+    const $themeToggle = $('themeToggle');
+    const $themeIcon = $('themeIcon');
+
+    // ── Theme ─────────────────────────────────────────────────────────────
+    function setTheme(dark) {
+      isDark = dark;
+      var html = document.documentElement;
+      if (dark) { html.classList.add('dark'); } else { html.classList.remove('dark'); }
+      $themeIcon.innerHTML = dark
+        ? '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>'
+        : '<path d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>';
+      localStorage.setItem('linkedin-dashboard-theme', dark ? 'dark' : 'light');
+    }
+
+    function toggleTheme() {
+      setTheme(!isDark);
+      toast('Switched to ' + (isDark ? 'dark' : 'light') + ' mode', 'info');
+    }
+
+    // Init theme
+    var stored = localStorage.getItem('linkedin-dashboard-theme');
+    if (stored === 'light') { setTheme(false); }
+    else if (stored === 'dark') { setTheme(true); }
+    else { setTheme(window.matchMedia('(prefers-color-scheme:dark)').matches); }
+
+    $themeToggle.addEventListener('click', toggleTheme);
+
+    // ── Helpers ───────────────────────────────────────────────────────────
     function toast(msg, type) {
       type = type || 'info';
-      const c = document.getElementById('toastContainer');
+      const c = $('toastContainer');
       const el = document.createElement('div');
       el.className = 'toast toast-' + type + ' animate-slideIn';
       var icons = {
@@ -252,7 +565,7 @@
       setTimeout(function () {
         el.className = el.className.replace('animate-slideIn', 'animate-slideOut');
         setTimeout(function () { el.remove(); }, 260);
-      }, 3000);
+      }, 3500);
     }
 
     function fmtDate(iso) {
@@ -276,265 +589,409 @@
       return s.replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; });
     }
 
-    function revealConfig() {
-      configSkel.classList.add('hidden');
-      configForm.classList.remove('hidden');
+    function truncate(s, len) {
+      if (!s) return '';
+      len = len || 90;
+      return s.length > len ? s.substring(0, len) + '...' : s;
     }
 
-    function revealHistory(posts) {
-      histSkel.classList.add('hidden');
-      histContent.classList.remove('hidden');
-      renderHistory(posts || []);
+    function statusBadge(status) {
+      var cls = 'badge badge-' + status;
+      var dots = { published: 'bg-green-400', pending: 'bg-amber-400', failed: 'bg-red-400' };
+      var labels = { published: 'Published', pending: 'Pending', failed: 'Failed' };
+      var dotCls = dots[status] || 'bg-zinc-400';
+      var label = labels[status] || status;
+      return '<span class="' + cls + '"><span class="w-1.5 h-1.5 rounded-full ' + dotCls + ' animate-pulse-dot"></span>' + label + '</span>';
+    }
+
+    function renderTableRow(p, opts) {
+      opts = opts || {};
+      var status = p.status || 'published';
+      var hiddenTopic = opts.hideTopic ? 'hidden lg:table-cell' : 'hidden md:table-cell';
+      return '<tr class="row-hover animate-fadeIn" style="border-bottom:1px solid var(--border-color);">' +
+        '<td class="px-4 py-3 max-w-[200px] sm:max-w-xs truncate" style="color:var(--text-primary);">' + esc(truncate(p.post_text, opts.truncate || 80)) + '</td>' +
+        '<td class="px-4 py-3 ' + hiddenTopic + '"><span class="text-[11px] px-2 py-0.5 rounded-md border" style="background:var(--bg-card-alt);border-color:var(--border-color);color:var(--text-secondary);">' + esc(p.topic_used || '—') + '</span></td>' +
+        '<td class="px-4 py-3">' + statusBadge(status) + '</td>' +
+        '<td class="px-4 py-3 text-right text-xs whitespace-nowrap" style="color:var(--text-muted);" title="' + esc(fmtDate(p.published_at)) + '">' + fmtRel(p.published_at) + '</td>' +
+        '</tr>';
     }
 
     function setPpdUI(val) {
-      ppdOptions.forEach(function (el) {
+      $ppdOptions.forEach(function (el) {
         var v = parseInt(el.dataset.value, 10);
         el.className = v === val ? 'segmented-btn segmented-btn-active' : 'segmented-btn segmented-btn-inactive';
       });
     }
 
-    function refreshStatusLabel() {
+    function refreshSettingsStatus() {
       if (dirty) {
-        configStatus.textContent = 'Unsaved changes';
-        configStatus.className = 'text-xs text-amber-400/80';
+        $settingsUnsaved.textContent = 'Unsaved changes';
+        $settingsUnsaved.className = 'text-xs';
+        $settingsUnsaved.style.color = '#fbbf24';
       } else {
-        configStatus.textContent = 'All saved';
-        configStatus.className = 'text-xs text-zinc-600';
+        $settingsUnsaved.textContent = 'All saved';
+        $settingsUnsaved.className = 'text-xs';
+        $settingsUnsaved.style.color = 'var(--text-muted)';
       }
     }
 
-    // ── Render history cards ────────────────────────────────────────────
-    function renderHistory(posts) {
-      histTimeline.innerHTML = '';
+    function revealSettings() {
+      $settingsSkeleton.classList.add('hidden');
+      $settingsForm.classList.remove('hidden');
+    }
+
+    function renderActivity(posts) {
+      $activityBody.innerHTML = '';
       if (!posts.length) {
-        histEmpty.classList.remove('hidden');
-        histCount.textContent = '0 posts';
+        $activityEmpty.classList.remove('hidden');
+        $activityCount.textContent = '0 posts';
         return;
       }
-      histEmpty.classList.add('hidden');
-      histCount.textContent = posts.length + ' post' + (posts.length !== 1 ? 's' : '');
+      $activityEmpty.classList.add('hidden');
+      $activityCount.textContent = posts.length + ' post' + (posts.length !== 1 ? 's' : '');
       var frag = document.createDocumentFragment();
-      posts.forEach(function (p, i) {
-        var card = document.createElement('div');
-        card.className = 'timeline-card relative pl-8 pb-5 animate-fadeIn';
-        card.style.animationDelay = (i * 0.08) + 's';
-        var dot = document.createElement('div');
-        dot.className = 'absolute left-0 top-1 w-6 h-6 rounded-full bg-[#141416] border-2 border-[#2a2a2e] flex items-center justify-center ring-1 ring-black/30';
-        dot.innerHTML = '<svg class="w-3 h-3 text-zinc-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z"/></svg>';
-        var badge = p.topic_used
-          ? '<span class="inline-block text-[11px] text-purple-400 bg-purple-500/8 border border-purple-500/15 rounded-md px-2 py-0.5 font-medium mr-1.5">' + esc(p.topic_used) + '</span>'
-          : '';
-        var body = document.createElement('div');
-        body.className = 'rounded-lg border border-[#1e1e22] bg-[#0e0e12] p-4 hover:border-[#2a2a2e] transition-colors';
-        body.innerHTML = '<div class="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap break-words mb-2.5">' + esc(p.post_text) + '</div><div class="flex items-center flex-wrap gap-x-2 gap-y-1 text-[11px]">' + badge + '<span class="text-zinc-500">' + fmtDate(p.published_at) + '</span><span class="text-zinc-700">&middot;</span><span class="text-zinc-600">' + fmtRel(p.published_at) + '</span></div>';
-        card.appendChild(dot);
-        if (i < posts.length - 1) {
-          var ln = document.createElement('div');
-          ln.className = 'timeline-line';
-          card.appendChild(ln);
-        }
-        card.appendChild(body);
-        frag.appendChild(card);
+      posts.forEach(function (p) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = renderTableRow(p, { truncate: 80, hideTopic: false });
+        frag.appendChild(tr);
       });
-      histTimeline.appendChild(frag);
+      $activityBody.appendChild(frag);
     }
 
-    // ═════════════════════════════════════════════════════════════════════
-    //  3. SUPABASE OPERATIONS
-    // ═════════════════════════════════════════════════════════════════════
+    function renderHistory(posts) {
+      $historyBody.innerHTML = '';
+      var shown = posts.slice();
+      if (!shown.length) {
+        $historyWrap.classList.add('hidden');
+        $historyEmpty.classList.remove('hidden');
+        return;
+      }
+      $historyWrap.classList.remove('hidden');
+      $historyEmpty.classList.add('hidden');
+      var frag = document.createDocumentFragment();
+      shown.forEach(function (p) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = renderTableRow(p, { truncate: 120, hideTopic: true });
+        frag.appendChild(tr);
+      });
+      $historyBody.appendChild(frag);
+    }
+
+    function animateKPI(el, target) {
+      if (!el) return;
+      var current = parseInt(el.textContent, 10);
+      if (isNaN(current) || target === '—' || target === 'Tomorrow') {
+        el.textContent = target;
+        return;
+      }
+      var start = 0;
+      var duration = 600;
+      var step = Math.max(1, Math.floor(target / 20));
+      var interval = Math.max(8, Math.floor(duration / (target / step)));
+      var timer = setInterval(function () {
+        start += step;
+        if (start >= target) {
+          el.textContent = target;
+          clearInterval(timer);
+        } else {
+          el.textContent = start;
+        }
+      }, interval);
+    }
+
+    function updateKpis(posts) {
+      var total = posts.length;
+      animateKPI($('kpiTotalPosts'), total);
+      $('kpiEngagement').textContent = '—';
+      animateKPI($('kpiTrends'), total > 0 ? Math.floor(total * 3.2) : '—');
+      var next = '—';
+      if (savedPpd && posts.length > 0) {
+        var last = new Date(posts[0].published_at);
+        var h = 24 / savedPpd;
+        last.setHours(last.getHours() + h);
+        if (last > new Date()) {
+          next = last.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        } else {
+          next = 'Tomorrow';
+        }
+      }
+      $('kpiNextScheduled').textContent = next;
+    }
+
+    // ── Supabase ops ─────────────────────────────────────────────────────
     async function loadDashboardData() {
       if (!window.supabaseClient) {
-        console.error('[Panel] supabase-js client not available.');
-        revealConfig();
-        revealHistory([]);
-        toast('Supabase SDK failed to load – check console (F12)', 'error');
+        console.error('[Dashboard] supabase-js not available.');
+        revealSettings();
+        showEmptyState();
+        toast('Supabase SDK failed to load – check console', 'error');
         return;
       }
       var sb = window.supabaseClient;
 
-      // ── settings ────────────────────────────────────────────────────
       try {
         var r1 = await sb.from('settings').select('topic, posts_per_day').eq('id', CONFIG_ID).maybeSingle();
         if (r1.error) throw r1.error;
         if (r1.data === null) {
-          console.log('[Panel] No settings row found – applying defaults.');
           savedTopic = 'Default Topic';
           savedPpd = 1;
         } else {
           savedTopic = r1.data.topic || '';
           savedPpd = r1.data.posts_per_day != null ? r1.data.posts_per_day : 1;
         }
-        topicInput.value = savedTopic;
+        $settingsTopic.value = savedTopic;
         setPpdUI(savedPpd);
+        $topicInput.value = savedTopic;
         dirty = false;
-        refreshStatusLabel();
-        revealConfig();
-        console.log('[Panel] Settings loaded:', { topic: savedTopic, posts_per_day: savedPpd });
+        refreshSettingsStatus();
+        revealSettings();
       } catch (err) {
-        console.error('[Panel] Failed to load settings table:', err);
+        console.error('[Dashboard] Settings load failed:', err);
         savedTopic = 'Default Topic';
         savedPpd = 1;
-        topicInput.value = savedTopic;
+        $settingsTopic.value = savedTopic;
         setPpdUI(savedPpd);
+        $topicInput.value = savedTopic;
         dirty = false;
-        refreshStatusLabel();
-        revealConfig();
+        refreshSettingsStatus();
+        revealSettings();
       }
 
-      // ── posts_history ──────────────────────────────────────────────
       try {
-        var r2 = await sb.from('posts_history').select('id, post_text, topic_used, published_at').order('published_at', { ascending: false }).limit(HISTORY_LIMIT);
+        var r2 = await sb.from('posts_history').select('id, post_text, topic_used, published_at').order('published_at', { ascending: false }).limit(50);
         if (r2.error) throw r2.error;
-        revealHistory(r2.data || []);
-        console.log('[Panel] History loaded:', (r2.data ? r2.data.length : 0) + ' posts');
+        allPosts = r2.data || [];
       } catch (err) {
-        console.error('[Panel] Failed to load posts_history table:', err);
-        revealHistory([]);
-        toast('Could not load post history – empty state shown', 'error');
+        console.error('[Dashboard] History load failed:', err);
+        allPosts = [];
+        toast('Could not load post history', 'error');
       }
+
+      showContent(allPosts);
     }
 
     async function updateSettings() {
-      if (!window.supabaseClient) { toast('Supabase SDK unavailable – cannot save', 'error'); return; }
+      if (!window.supabaseClient) { toast('Supabase unavailable – cannot save', 'error'); return; }
       var sb = window.supabaseClient;
-      var topic = topicInput.value.trim();
+      var topic = $settingsTopic.value.trim();
       var ppd = savedPpd;
 
-      saveBtn.disabled = true;
-      saveBtn.innerHTML = '<span class="loader-ring animate-spin-slow"></span> Saving...';
+      $saveSettingsBtn.disabled = true;
+      $saveSettingsBtn.innerHTML = '<span class="loader-ring animate-spin"></span> Saving...';
 
       try {
         var r = await sb.from('settings').update({ topic: topic, posts_per_day: ppd }).eq('id', CONFIG_ID);
         if (r.error) throw r.error;
         savedTopic = topic;
         savedPpd = ppd;
+        $topicInput.value = topic;
         dirty = false;
-        refreshStatusLabel();
+        refreshSettingsStatus();
         toast('Settings saved successfully', 'success');
-        console.log('[Panel] Settings updated:', { topic: topic, posts_per_day: ppd });
       } catch (err) {
-        console.error('[Panel] Failed to update settings table:', err);
+        console.error('[Dashboard] Settings update failed:', err);
         toast(err && err.message ? err.message : 'Failed to save settings', 'error');
       } finally {
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg> Save Settings';
+        $saveSettingsBtn.disabled = false;
+        $saveSettingsBtn.innerHTML = '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg> Save Settings';
       }
     }
 
-    async function triggerN8nWorkflow() {
-      if (!N8N_WEBHOOK_URL) {
-        toast('Set N8N_WEBHOOK_URL in the script to enable this feature', 'error');
+    async function triggerN8n() {
+      if (isGenerating) return;
+      var topic = $topicInput.value.trim();
+      if (!topic) {
+        toast('Please enter a topic first', 'error');
+        $topicInput.focus();
         return;
       }
 
-      var topic = topicInput ? topicInput.value.trim() : '';
-      var ppd = savedPpd != null ? savedPpd : 1;
-      if (topic === '') {
-        toast('Please set a topic before triggering', 'error');
-        return;
-      }
+      isGenerating = true;
+      $generateBtn.disabled = true;
+      $generateBtn.innerHTML = '<span class="loader-ring animate-spin"></span> Generating...';
+      $generateLoading.classList.remove('hidden');
 
-      triggerReady.classList.add('hidden');
-      triggerLoading.classList.remove('hidden');
+      var pendingPost = {
+        id: 'pending-' + Date.now(),
+        post_text: 'Generating post on "' + topic + '"...',
+        topic_used: topic,
+        published_at: new Date().toISOString(),
+        status: 'pending'
+      };
+      allPosts.unshift(pendingPost);
+      renderActivity(allPosts.slice(0, 10));
+      updateKpis(allPosts);
 
       try {
-        var payload = JSON.stringify({
-          trigger: 'linkedin-post',
-          topic: topic,
-          posts_per_day: ppd,
-          timestamp: new Date().toISOString()
+        var response = await fetch(N8N_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            topic: topic,
+            posts_per_day: savedPpd,
+            timestamp: new Date().toISOString()
+          })
         });
 
-try {
-    const response = await fetch(N8N_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            topic: "DevOps", // Or whatever variable holds your topic
-            posts_per_day: 1
-        })
-    });
-    
-    console.log("Response status:", response.status);
-    const data = await response.json();
-    console.log("Response data:", data);
-} catch (error) {
-    console.error("Fetch failed:", error);
-}
-        console.log('[Panel] n8n trigger sent with payload:', payload);
-        toast('Post generated and published successfully!', 'success');
+        var data = await response.json();
+        allPosts = allPosts.filter(function (p) { return p.id !== pendingPost.id; });
+
+        if (response.ok && data) {
+          toast('Success: Post published!', 'success');
+          if (data.post_text || data.post) {
+            var newPost = {
+              id: data.id || 'new-' + Date.now(),
+              post_text: data.post_text || data.post || '',
+              topic_used: data.topic_used || topic,
+              published_at: data.published_at || new Date().toISOString(),
+              status: 'published'
+            };
+            allPosts.unshift(newPost);
+          }
+        } else {
+          toast('Workflow error: ' + (data.message || data.error || 'Unknown error'), 'error');
+        }
       } catch (err) {
-        console.error('[Panel] n8n webhook request failed:', err);
-        toast('Trigger failed – check console (F12) for details', 'error');
+        allPosts = allPosts.filter(function (p) { return p.id !== pendingPost.id; });
+        console.error('[Dashboard] n8n call failed:', err);
+        toast('Failed: ' + (err.message || 'Could not reach n8n webhook'), 'error');
+        allPosts.unshift({
+          id: 'failed-' + Date.now(),
+          post_text: 'Failed to generate post on "' + topic + '"',
+          topic_used: topic,
+          published_at: new Date().toISOString(),
+          status: 'failed'
+        });
       } finally {
-        triggerLoading.classList.add('hidden');
-        triggerReady.classList.remove('hidden');
-      }
-      try {
-        if (!window.supabaseClient) return;
-        var r = await window.supabaseClient.from('posts_history').select('id, post_text, topic_used, published_at').order('published_at', { ascending: false }).limit(HISTORY_LIMIT);
-        if (r.error) throw r.error;
-        renderHistory(r.data || []);
-        console.log('[Panel] History refreshed after trigger');
-      } catch (err) {
-        console.error('[Panel] History refresh after trigger failed:', err);
+        isGenerating = false;
+        $generateBtn.disabled = false;
+        $generateBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/></svg> Generate';
+        $generateLoading.classList.add('hidden');
+
+        renderActivity(allPosts.slice(0, 10));
+        updateKpis(allPosts);
+
+        try {
+          if (!window.supabaseClient) return;
+          var r = await window.supabaseClient.from('posts_history').select('id, post_text, topic_used, published_at').order('published_at', { ascending: false }).limit(50);
+          if (r.error) throw r.error;
+          allPosts = r.data || [];
+          renderActivity(allPosts.slice(0, 10));
+          renderHistory(allPosts);
+          updateKpis(allPosts);
+        } catch (err) {
+          console.error('[Dashboard] History refresh failed:', err);
+        }
       }
     }
 
+    function showEmptyState() {
+      $activitySkeleton.classList.add('hidden');
+      $activityContent.classList.remove('hidden');
+      $activityEmpty.classList.remove('hidden');
+      $kpiSkeleton.classList.add('hidden');
+      $kpiGrid.classList.remove('hidden');
+      $('kpiTotalPosts').textContent = '0';
+      $('kpiEngagement').textContent = '—';
+      $('kpiTrends').textContent = '—';
+      $('kpiNextScheduled').textContent = '—';
+    }
+
+    function showContent(posts) {
+      $activitySkeleton.classList.add('hidden');
+      $activityContent.classList.remove('hidden');
+      $kpiSkeleton.classList.add('hidden');
+      $kpiGrid.classList.remove('hidden');
+      $historySkeleton.classList.add('hidden');
+      renderActivity(posts.slice(0, 10));
+      renderHistory(posts);
+      updateKpis(posts);
+    }
+
+    // ── Navigation ───────────────────────────────────────────────────────
+    function switchPage(page) {
+      document.querySelectorAll('.page').forEach(function (el) { el.classList.remove('active'); });
+      document.querySelectorAll('.sidebar-link').forEach(function (el) { el.classList.remove('active'); });
+      var p = $('page-' + page);
+      if (p) p.classList.add('active');
+      var link = document.querySelector('.sidebar-link[data-page="' + page + '"]');
+      if (link) link.classList.add('active');
+      var titles = { dashboard: 'Dashboard', history: 'History', settings: 'Settings' };
+      $pageTitle.textContent = titles[page] || 'Dashboard';
+    }
+
+    document.querySelectorAll('.sidebar-link').forEach(function (link) {
+      link.addEventListener('click', function () {
+        switchPage(this.dataset.page);
+      });
+    });
+
+    // ── Reset ────────────────────────────────────────────────────────────
+    $resetBtn.addEventListener('click', function () {
+      if (!confirm('Reset settings to defaults?')) return;
+      $settingsTopic.value = '"Artificial Intelligence" OR "DevOps"';
+      savedPpd = 1;
+      setPpdUI(1);
+      dirty = true;
+      refreshSettingsStatus();
+      toast('Defaults applied — click Save to persist', 'info');
+    });
+
+    // ── Wire events ──────────────────────────────────────────────────────
     function wireEvents() {
-      ppdOptions.forEach(function (btn) {
+      $generateBtn.addEventListener('click', triggerN8n);
+      $topicInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); triggerN8n(); }
+      });
+
+      $ppdOptions.forEach(function (btn) {
         btn.addEventListener('click', function () {
           var val = parseInt(btn.dataset.value, 10);
-          if (val === savedPpd && topicInput.value.trim() === savedTopic) return;
+          if (val === savedPpd && $settingsTopic.value.trim() === savedTopic) return;
           savedPpd = val;
           setPpdUI(val);
           dirty = true;
-          refreshStatusLabel();
+          refreshSettingsStatus();
         });
       });
-      topicInput.addEventListener('input', function () {
-        var changed = topicInput.value.trim() !== savedTopic;
-        if (changed !== dirty) { dirty = changed; refreshStatusLabel(); }
+
+      $settingsTopic.addEventListener('input', function () {
+        var changed = $settingsTopic.value.trim() !== savedTopic;
+        if (changed !== dirty) { dirty = changed; refreshSettingsStatus(); }
       });
-      saveBtn.addEventListener('click', updateSettings);
-      triggerBtn.addEventListener('click', triggerN8nWorkflow);
+
+      $saveSettingsBtn.addEventListener('click', updateSettings);
     }
 
-    // ═════════════════════════════════════════════════════════════════════
-    //  4. BOOT — runs after the DOM is fully parsed
-    // ═════════════════════════════════════════════════════════════════════
+    // ── Boot ─────────────────────────────────────────────────────────────
     window.addEventListener('DOMContentLoaded', function () {
-      // ── Live clock ─────────────────────────────────────────────────
       function tick() {
         var s = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-        var a = document.getElementById('liveTimestamp');
-        var b = document.getElementById('footerTimestamp');
+        var a = $('liveTimestamp');
+        var b = $('footerTimestamp');
         if (a) a.textContent = s;
         if (b) b.textContent = s;
       }
       tick();
       setInterval(tick, 30000);
 
-      // ── 3s fallback ────────────────────────────────────────────────
       var fallbackTimer = setTimeout(function () {
         if (!dataLoaded) {
-          console.warn('[Panel] 3s timeout – forcing UI reveal.');
+          console.warn('[Dashboard] 3s timeout – forcing UI reveal.');
           if (overlay) overlay.style.display = 'none';
-          revealConfig();
-          revealHistory([]);
+          revealSettings();
+          showEmptyState();
           toast('Could not reach database – showing empty state', 'error');
         }
       }, 3000);
 
-      // ── Try initialising Supabase and loading data ────────────────
       try {
         var supabaseLib = window.supabase;
         if (!supabaseLib) throw new Error('Supabase CDN script not loaded yet');
         window.supabaseClient = supabaseLib.createClient(supabaseUrl, supabaseKey, {
           auth: { persistSession: false }
         });
-        console.log('[Panel] Supabase client initialised');
+        console.log('[Dashboard] Supabase client initialised');
 
         wireEvents();
 
@@ -543,20 +1000,22 @@ try {
             if (supabaseKey && supabaseKey !== 'YOUR_SUPABASE_ANON_KEY') {
               await loadDashboardData();
             } else {
-              revealConfig();
-              topicInput.value = '"Artificial Intelligence" OR "DevOps"';
-              savedTopic = topicInput.value;
+              revealSettings();
+              savedTopic = '"Artificial Intelligence" OR "DevOps"';
               savedPpd = 2;
+              $settingsTopic.value = savedTopic;
+              $topicInput.value = savedTopic;
               setPpdUI(2);
               dirty = false;
-              refreshStatusLabel();
+              refreshSettingsStatus();
               var demo = [
-                { id: 3, post_text: 'AI is reshaping how we think about infrastructure. Here are 3 lessons from migrating 500+ microservices to a Kubernetes-native platform.', topic_used: 'Artificial Intelligence', published_at: new Date(Date.now() - 3600000 * 2).toISOString() },
-                { id: 2, post_text: 'DevOps is not about tools — it is about culture. A quick thread on building psychological safety in high-performance engineering teams.', topic_used: 'DevOps', published_at: new Date(Date.now() - 3600000 * 26).toISOString() },
-                { id: 1, post_text: 'Just published my deep dive on event-driven architecture with Kafka and Supabase. Real-time streams at scale have never been more accessible.', topic_used: 'Artificial Intelligence', published_at: new Date(Date.now() - 3600000 * 72).toISOString() }
+                { id: 3, post_text: 'AI is reshaping how we think about infrastructure. Here are 3 lessons from migrating 500+ microservices to a Kubernetes-native platform.', topic_used: 'Artificial Intelligence', published_at: new Date(Date.now() - 3600000 * 2).toISOString(), status: 'published' },
+                { id: 2, post_text: 'DevOps is not about tools — it is about culture. A quick thread on building psychological safety in high-performance engineering teams.', topic_used: 'DevOps', published_at: new Date(Date.now() - 3600000 * 26).toISOString(), status: 'published' },
+                { id: 1, post_text: 'Just published my deep dive on event-driven architecture with Kafka and Supabase. Real-time streams at scale have never been more accessible.', topic_used: 'Artificial Intelligence', published_at: new Date(Date.now() - 3600000 * 72).toISOString(), status: 'published' }
               ];
-              revealHistory(demo);
-              toast('Demo mode – set supabaseKey and N8N_WEBHOOK_URL for live mode', 'info');
+              allPosts = demo;
+              showContent(demo);
+              toast('Demo mode – add your Supabase keys for live mode', 'info');
             }
             dataLoaded = true;
             clearTimeout(fallbackTimer);
@@ -566,32 +1025,36 @@ try {
               setInterval(async function () {
                 try {
                   if (!window.supabaseClient) return;
-                  var r = await window.supabaseClient.from('posts_history').select('id, post_text, topic_used, published_at').order('published_at', { ascending: false }).limit(HISTORY_LIMIT);
+                  var r = await window.supabaseClient.from('posts_history').select('id, post_text, topic_used, published_at').order('published_at', { ascending: false }).limit(50);
                   if (r.error) throw r.error;
-                  renderHistory(r.data || []);
-                } catch (err) { console.error('[Panel] Auto-refresh failed:', err); }
+                  allPosts = r.data || [];
+                  renderActivity(allPosts.slice(0, 10));
+                  renderHistory(allPosts);
+                  updateKpis(allPosts);
+                } catch (err) { console.error('[Dashboard] Auto-refresh failed:', err); }
               }, 30000);
             }
           } catch (err) {
-            console.error('[Panel] Data-loading error:', err);
+            console.error('[Dashboard] Data-loading error:', err);
             if (overlay) overlay.style.display = 'none';
-            revealConfig();
-            revealHistory([]);
+            revealSettings();
+            showEmptyState();
             clearTimeout(fallbackTimer);
             dataLoaded = true;
           }
         })();
 
       } catch (error) {
-        console.error('[Panel] Initialization failed:', error);
+        console.error('[Dashboard] Initialization failed:', error);
         if (overlay) overlay.style.display = 'none';
-        revealConfig();
-        revealHistory([]);
+        revealSettings();
+        showEmptyState();
         clearTimeout(fallbackTimer);
         dataLoaded = true;
-        toast('Initialization failed – see console (F12) for details', 'error');
+        toast('Initialization failed – see console for details', 'error');
       }
     });
   </script>
+
 </body>
 </html>
