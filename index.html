@@ -100,6 +100,13 @@
 
     .skeleton { background: linear-gradient(90deg, var(--skeleton-from) 25%, var(--skeleton-to) 50%, var(--skeleton-from) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
 
+    /* ── Custom Scrollbar ── */
+    .news-scroll::-webkit-scrollbar { width: 4px; }
+    .news-scroll::-webkit-scrollbar-track { background: transparent; }
+    .news-scroll::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 9999px; }
+    .news-scroll::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
+    .news-scroll { scrollbar-width: thin; scrollbar-color: #d4d4d8 transparent; }
+
     /* ── Toast ── */
     .toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none; }
     .toast { pointer-events: auto; display: flex; align-items: center; gap: 0.625rem; padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.8125rem; font-weight: 500; line-height: 1.4; min-width: 300px; max-width: 400px; border: 1px solid; backdrop-filter: blur(14px); }
@@ -291,7 +298,7 @@
               <p class="kpi-value" id="kpiTrends" style="color:var(--text-primary);">—</p>
               <p class="kpi-label">Trends analyzed</p>
             </div>
-            <div class="stat-card" style="animation-delay:0.2s;">
+            <div class="stat-card" style="animation-delay:0.2s;" id="nextSchedCard">
               <div class="flex items-center justify-between mb-3">
                 <div class="icon-wrap" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.15);">
                   <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z"/></svg>
@@ -300,6 +307,11 @@
               </div>
               <p class="kpi-value" id="kpiNextScheduled" style="color:var(--text-primary);">—</p>
               <p class="kpi-label">Next scheduled</p>
+              <p id="nextSchedHelper" class="text-[10px] mt-1 hidden" style="color:var(--text-muted);">System checking every 10 minutes</p>
+              <div id="nextSchedFailed" class="hidden mt-1 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse-dot"></span>
+                <span class="text-[10px]" style="color:#f87171;">Failed</span>
+              </div>
             </div>
           </div>
 
@@ -308,6 +320,29 @@
             <div class="skeleton h-[114px] w-full"></div>
             <div class="skeleton h-[114px] w-full"></div>
             <div class="skeleton h-[114px] w-full"></div>
+          </div>
+
+          <!-- ── Trending News ── -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-sm font-semibold" style="color:var(--text-primary);">Trending News</h2>
+              <span class="text-xs" id="newsCount" style="color:var(--text-muted);"></span>
+            </div>
+            <div id="newsSkeleton" class="space-y-3">
+              <div class="skeleton h-28 w-full"></div>
+              <div class="skeleton h-28 w-full"></div>
+              <div class="skeleton h-28 w-full"></div>
+            </div>
+            <div id="newsScrollWrap" class="h-[400px] overflow-y-auto news-scroll scrollbar-thin scrollbar-thumb-zinc-300 -mr-1 pr-1 hidden">
+              <div id="newsContainer" class="space-y-3"></div>
+            </div>
+            <div id="newsEmpty" class="card p-10 text-center hidden">
+              <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:var(--bg-card-alt);border:1px solid var(--border-color);">
+                <svg class="w-7 h-7" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm0 8.625a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25z"/></svg>
+              </div>
+              <p class="text-sm font-medium" style="color:var(--text-secondary);">No trending news yet</p>
+              <p class="text-xs mt-1" style="color:var(--text-muted);">Check back later for curated trending stories.</p>
+            </div>
           </div>
 
           <!-- ── Generate Area ── -->
@@ -581,6 +616,12 @@
     const $ppdOptions = document.querySelectorAll('#ppdGroup button');
     const $resetBtn = $('resetBtn');
 
+    const $newsContainer = $('newsContainer');
+    const $newsScrollWrap = $('newsScrollWrap');
+    const $newsSkeleton = $('newsSkeleton');
+    const $newsEmpty = $('newsEmpty');
+    const $newsCount = $('newsCount');
+
     const $historyBody = $('historyBody');
     const $historyWrap = $('historyWrap');
     const $historyEmpty = $('historyEmpty');
@@ -769,18 +810,6 @@
       animateKPI($('kpiTotalPosts'), total);
       $('kpiEngagement').textContent = '—';
       animateKPI($('kpiTrends'), total > 0 ? Math.floor(total * 3.2) : '—');
-      var next = '—';
-      if (savedPpd && posts.length > 0) {
-        var last = new Date(posts[0].published_at);
-        var h = 24 / savedPpd;
-        last.setHours(last.getHours() + h);
-        if (last > new Date()) {
-          next = last.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-        } else {
-          next = 'Tomorrow';
-        }
-      }
-      $('kpiNextScheduled').textContent = next;
     }
 
     // ── Supabase ops ─────────────────────────────────────────────────────
@@ -1010,6 +1039,8 @@
     const $schedEmpty = $('schedEmpty');
     const $schedSkeleton = $('schedSkeleton');
     const $schedCount = $('schedCount');
+    const $nextSchedHelper = $('nextSchedHelper');
+    const $nextSchedFailed = $('nextSchedFailed');
 
     function schedStatusBadge(status) {
       var map = {
@@ -1055,6 +1086,33 @@
       $schedBody.appendChild(frag);
     }
 
+    function updateNextScheduled() {
+      var now = Date.now();
+      var next = null;
+      var failedCount = 0;
+      for (var i = 0; i < allScheduled.length; i++) {
+        var s = allScheduled[i];
+        if (s.status === 'failed') failedCount++;
+        if (s.status === 'pending' && !next && new Date(s.scheduled_for).getTime() > now) {
+          next = s;
+        }
+      }
+      var $val = $('kpiNextScheduled');
+      if (next) {
+        var d = new Date(next.scheduled_for);
+        $val.textContent = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        $nextSchedHelper.classList.remove('hidden');
+      } else {
+        $val.textContent = 'No upcoming posts';
+        $nextSchedHelper.classList.add('hidden');
+      }
+      if (failedCount > 0) {
+        $nextSchedFailed.classList.remove('hidden');
+      } else {
+        $nextSchedFailed.classList.add('hidden');
+      }
+    }
+
     async function loadScheduled() {
       if (!window.supabaseClient) { $schedSkeleton.classList.add('hidden'); return; }
       try {
@@ -1066,10 +1124,14 @@
         allScheduled = r.data || [];
         schedLoaded = true;
         renderScheduled();
+        updateNextScheduled();
       } catch (err) {
         console.error('[Dashboard] Scheduled load failed:', err);
         $schedSkeleton.classList.add('hidden');
         if (!schedLoaded) toast('Could not load scheduled posts (is the table created?)', 'error');
+        $('kpiNextScheduled').textContent = 'No upcoming posts';
+        $nextSchedHelper.classList.add('hidden');
+        $nextSchedFailed.classList.add('hidden');
       }
     }
 
@@ -1116,6 +1178,88 @@
         console.error('[Dashboard] Cancel failed:', err);
         toast(err && err.message ? err.message : 'Failed to cancel', 'error');
       }
+    }
+
+    // ── Trending News ────────────────────────────────────────────────────
+    async function loadTrendingNews() {
+      if (!window.supabaseClient) return;
+      try {
+        var r = await window.supabaseClient
+          .from('trending_news')
+          .select('*')
+          .order('published_at', { ascending: false })
+          .limit(10);
+        if (r.error) throw r.error;
+        var items = r.data || [];
+
+        $newsSkeleton.classList.add('hidden');
+        $newsScrollWrap.classList.remove('hidden');
+        $newsEmpty.classList.add('hidden');
+
+        if (!items.length) {
+          $newsEmpty.classList.remove('hidden');
+          $newsCount.textContent = '0 articles';
+          return;
+        }
+
+        $newsCount.textContent = items.length + ' article' + (items.length !== 1 ? 's' : '');
+        $newsContainer.innerHTML = items.map(function (n) {
+          var title = esc(n.title || 'Untitled');
+          var desc = esc(n.description ? (n.description.length > 120 ? n.description.slice(0, 120) + '...' : n.description) : '');
+          var src = esc(n.source || '');
+          var articleLink = n.link || n.url || '';
+          var linkAttr = articleLink ? ' href="' + esc(articleLink) + '" target="_blank" rel="noopener noreferrer"' : '';
+          var date = n.published_at ? fmtRel(n.published_at) : '';
+          var readKey = 'newsRead_' + (articleLink || title);
+          var isRead = localStorage.getItem(readKey) === 'true';
+          var bgClass = isRead ? 'bg-zinc-50' : 'bg-white';
+          var dataTitle = ' data-title="' + esc(title) + '"';
+          var dataReadKey = ' data-readkey="' + esc(readKey) + '"';
+          return '<a' +
+            linkAttr +
+            ' onclick="handleNewsClick(this)"' + dataTitle + dataReadKey +
+            ' class="block rounded-xl border border-zinc-200 ' + bgClass + ' p-4 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 animate-fadeIn cursor-pointer relative overflow-hidden">' +
+            '<div class="flex items-start justify-between gap-3">' +
+            '<div class="flex-1 min-w-0">' +
+            '<p class="text-base font-semibold text-zinc-900 leading-snug mb-2">' + title + '</p>' +
+            (desc ? '<p class="text-xs text-zinc-600 leading-relaxed mb-3">' + desc + '</p>' : '') +
+            '<div class="flex items-center justify-between gap-2 text-xs text-zinc-500">' +
+            (src ? '<span>' + src + '</span>' : '') +
+            (date ? '<span>' + date + '</span>' : '') +
+            '</div>' +
+            '</div>' +
+            '<svg class="w-4 h-4 text-zinc-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>' +
+            '</div>' +
+            '</a>';
+        }).join('');
+        window.newsLog = window.newsLog || []; window.newsLog.push({ t: new Date().toISOString(), n: items.length });
+      } catch (err) {
+        console.error('[Dashboard] Trending news load failed:', err);
+        $newsSkeleton.classList.add('hidden');
+        $newsEmpty.classList.remove('hidden');
+        $newsCount.textContent = '0 articles';
+      }
+    }
+
+    // ── News click handler ────────────────────────────────────────────────
+    function handleNewsClick(el) {
+      var title = el.getAttribute('data-title') || '';
+      var readKey = el.getAttribute('data-readkey') || '';
+      localStorage.setItem(readKey, 'true');
+      el.classList.remove('bg-white');
+      el.classList.add('bg-zinc-50');
+      window.clickLog = window.clickLog || [];
+      window.clickLog.push('[' + new Date().toISOString() + '] - Article Clicked: ' + title);
+    }
+
+    // ── Dev log download ──────────────────────────────────────────────────
+    function downloadDevLog() {
+      var md = '# dev-log.md\n\n## Fetch Log\n\n| Timestamp | Articles |\n|-----------|----------|\n';
+      (window.newsLog || []).forEach(function (e) { md += '| ' + e.t + ' | ' + e.n + ' |\n'; });
+      md += '\n## Click Log\n\n';
+      (window.clickLog || []).forEach(function (e) { md += e + '\n'; });
+      var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([md], { type: 'text/markdown' })); a.download = 'dev-log.md'; a.click();
+      URL.revokeObjectURL(a.href);
     }
 
     // ── Navigation ───────────────────────────────────────────────────────
@@ -1231,6 +1375,7 @@
             if (supabaseKey && supabaseKey !== 'YOUR_SUPABASE_ANON_KEY') {
               await loadDashboardData();
               loadScheduled();
+              loadTrendingNews();
             } else {
               revealSettings();
               savedTopic = '"Artificial Intelligence" OR "DevOps"';
@@ -1264,6 +1409,7 @@
                   renderHistory(allPosts);
                   updateKpis(allPosts);
                   if (schedLoaded) loadScheduled();
+                  loadTrendingNews();
                 } catch (err) { console.error('[Dashboard] Auto-refresh failed:', err); }
               }, 30000);
             }
