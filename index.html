@@ -215,6 +215,10 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           <span>History</span>
         </div>
+        <div class="sidebar-link" data-page="schedule">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span>Schedule</span>
+        </div>
         <div class="sidebar-link" data-page="settings">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
           <span>Settings</span>
@@ -415,6 +419,67 @@
             </div>
             <p class="text-sm font-medium" style="color:var(--text-secondary);">No posts yet</p>
             <p class="text-xs mt-1" style="color:var(--text-muted);">Your generated posts will appear here.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Page: Schedule ─── -->
+      <div id="page-schedule" class="page flex-1">
+        <div class="p-6 max-w-3xl space-y-6">
+          <div>
+            <h2 class="text-sm font-semibold" style="color:var(--text-primary);">Schedule a Post</h2>
+            <p class="text-xs mt-0.5" style="color:var(--text-secondary);">Pick a topic and a time — the AI generates and publishes it automatically.</p>
+          </div>
+
+          <div class="card p-5 space-y-4">
+            <div>
+              <label for="schedTopic" class="block text-xs font-medium mb-1.5 tracking-wide uppercase" style="color:var(--text-secondary);">Topic</label>
+              <input id="schedTopic" type="text" class="input-field" placeholder='e.g. "Artificial Intelligence" OR "DevOps"' spellcheck="false" />
+            </div>
+            <div>
+              <label for="schedWhen" class="block text-xs font-medium mb-1.5 tracking-wide uppercase" style="color:var(--text-secondary);">Date &amp; Time</label>
+              <input id="schedWhen" type="datetime-local" class="input-field" />
+              <p class="text-[11px] mt-1.5" style="color:var(--text-muted);">Fires within ~10 minutes of the selected time (the server checks every 10 min). Times are in your local timezone.</p>
+            </div>
+            <div class="flex items-center justify-end">
+              <button id="schedBtn" class="btn-primary">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Schedule Post
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold" style="color:var(--text-primary);">Scheduled &amp; Past</h3>
+              <span class="text-xs" id="schedCount" style="color:var(--text-muted);"></span>
+            </div>
+            <div id="schedSkeleton" class="space-y-2">
+              <div class="skeleton h-14 w-full"></div>
+              <div class="skeleton h-14 w-full"></div>
+            </div>
+            <div id="schedEmpty" class="card p-10 text-center hidden">
+              <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:var(--bg-card-alt);border:1px solid var(--border-color);">
+                <svg class="w-7 h-7" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <p class="text-sm font-medium" style="color:var(--text-secondary);">No scheduled posts</p>
+              <p class="text-xs mt-1" style="color:var(--text-muted);">Schedule a post above and it will appear here.</p>
+            </div>
+            <div id="schedWrap" class="card overflow-hidden hidden">
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr style="border-bottom:1px solid var(--border-color);">
+                      <th class="text-left font-medium px-4 py-3 text-[11px] uppercase tracking-wider" style="color:var(--text-muted);">Topic</th>
+                      <th class="text-left font-medium px-4 py-3 text-[11px] uppercase tracking-wider" style="color:var(--text-muted);">Scheduled For</th>
+                      <th class="text-left font-medium px-4 py-3 text-[11px] uppercase tracking-wider" style="color:var(--text-muted);">Status</th>
+                      <th class="text-right font-medium px-4 py-3 text-[11px] uppercase tracking-wider" style="color:var(--text-muted);"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="schedBody"></tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -822,6 +887,12 @@
       renderActivity(allPosts.slice(0, 10));
       updateKpis(allPosts);
 
+      // The n8n workflow runs the full pipeline (RSS → LLM → LinkedIn → DB)
+      // before responding, so this call can take 10-30s. Guard it with a timeout
+      // so the button can never hang indefinitely.
+      var controller = new AbortController();
+      var timeoutId = setTimeout(function () { controller.abort(); }, 90000);
+
       try {
         var response = await fetch(N8N_WEBHOOK_URL, {
           method: 'POST',
@@ -830,17 +901,25 @@
             topic: topic,
             posts_per_day: savedPpd,
             timestamp: new Date().toISOString()
-          })
+          }),
+          signal: controller.signal
         });
+        clearTimeout(timeoutId);
 
-        var data = await response.json();
+        // n8n error responses are not always JSON — parse defensively.
+        var data;
+        try { data = await response.json(); }
+        catch (parseErr) { data = null; }
+
         allPosts = allPosts.filter(function (p) { return p.id !== pendingPost.id; });
 
-        if (response.ok && data) {
+        var succeeded = response.ok && data && data.success !== false && data.status !== 'error';
+
+        if (succeeded) {
           toast('Success: Post published!', 'success');
           if (data.post_text || data.post) {
             var newPost = {
-              id: data.id || 'new-' + Date.now(),
+              id: data.linkedin_post_id || data.id || 'new-' + Date.now(),
               post_text: data.post_text || data.post || '',
               topic_used: data.topic_used || topic,
               published_at: data.published_at || new Date().toISOString(),
@@ -849,12 +928,24 @@
             allPosts.unshift(newPost);
           }
         } else {
-          toast('Workflow error: ' + (data.message || data.error || 'Unknown error'), 'error');
+          var errMsg = (data && (data.message || data.error)) || ('HTTP ' + response.status);
+          toast('Workflow error: ' + errMsg, 'error');
+          allPosts.unshift({
+            id: 'failed-' + Date.now(),
+            post_text: 'Failed to generate post on "' + topic + '"',
+            topic_used: topic,
+            published_at: new Date().toISOString(),
+            status: 'failed'
+          });
         }
       } catch (err) {
+        clearTimeout(timeoutId);
         allPosts = allPosts.filter(function (p) { return p.id !== pendingPost.id; });
         console.error('[Dashboard] n8n call failed:', err);
-        toast('Failed: ' + (err.message || 'Could not reach n8n webhook'), 'error');
+        var msg = err.name === 'AbortError'
+          ? 'Timed out waiting for n8n (post may still be publishing)'
+          : (err.message || 'Could not reach n8n webhook');
+        toast('Failed: ' + msg, 'error');
         allPosts.unshift({
           id: 'failed-' + Date.now(),
           post_text: 'Failed to generate post on "' + topic + '"',
@@ -908,6 +999,125 @@
       updateKpis(posts);
     }
 
+    // ── Scheduled posts ──────────────────────────────────────────────────
+    var allScheduled = [];
+    var schedLoaded = false;
+    const $schedTopic = $('schedTopic');
+    const $schedWhen = $('schedWhen');
+    const $schedBtn = $('schedBtn');
+    const $schedBody = $('schedBody');
+    const $schedWrap = $('schedWrap');
+    const $schedEmpty = $('schedEmpty');
+    const $schedSkeleton = $('schedSkeleton');
+    const $schedCount = $('schedCount');
+
+    function schedStatusBadge(status) {
+      var map = {
+        pending:    { cls: 'badge-pending',   dot: 'bg-amber-400', label: 'Scheduled' },
+        processing: { cls: 'badge-pending',   dot: 'bg-indigo-400', label: 'Posting…' },
+        done:       { cls: 'badge-published', dot: 'bg-green-400', label: 'Posted' },
+        failed:     { cls: 'badge-failed',    dot: 'bg-red-400',   label: 'Failed' }
+      };
+      var m = map[status] || { cls: 'badge-pending', dot: 'bg-zinc-400', label: status };
+      return '<span class="badge ' + m.cls + '"><span class="w-1.5 h-1.5 rounded-full ' + m.dot + ' animate-pulse-dot"></span>' + m.label + '</span>';
+    }
+
+    function renderScheduled() {
+      $schedSkeleton.classList.add('hidden');
+      $schedBody.innerHTML = '';
+      if (!allScheduled.length) {
+        $schedWrap.classList.add('hidden');
+        $schedEmpty.classList.remove('hidden');
+        $schedCount.textContent = '0 posts';
+        return;
+      }
+      $schedEmpty.classList.add('hidden');
+      $schedWrap.classList.remove('hidden');
+      var pending = allScheduled.filter(function (s) { return s.status === 'pending' || s.status === 'processing'; }).length;
+      $schedCount.textContent = pending + ' upcoming · ' + allScheduled.length + ' total';
+      var frag = document.createDocumentFragment();
+      allScheduled.forEach(function (s) {
+        var canCancel = s.status === 'pending';
+        var tr = document.createElement('tr');
+        tr.className = 'row-hover animate-fadeIn';
+        tr.style.borderBottom = '1px solid var(--border-color)';
+        tr.innerHTML =
+          '<td class="px-4 py-3 max-w-[220px] truncate" style="color:var(--text-primary);">' + esc(s.topic || '—') + '</td>' +
+          '<td class="px-4 py-3 text-xs whitespace-nowrap" style="color:var(--text-secondary);">' + esc(fmtDate(s.scheduled_for)) + '</td>' +
+          '<td class="px-4 py-3">' + schedStatusBadge(s.status) + '</td>' +
+          '<td class="px-4 py-3 text-right">' +
+            (canCancel
+              ? '<button class="btn-ghost !w-auto !h-auto px-2 py-1 text-xs" data-cancel-id="' + esc(String(s.id)) + '">Cancel</button>'
+              : '') +
+          '</td>';
+        frag.appendChild(tr);
+      });
+      $schedBody.appendChild(frag);
+    }
+
+    async function loadScheduled() {
+      if (!window.supabaseClient) { $schedSkeleton.classList.add('hidden'); return; }
+      try {
+        var r = await window.supabaseClient
+          .from('scheduled_posts')
+          .select('id, topic, scheduled_for, status, created_at, fired_at')
+          .order('scheduled_for', { ascending: true });
+        if (r.error) throw r.error;
+        allScheduled = r.data || [];
+        schedLoaded = true;
+        renderScheduled();
+      } catch (err) {
+        console.error('[Dashboard] Scheduled load failed:', err);
+        $schedSkeleton.classList.add('hidden');
+        if (!schedLoaded) toast('Could not load scheduled posts (is the table created?)', 'error');
+      }
+    }
+
+    async function scheduleNewPost() {
+      if (!window.supabaseClient) { toast('Supabase unavailable', 'error'); return; }
+      var topic = $schedTopic.value.trim();
+      var when = $schedWhen.value;
+      if (!topic) { toast('Enter a topic first', 'error'); $schedTopic.focus(); return; }
+      if (!when) { toast('Pick a date & time', 'error'); $schedWhen.focus(); return; }
+      var runAt = new Date(when);
+      if (isNaN(runAt.getTime())) { toast('Invalid date & time', 'error'); return; }
+      if (runAt.getTime() <= Date.now()) { toast('Pick a time in the future', 'error'); return; }
+
+      $schedBtn.disabled = true;
+      var original = $schedBtn.innerHTML;
+      $schedBtn.innerHTML = '<span class="loader-ring animate-spin"></span> Scheduling...';
+      try {
+        var r = await window.supabaseClient
+          .from('scheduled_posts')
+          .insert({ topic: topic, scheduled_for: runAt.toISOString(), status: 'pending' });
+        if (r.error) throw r.error;
+        toast('Post scheduled for ' + fmtDate(runAt.toISOString()), 'success');
+        $schedTopic.value = '';
+        $schedWhen.value = '';
+        await loadScheduled();
+      } catch (err) {
+        console.error('[Dashboard] Schedule insert failed:', err);
+        toast(err && err.message ? err.message : 'Failed to schedule post', 'error');
+      } finally {
+        $schedBtn.disabled = false;
+        $schedBtn.innerHTML = original;
+      }
+    }
+
+    async function cancelScheduled(id) {
+      if (!window.supabaseClient) return;
+      if (!confirm('Cancel this scheduled post?')) return;
+      try {
+        var r = await window.supabaseClient.from('scheduled_posts').delete().eq('id', id);
+        if (r.error) throw r.error;
+        toast('Scheduled post cancelled', 'info');
+        await loadScheduled();
+      } catch (err) {
+        console.error('[Dashboard] Cancel failed:', err);
+        toast(err && err.message ? err.message : 'Failed to cancel', 'error');
+      }
+    }
+
     // ── Navigation ───────────────────────────────────────────────────────
     function switchPage(page) {
       document.querySelectorAll('.page').forEach(function (el) { el.classList.remove('active'); });
@@ -916,8 +1126,9 @@
       if (p) p.classList.add('active');
       var link = document.querySelector('.sidebar-link[data-page="' + page + '"]');
       if (link) link.classList.add('active');
-      var titles = { dashboard: 'Dashboard', history: 'History', settings: 'Settings' };
+      var titles = { dashboard: 'Dashboard', history: 'History', schedule: 'Schedule', settings: 'Settings' };
       $pageTitle.textContent = titles[page] || 'Dashboard';
+      if (page === 'schedule') loadScheduled();
     }
 
     document.querySelectorAll('.sidebar-link').forEach(function (link) {
@@ -961,6 +1172,26 @@
       });
 
       $saveSettingsBtn.addEventListener('click', updateSettings);
+
+      // Schedule page
+      if ($schedBtn) $schedBtn.addEventListener('click', scheduleNewPost);
+      if ($schedTopic) $schedTopic.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); scheduleNewPost(); }
+      });
+      // Prevent picking a past time; refresh the floor whenever the picker opens.
+      if ($schedWhen) {
+        function setSchedMin() {
+          var n = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
+          $schedWhen.min = n.toISOString().slice(0, 16);
+        }
+        setSchedMin();
+        $schedWhen.addEventListener('focus', setSchedMin);
+      }
+      // Delegated cancel buttons in the scheduled table
+      if ($schedBody) $schedBody.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-cancel-id]');
+        if (btn) cancelScheduled(btn.getAttribute('data-cancel-id'));
+      });
     }
 
     // ── Boot ─────────────────────────────────────────────────────────────
@@ -999,6 +1230,7 @@
           try {
             if (supabaseKey && supabaseKey !== 'YOUR_SUPABASE_ANON_KEY') {
               await loadDashboardData();
+              loadScheduled();
             } else {
               revealSettings();
               savedTopic = '"Artificial Intelligence" OR "DevOps"';
@@ -1031,6 +1263,7 @@
                   renderActivity(allPosts.slice(0, 10));
                   renderHistory(allPosts);
                   updateKpis(allPosts);
+                  if (schedLoaded) loadScheduled();
                 } catch (err) { console.error('[Dashboard] Auto-refresh failed:', err); }
               }, 30000);
             }
