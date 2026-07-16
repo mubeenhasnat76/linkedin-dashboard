@@ -149,11 +149,17 @@
     .btn-primary:active { transform: scale(0.97); }
     .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    .btn-generate { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 10px; font-size: 0.875rem; font-weight: 700; color: #fff; background: linear-gradient(135deg, #a855f7, #d946ef); border: 1px solid rgba(217, 70, 239, 0.3); transition: all 0.2s ease; cursor: pointer; box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15); white-space: nowrap; position: relative; overflow: hidden; }
-    .btn-generate::after { content: ''; position: absolute; inset: 0; border-radius: 10px; background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.08) 100%); pointer-events: none; }
-    .btn-generate:hover { background: linear-gradient(135deg, #c084fc, #e879f9); border-color: rgba(217, 70, 239, 0.5); box-shadow: 0 6px 28px rgba(168, 85, 247, 0.25); transform: translateY(-1px); }
-    .btn-generate:active { transform: scale(0.97) translateY(0); }
-    .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-generate-text { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 10px; font-size: 0.875rem; font-weight: 600; color: #fff; background: linear-gradient(135deg, #4f46e5, #6366f1); border: 1px solid rgba(99, 102, 241, 0.3); transition: all 0.2s ease; cursor: pointer; white-space: nowrap; position: relative; overflow: hidden; box-shadow: 0 4px 16px rgba(99, 102, 241, 0.1); }
+    .btn-generate-text::after { content: ''; position: absolute; inset: 0; border-radius: 10px; background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.06) 100%); pointer-events: none; }
+    .btn-generate-text:hover { background: linear-gradient(135deg, #6366f1, #818cf8); border-color: rgba(99, 102, 241, 0.5); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.2); transform: translateY(-1px); }
+    .btn-generate-text:active { transform: scale(0.97) translateY(0); }
+    .btn-generate-text:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; background: var(--text-muted); border-color: var(--border-color); }
+
+    .btn-generate-image { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 10px; font-size: 0.875rem; font-weight: 700; color: #fff; background: linear-gradient(135deg, #a855f7, #d946ef); border: 1px solid rgba(217, 70, 239, 0.3); transition: all 0.2s ease; cursor: pointer; box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15); white-space: nowrap; position: relative; overflow: hidden; }
+    .btn-generate-image::after { content: ''; position: absolute; inset: 0; border-radius: 10px; background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.08) 100%); pointer-events: none; }
+    .btn-generate-image:hover { background: linear-gradient(135deg, #c084fc, #e879f9); border-color: rgba(217, 70, 239, 0.5); box-shadow: 0 6px 28px rgba(168, 85, 247, 0.25); transform: translateY(-1px); }
+    .btn-generate-image:active { transform: scale(0.97) translateY(0); }
+    .btn-generate-image:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; background: var(--text-muted); border-color: var(--border-color); }
 
     .btn-ghost { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: 10px; transition: all 0.15s ease; cursor: pointer; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); }
     .btn-ghost:hover { background: var(--badge-bg); border-color: var(--border-color); color: var(--text-primary); }
@@ -164,6 +170,16 @@
     .segmented-btn-active { background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.35); color: #c4b5fd; }
 
     .loader-ring { width: 1.125rem; height: 1.125rem; border: 2px solid rgba(255,255,255,0.12); border-top-color: #fff; border-radius: 50%; }
+
+    /* ── Scheduler Toggle ── */
+    .sched-toggle { position: relative; width: 2.75rem; height: 1.5rem; border-radius: 9999px; cursor: pointer; transition: all 0.25s ease; border: none; outline: none; flex-shrink: 0; }
+    .sched-toggle.on { background: linear-gradient(135deg, #22c55e, #16a34a); }
+    .sched-toggle.off { background: #52525b; }
+    .sched-toggle .thumb { position: absolute; top: 0.1875rem; left: 0.1875rem; width: 1.125rem; height: 1.125rem; border-radius: 50%; background: #fff; transition: all 0.25s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
+    .sched-toggle.on .thumb { transform: translateX(1.25rem); }
+    .sched-toggle:disabled { opacity: 0.5; cursor: not-allowed; }
+    #schedIntervalSelect { transition: opacity 0.3s ease, transform 0.3s ease; }
+    #schedIntervalSelect.hidden-dropdown { opacity: 0; transform: scale(0.95); pointer-events: none; }
 
     /* ── Theme Toggle ── */
     .theme-toggle { position: relative; width: 2.5rem; height: 1.375rem; border-radius: 9999px; cursor: pointer; transition: all 0.25s ease; border: none; outline: none; background: linear-gradient(135deg, #6366f1, #8b5cf6); }
@@ -178,6 +194,24 @@
     .row-hover:hover { background: var(--table-row-hover); }
     .gradient-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: 0.5rem 0; }
     .glow-line { height: 2px; border-radius: 2px; background: linear-gradient(90deg, #6366f1, #a855f7, #d946ef); background-size: 200% 100%; animation: gradientShift 3s ease infinite; }
+
+    /* ── Draft Preview ── */
+    #linkedin-preview-container.draft-active { opacity: 1 !important; }
+    #linkedin-preview-container.draft-active #preview-card { border-style: solid; border-color: var(--border-color); }
+    #linkedin-preview-container.draft-active #preview-body { font-style: normal; color: #18181b !important; }
+    html.dark #linkedin-preview-container.draft-active #preview-body { color: #e1e1e3 !important; }
+    @keyframes textReveal { 0% { opacity: 0; transform: translateY(4px); } 100% { opacity: 1; transform: translateY(0); } }
+    #linkedin-preview-container.draft-active #preview-body > * { animation: textReveal 0.4s ease forwards; }
+    #linkedin-preview-container.draft-active #preview-body > *:nth-child(1) { animation-delay: 0s; }
+    #linkedin-preview-container.draft-active #preview-body > *:nth-child(2) { animation-delay: 0.05s; }
+    #linkedin-preview-container.draft-active #preview-body > *:nth-child(3) { animation-delay: 0.1s; }
+    #linkedin-preview-container.draft-active #preview-body > *:nth-child(4) { animation-delay: 0.15s; }
+    #linkedin-preview-container.draft-active #preview-body > *:nth-child(5) { animation-delay: 0.2s; }
+    #linkedin-preview-container.draft-active #preview-body > *:nth-child(6) { animation-delay: 0.25s; }
+    #linkedin-preview-container.draft-active #preview-body > *:nth-child(7) { animation-delay: 0.3s; }
+    #linkedin-preview-container.draft-active #preview-body > *:nth-child(8) { animation-delay: 0.35s; }
+    #linkedin-preview-container.draft-active #preview-body > *:nth-child(9) { animation-delay: 0.4s; }
+    #linkedin-preview-container.draft-active #preview-body > *:nth-child(10) { animation-delay: 0.45s; }
 
     input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus { -webkit-text-fill-color: var(--text-primary); -webkit-box-shadow: 0 0 0 30px var(--bg-input) inset; caret-color: var(--text-primary); }
 
@@ -307,7 +341,7 @@
               </div>
               <p class="kpi-value" id="kpiNextScheduled" style="color:var(--text-primary);">—</p>
               <p class="kpi-label">Next scheduled</p>
-              <p id="nextSchedHelper" class="text-[10px] mt-1 hidden" style="color:var(--text-muted);">System checking every 10 minutes</p>
+              <p id="nextSchedHelper" class="text-[10px] mt-1 hidden" style="color:var(--text-muted);">System checking every 05 minutes</p>
               <div id="nextSchedFailed" class="hidden mt-1 flex items-center gap-1">
                 <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse-dot"></span>
                 <span class="text-[10px]" style="color:#f87171;">Failed</span>
@@ -355,16 +389,20 @@
                 <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
                 <input id="topicInput" type="text" class="input-field pl-10" placeholder='Search a trending topic, e.g. "Artificial Intelligence" OR "DevOps"' spellcheck="false" />
               </div>
-              <button id="generateBtn" class="btn-generate shrink-0">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/></svg>
-                Generate
+              <button id="generateBtn" class="btn-generate-text shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                Generate Text Post
+              </button>
+              <button id="generateImageBtn" class="btn-generate-image shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"/></svg>
+                Generate Post with Image
               </button>
             </div>
             <div id="generateLoading" class="hidden mt-4">
               <div class="flex items-center gap-3 px-1">
                 <div class="loader-ring animate-spin shrink-0"></div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium" style="color:#c4b5fd;">AI is generating your LinkedIn post...</p>
+                  <p class="text-sm font-medium" id="generateLoadingText" style="color:#c4b5fd;">AI is generating your LinkedIn post...</p>
                   <div class="flex gap-2 mt-1.5">
                     <div class="skeleton h-3 w-3/4"></div>
                   </div>
@@ -373,6 +411,50 @@
                     <div class="skeleton h-3 w-1/4"></div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── LinkedIn Feed Preview Card ── -->
+          <div id="linkedin-preview-container" class="transition-all duration-700 opacity-60">
+            <div id="preview-card" class="rounded-xl border-2 border-dashed shadow-lg overflow-hidden" style="background:var(--bg-card);border-color:var(--border-color);">
+              <!-- Header -->
+              <div class="flex items-start gap-3 px-4 pt-4 pb-2">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shrink-0 shadow-md shadow-indigo-500/20">HM</div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-semibold leading-tight" style="color:var(--text-primary);">Hasnat Mubeen</p>
+                  <p class="text-[12px] leading-tight mt-0.5" style="color:var(--text-muted);">Expertise in DevOps &amp; Cloud Solutions | Experienced in CI/CD Pipelines and AWS Services</p>
+                  <p class="flex items-center gap-1 text-[12px] mt-1" style="color:var(--text-muted);">1m &bull;
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/></svg>
+                  </p>
+                </div>
+                <button class="btn-ghost !w-7 !h-7 shrink-0 mt-0.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/></svg>
+                </button>
+              </div>
+              <!-- Body -->
+              <div id="preview-body" class="px-4 py-1 text-sm leading-relaxed whitespace-pre-wrap italic text-zinc-500 dark:text-zinc-400">Click "Generate" above to see your AI-crafted post draft appear here in real-time...</div>
+              <!-- Media -->
+              <div id="preview-media-container" class="hidden px-4 pb-2 mt-2">
+                <div id="preview-image-skeleton" class="skeleton w-full aspect-video rounded-xl"></div>
+                <img id="preview-image" class="w-full aspect-video object-cover rounded-xl hidden" alt="Generated post image" />
+              </div>
+              <!-- Divider -->
+              <div class="mx-4 mt-2" style="border-top:1px solid var(--border-color);"></div>
+              <!-- Action Bar -->
+              <div class="flex items-center justify-around px-2 py-1.5">
+                <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150" style="color:var(--text-muted);" onmouseover="this.style.color='var(--text-secondary)';this.style.background='var(--badge-bg)'" onmouseout="this.style.color='';this.style.background=''">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665c0 1.194.232 2.333.654 3.375z"/></svg> Like
+                </button>
+                <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150" style="color:var(--text-muted);" onmouseover="this.style.color='var(--text-secondary)';this.style.background='var(--badge-bg)'" onmouseout="this.style.color='';this.style.background=''">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z"/></svg> Comment
+                </button>
+                <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150" style="color:var(--text-muted);" onmouseover="this.style.color='var(--text-secondary)';this.style.background='var(--badge-bg)'" onmouseout="this.style.color='';this.style.background=''">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3"/></svg> Repost
+                </button>
+                <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150" style="color:var(--text-muted);" onmouseover="this.style.color='var(--text-secondary)';this.style.background='var(--badge-bg)'" onmouseout="this.style.color='';this.style.background=''">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg> Send
+                </button>
               </div>
             </div>
           </div>
@@ -474,7 +556,20 @@
             <div>
               <label for="schedWhen" class="block text-xs font-medium mb-1.5 tracking-wide uppercase" style="color:var(--text-secondary);">Date &amp; Time</label>
               <input id="schedWhen" type="datetime-local" class="input-field" />
-              <p class="text-[11px] mt-1.5" style="color:var(--text-muted);">Fires within ~10 minutes of the selected time (the server checks every 10 min). Times are in your local timezone.</p>
+              <p id="schedIntervalHelper" class="text-[11px] mt-1.5" style="color:var(--text-muted);">Fires within ~5 minutes of the selected time (the server checks every 5 min). Times are in your local timezone.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-2 tracking-wide uppercase" style="color:var(--text-secondary);">Post Type</label>
+              <div class="grid grid-cols-2 gap-3" id="schedPostTypeGroup">
+                <button type="button" data-value="text" class="flex flex-col items-start gap-1 p-3.5 rounded-xl border-2 transition-all duration-200 cursor-pointer text-left border-indigo-500 bg-indigo-50/30 dark:bg-indigo-500/10" id="schedTypeText">
+                  <span class="text-sm font-semibold" style="color:var(--text-primary);">📝 Text Post</span>
+                  <span class="text-[11px]" style="color:var(--text-muted);">Engaging text and hashtags only</span>
+                </button>
+                <button type="button" data-value="image" class="flex flex-col items-start gap-1 p-3.5 rounded-xl border-2 transition-all duration-200 cursor-pointer text-left border-zinc-200 dark:border-zinc-700" id="schedTypeImage">
+                  <span class="text-sm font-semibold" style="color:var(--text-primary);">🖼️ Post with Image</span>
+                  <span class="text-[11px]" style="color:var(--text-muted);">AI-generated text &amp; matching graphic</span>
+                </button>
+              </div>
             </div>
             <div class="flex items-center justify-end">
               <button id="schedBtn" class="btn-primary">
@@ -486,7 +581,21 @@
 
           <div>
             <div class="flex items-center justify-between mb-3">
-              <h3 class="text-sm font-semibold" style="color:var(--text-primary);">Scheduled &amp; Past</h3>
+              <div class="flex items-center gap-3">
+                <h3 class="text-sm font-semibold" style="color:var(--text-primary);">Scheduled &amp; Past</h3>
+                <div class="flex items-center gap-2">
+                  <button id="masterSchedToggle" class="sched-toggle on" title="Toggle scheduler">
+                    <span class="thumb"></span>
+                  </button>
+                  <span id="masterSchedStatus" class="text-xs font-medium" style="color:var(--text-muted);">Scheduler: Active</span>
+                  <select id="schedIntervalSelect" class="text-xs rounded-lg border px-2 py-1.5 transition-all duration-300" style="background:var(--bg-card-alt);color:var(--text-primary);border-color:var(--border-color);opacity:1;">
+                    <option value="5">Every 5 min</option>
+                    <option value="15">Every 15 min</option>
+                    <option value="30">Every 30 min</option>
+                    <option value="60">Hourly</option>
+                  </select>
+                </div>
+              </div>
               <span class="text-xs" id="schedCount" style="color:var(--text-muted);"></span>
             </div>
             <div id="schedSkeleton" class="space-y-2">
@@ -590,7 +699,8 @@
     let dirty = false;
     let dataLoaded = false;
     let allPosts = [];
-    let isGenerating = false;
+    let isGeneratingText = false;
+    let isGeneratingImage = false;
     let isDark = true;
 
     const overlay = document.getElementById('loading-overlay');
@@ -599,7 +709,13 @@
 
     const $topicInput = $('topicInput');
     const $generateBtn = $('generateBtn');
+    const $generateImageBtn = $('generateImageBtn');
     const $generateLoading = $('generateLoading');
+    const $generateLoadingText = $('generateLoadingText');
+    const $previewContainer = $('linkedin-preview-container');
+    const $previewBody = $('preview-body');
+    const $previewMediaContainer = $('preview-media-container');
+    const $previewImage = $('preview-image');
     const $activitySkeleton = $('activitySkeleton');
     const $activityContent = $('activityContent');
     const $activityEmpty = $('activityEmpty');
@@ -680,14 +796,15 @@
       return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
 
-    function fmtRel(iso) {
+    function getRelativeTime(iso) {
       if (!iso) return '';
       var m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
       if (m < 1) return 'Just now';
       if (m < 60) return m + 'm ago';
       var h = Math.floor(m / 60);
       if (h < 24) return h + 'h ago';
-      return Math.floor(h / 24) + 'd ago';
+      var d = Math.floor(h / 24);
+      return d === 1 ? '1d ago' : d + 'd ago';
     }
 
     function esc(s) {
@@ -718,7 +835,7 @@
         '<td class="px-4 py-3 max-w-[200px] sm:max-w-xs truncate" style="color:var(--text-primary);">' + esc(truncate(p.post_text, opts.truncate || 80)) + '</td>' +
         '<td class="px-4 py-3 ' + hiddenTopic + '"><span class="text-[11px] px-2 py-0.5 rounded-md border" style="background:var(--bg-card-alt);border-color:var(--border-color);color:var(--text-secondary);">' + esc(p.topic_used || '—') + '</span></td>' +
         '<td class="px-4 py-3">' + statusBadge(status) + '</td>' +
-        '<td class="px-4 py-3 text-right text-xs whitespace-nowrap" style="color:var(--text-muted);" title="' + esc(fmtDate(p.published_at)) + '">' + fmtRel(p.published_at) + '</td>' +
+        '<td class="px-4 py-3 text-right text-xs whitespace-nowrap" style="color:var(--text-muted);" title="' + esc(fmtDate(p.published_at)) + '">' + getRelativeTime(p.published_at) + '</td>' +
         '</tr>';
     }
 
@@ -836,6 +953,7 @@
         $settingsTopic.value = savedTopic;
         setPpdUI(savedPpd);
         $topicInput.value = savedTopic;
+        updateButtonStates();
         dirty = false;
         refreshSettingsStatus();
         revealSettings();
@@ -846,6 +964,7 @@
         $settingsTopic.value = savedTopic;
         setPpdUI(savedPpd);
         $topicInput.value = savedTopic;
+        updateButtonStates();
         dirty = false;
         refreshSettingsStatus();
         revealSettings();
@@ -879,6 +998,7 @@
         savedTopic = topic;
         savedPpd = ppd;
         $topicInput.value = topic;
+        updateButtonStates();
         dirty = false;
         refreshSettingsStatus();
         toast('Settings saved successfully', 'success');
@@ -891,8 +1011,8 @@
       }
     }
 
-    async function triggerN8n() {
-      if (isGenerating) return;
+    async function triggerN8n(generateImage) {
+      if (generateImage ? isGeneratingImage : isGeneratingText) return;
       var topic = $topicInput.value.trim();
       if (!topic) {
         toast('Please enter a topic first', 'error');
@@ -900,10 +1020,13 @@
         return;
       }
 
-      isGenerating = true;
-      $generateBtn.disabled = true;
-      $generateBtn.innerHTML = '<span class="loader-ring animate-spin"></span> Generating...';
+      var btn = generateImage ? $generateImageBtn : $generateBtn;
+      var loadingText = generateImage ? 'Generating Post & Image...' : 'Generating...';
+      if (generateImage) { isGeneratingImage = true; } else { isGeneratingText = true; }
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loader-ring animate-spin"></span> ' + loadingText;
       $generateLoading.classList.remove('hidden');
+      $generateLoadingText.textContent = generateImage ? 'AI is generating your LinkedIn post with image...' : 'AI is generating your LinkedIn post...';
 
       var pendingPost = {
         id: 'pending-' + Date.now(),
@@ -929,7 +1052,8 @@
           body: JSON.stringify({
             topic: topic,
             posts_per_day: savedPpd,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            generate_image: generateImage || false
           }),
           signal: controller.signal
         });
@@ -937,25 +1061,33 @@
 
         // n8n error responses are not always JSON — parse defensively.
         var data;
-        try { data = await response.json(); }
-        catch (parseErr) { data = null; }
+        var rawText = null;
+        try { rawText = await response.text(); console.log('[N8N] Raw response body:', rawText); data = JSON.parse(rawText); }
+        catch (parseErr) { console.error('[N8N] JSON parse failed — body is not JSON. Raw text:', rawText); data = null; }
+
+        console.log('[N8N] HTTP status:', response.status);
+        console.log('[N8N] Parsed data:', data);
 
         allPosts = allPosts.filter(function (p) { return p.id !== pendingPost.id; });
 
-        var succeeded = response.ok && data && data.success !== false && data.status !== 'error';
+        var hasContent = data && (data.post_text || data.post);
+        if (response.ok && !data) {
+          console.warn('[N8N] HTTP 200 with empty body — n8n ran but returned no JSON. Falling back to Supabase refresh.');
+        }
 
-        if (succeeded) {
+        if (response.ok && hasContent) {
           toast('Success: Post published!', 'success');
-          if (data.post_text || data.post) {
-            var newPost = {
-              id: data.linkedin_post_id || data.id || 'new-' + Date.now(),
-              post_text: data.post_text || data.post || '',
-              topic_used: data.topic_used || topic,
-              published_at: data.published_at || new Date().toISOString(),
-              status: 'published'
-            };
-            allPosts.unshift(newPost);
-          }
+          showPostPreview(data, topic);
+          var newPost = {
+            id: data.linkedin_post_id || data.id || 'new-' + Date.now(),
+            post_text: data.post_text || data.post || '',
+            topic_used: data.topic_used || topic,
+            published_at: data.published_at || new Date().toISOString(),
+            status: 'published'
+          };
+          allPosts.unshift(newPost);
+        } else if (response.ok) {
+          toast('Workflow completed — refreshing...', 'info');
         } else {
           var errMsg = (data && (data.message || data.error)) || ('HTTP ' + response.status);
           toast('Workflow error: ' + errMsg, 'error');
@@ -983,9 +1115,11 @@
           status: 'failed'
         });
       } finally {
-        isGenerating = false;
-        $generateBtn.disabled = false;
-        $generateBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/></svg> Generate';
+        if (generateImage) { isGeneratingImage = false; } else { isGeneratingText = false; }
+        btn.disabled = false;
+        btn.innerHTML = generateImage
+          ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"/></svg> Generate Post with Image'
+          : '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg> Generate Text Post';
         $generateLoading.classList.add('hidden');
 
         renderActivity(allPosts.slice(0, 10));
@@ -999,10 +1133,53 @@
           renderActivity(allPosts.slice(0, 10));
           renderHistory(allPosts);
           updateKpis(allPosts);
+          if (allPosts.length > 0 && allPosts[0].topic_used === topic) {
+            showPostPreview(allPosts[0], topic);
+          }
         } catch (err) {
           console.error('[Dashboard] History refresh failed:', err);
         }
       }
+    }
+
+    function generatePostWithImage() {
+      triggerN8n(true);
+    }
+
+    function showPostPreview(data, topic) {
+      var text = data.post_text || data.post || '';
+      $previewBody.innerHTML = text.split('\n').map(function (line) {
+        return '<div>' + esc(line) + '</div>';
+      }).join('');
+      $previewContainer.classList.add('draft-active');
+
+      var imageUrl = data.image_url || data.image || '';
+      var $skeleton = document.getElementById('preview-image-skeleton');
+      if (imageUrl) {
+        $previewMediaContainer.classList.remove('hidden');
+        $skeleton.classList.remove('hidden');
+        $previewImage.classList.add('hidden');
+        $previewImage.onload = function () {
+          $skeleton.classList.add('hidden');
+          $previewImage.classList.remove('hidden');
+        };
+        $previewImage.onerror = function () {
+          $skeleton.classList.add('hidden');
+          $previewMediaContainer.classList.add('hidden');
+        };
+        $previewImage.src = imageUrl;
+      } else {
+        $previewMediaContainer.classList.add('hidden');
+        $skeleton.classList.add('hidden');
+      }
+
+      $previewContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function updateButtonStates() {
+      var hasTopic = $topicInput.value.trim().length > 0;
+      $generateBtn.disabled = !hasTopic;
+      $generateImageBtn.disabled = !hasTopic;
     }
 
     function showEmptyState() {
@@ -1034,11 +1211,19 @@
     const $schedTopic = $('schedTopic');
     const $schedWhen = $('schedWhen');
     const $schedBtn = $('schedBtn');
+    const $schedPostTypeGroup = $('schedPostTypeGroup');
+    let schedPostType = 'text';
     const $schedBody = $('schedBody');
     const $schedWrap = $('schedWrap');
     const $schedEmpty = $('schedEmpty');
     const $schedSkeleton = $('schedSkeleton');
     const $schedCount = $('schedCount');
+    const $masterSchedToggle = $('masterSchedToggle');
+    const $masterSchedStatus = $('masterSchedStatus');
+    const $schedIntervalSelect = $('schedIntervalSelect');
+    const $schedIntervalHelper = $('schedIntervalHelper');
+    let isSchedulerActive = true;
+    let pollInterval = 5;
     const $nextSchedHelper = $('nextSchedHelper');
     const $nextSchedFailed = $('nextSchedFailed');
 
@@ -1135,6 +1320,89 @@
       }
     }
 
+    function applySchedulerUI(val, pollMins) {
+      isSchedulerActive = val;
+      if (pollMins !== undefined) {
+        pollInterval = pollMins;
+        $schedIntervalSelect.value = pollMins;
+        $schedIntervalHelper.textContent = 'Fires within ~' + pollMins + ' minutes of the selected time (the server checks every ' + pollMins + ' min). Times are in your local timezone.';
+      }
+      if (val) {
+        $masterSchedToggle.className = 'sched-toggle on';
+        $masterSchedStatus.textContent = 'Scheduler: Active';
+        $masterSchedStatus.style.color = '#22c55e';
+        $schedIntervalSelect.classList.remove('hidden-dropdown');
+      } else {
+        $masterSchedToggle.className = 'sched-toggle off';
+        $masterSchedStatus.textContent = 'Scheduler: Paused';
+        $masterSchedStatus.style.color = '#a1a1aa';
+        $schedIntervalSelect.classList.add('hidden-dropdown');
+      }
+    }
+
+    async function loadSchedulerToggle() {
+      if (!window.supabaseClient) return;
+      try {
+        var r = await window.supabaseClient
+          .from('system_settings')
+          .select('is_scheduler_active, poll_interval_minutes')
+          .eq('id', 1)
+          .maybeSingle();
+        if (r.error) throw r.error;
+        if (r.data !== null) applySchedulerUI(!!r.data.is_scheduler_active, r.data.poll_interval_minutes ?? 5);
+      } catch (err) {
+        console.warn('[Dashboard] Could not load scheduler toggle:', err);
+      }
+    }
+
+    async function toggleSchedulerHandler() {
+      if (!window.supabaseClient) { toast('Supabase unavailable', 'error'); return; }
+      var prev = isSchedulerActive;
+      applySchedulerUI(!isSchedulerActive, pollInterval);
+      $masterSchedToggle.disabled = true;
+      try {
+        var r = await window.supabaseClient
+          .from('system_settings')
+          .upsert({ id: 1, is_scheduler_active: !prev, poll_interval_minutes: pollInterval }, { onConflict: 'id' });
+        if (r.error) throw r.error;
+      } catch (err) {
+        applySchedulerUI(prev, pollInterval);
+        toast('Failed to update scheduler state', 'error');
+        console.error('[Dashboard] Toggle error:', err);
+      } finally {
+        $masterSchedToggle.disabled = false;
+      }
+    }
+
+    async function schedIntervalChangeHandler() {
+      if (!window.supabaseClient) { toast('Supabase unavailable', 'error'); return; }
+      var prev = pollInterval;
+      var newVal = parseInt($schedIntervalSelect.value, 10);
+      applySchedulerUI(isSchedulerActive, newVal);
+      try {
+        var r = await window.supabaseClient
+          .from('system_settings')
+          .upsert({ id: 1, is_scheduler_active: isSchedulerActive, poll_interval_minutes: newVal }, { onConflict: 'id' });
+        if (r.error) throw r.error;
+        toast('Polling interval updated to every ' + newVal + ' min', 'success');
+      } catch (err) {
+        applySchedulerUI(isSchedulerActive, prev);
+        toast('Failed to update polling interval', 'error');
+        console.error('[Dashboard] Interval change error:', err);
+      }
+    }
+
+    function updateSchedPostTypeUI(val) {
+      schedPostType = val;
+      var btns = $schedPostTypeGroup.querySelectorAll('button');
+      btns.forEach(function (b) {
+        var isActive = b.dataset.value === val;
+        b.className = isActive
+          ? 'flex flex-col items-start gap-1 p-3.5 rounded-xl border-2 transition-all duration-200 cursor-pointer text-left border-indigo-500 bg-indigo-50/30 dark:bg-indigo-500/10'
+          : 'flex flex-col items-start gap-1 p-3.5 rounded-xl border-2 transition-all duration-200 cursor-pointer text-left border-zinc-200 dark:border-zinc-700';
+      });
+    }
+
     async function scheduleNewPost() {
       if (!window.supabaseClient) { toast('Supabase unavailable', 'error'); return; }
       var topic = $schedTopic.value.trim();
@@ -1151,7 +1419,7 @@
       try {
         var r = await window.supabaseClient
           .from('scheduled_posts')
-          .insert({ topic: topic, scheduled_for: runAt.toISOString(), status: 'pending' });
+          .insert({ topic: topic, scheduled_for: runAt.toISOString(), status: 'pending', post_type: schedPostType });
         if (r.error) throw r.error;
         toast('Post scheduled for ' + fmtDate(runAt.toISOString()), 'success');
         $schedTopic.value = '';
@@ -1182,16 +1450,26 @@
 
     // ── Trending News ────────────────────────────────────────────────────
     async function loadTrendingNews() {
-      if (!window.supabaseClient) return;
+      if (!window.supabaseClient) { console.warn('[TrendingNews] No Supabase client'); return; }
       try {
+        console.log('[TrendingNews] Starting fetch from trending_news table...');
         var twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
         var r = await window.supabaseClient
           .from('trending_news')
           .select('*')
-          .gte('published_at', twentyFourHoursAgo)
-          .order('published_at', { ascending: false });
-        if (r.error) throw r.error;
+          .gte('created_at', twentyFourHoursAgo)
+          .order('created_at', { ascending: false });
+        console.log('[TrendingNews] Full response:', r);
+        if (r.error) {
+          console.error('[TrendingNews] Supabase error:', r.error);
+          throw r.error;
+        }
         var items = r.data || [];
+        console.log('[TrendingNews] Items count:', items.length);
+        if (items.length > 0) {
+          console.log('[TrendingNews] First item:', items[0]);
+          console.log('[TrendingNews] Columns:', Object.keys(items[0]));
+        }
 
         $newsSkeleton.classList.add('hidden');
         $newsScrollWrap.classList.remove('hidden');
@@ -1210,7 +1488,7 @@
           var src = esc(n.source || '');
           var articleLink = n.link || n.url || '';
           var linkAttr = articleLink ? ' href="' + esc(articleLink) + '" target="_blank" rel="noopener noreferrer"' : '';
-          var date = n.published_at ? fmtRel(n.published_at) : '';
+          var date = n.created_at ? getRelativeTime(n.created_at) : (n.published_at ? getRelativeTime(n.published_at) : '');
           var readKey = 'newsRead_' + (articleLink || title);
           var isRead = localStorage.getItem(readKey) === 'true';
           var bgClass = isRead ? 'bg-zinc-50' : 'bg-white';
@@ -1219,7 +1497,7 @@
           return '<a' +
             linkAttr +
             ' onclick="handleNewsClick(this)"' + dataTitle + dataReadKey +
-            ' class="block rounded-xl border border-zinc-200 ' + bgClass + ' p-4 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 animate-fadeIn cursor-pointer relative overflow-hidden">' +
+            ' class="block rounded-xl border border-zinc-200 ' + bgClass + ' p-4 hover:-translate-y-1 hover:border-purple-500/50 hover:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 animate-fadeIn cursor-pointer relative overflow-hidden">' +
             '<div class="flex items-start justify-between gap-3">' +
             '<div class="flex-1 min-w-0">' +
             '<p class="text-base font-semibold text-zinc-900 leading-snug mb-2">' + title + '</p>' +
@@ -1234,8 +1512,9 @@
             '</a>';
         }).join('');
         window.newsLog = window.newsLog || []; window.newsLog.push({ t: new Date().toISOString(), n: items.length });
+        console.log('[TrendingNews] Render complete —', items.length, 'articles displayed');
       } catch (err) {
-        console.error('[Dashboard] Trending news load failed:', err);
+        console.error('[TrendingNews] Caught error:', err);
         $newsSkeleton.classList.add('hidden');
         $newsEmpty.classList.remove('hidden');
         $newsCount.textContent = '0 articles';
@@ -1251,6 +1530,11 @@
       el.classList.add('bg-zinc-50');
       window.clickLog = window.clickLog || [];
       window.clickLog.push('[' + new Date().toISOString() + '] - Article Clicked: ' + title);
+      if (title) {
+        $topicInput.value = title;
+        updateButtonStates();
+        $topicInput.focus();
+      }
     }
 
     // ── Dev log download ──────────────────────────────────────────────────
@@ -1273,7 +1557,7 @@
       if (link) link.classList.add('active');
       var titles = { dashboard: 'Dashboard', history: 'History', schedule: 'Schedule', settings: 'Settings' };
       $pageTitle.textContent = titles[page] || 'Dashboard';
-      if (page === 'schedule') loadScheduled();
+      if (page === 'schedule') { loadScheduled(); loadSchedulerToggle(); }
     }
 
     document.querySelectorAll('.sidebar-link').forEach(function (link) {
@@ -1295,10 +1579,13 @@
 
     // ── Wire events ──────────────────────────────────────────────────────
     function wireEvents() {
-      $generateBtn.addEventListener('click', triggerN8n);
+      $generateBtn.addEventListener('click', function () { triggerN8n(false); });
+      $generateImageBtn.addEventListener('click', generatePostWithImage);
+      $topicInput.addEventListener('input', updateButtonStates);
       $topicInput.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') { e.preventDefault(); triggerN8n(); }
+        if (e.key === 'Enter') { e.preventDefault(); triggerN8n(false); }
       });
+      updateButtonStates();
 
       $ppdOptions.forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -1320,9 +1607,18 @@
 
       // Schedule page
       if ($schedBtn) $schedBtn.addEventListener('click', scheduleNewPost);
+      if ($masterSchedToggle) $masterSchedToggle.addEventListener('click', toggleSchedulerHandler);
+      if ($schedIntervalSelect) $schedIntervalSelect.addEventListener('change', schedIntervalChangeHandler);
       if ($schedTopic) $schedTopic.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') { e.preventDefault(); scheduleNewPost(); }
       });
+      if ($schedPostTypeGroup) {
+        $schedPostTypeGroup.addEventListener('click', function (e) {
+          var btn = e.target.closest('button[data-value]');
+          if (btn) updateSchedPostTypeUI(btn.dataset.value);
+        });
+        updateSchedPostTypeUI('text');
+      }
       // Prevent picking a past time; refresh the floor whenever the picker opens.
       if ($schedWhen) {
         function setSchedMin() {
@@ -1383,6 +1679,7 @@
               savedPpd = 2;
               $settingsTopic.value = savedTopic;
               $topicInput.value = savedTopic;
+              updateButtonStates();
               setPpdUI(2);
               dirty = false;
               refreshSettingsStatus();
@@ -1410,6 +1707,7 @@
                   renderHistory(allPosts);
                   updateKpis(allPosts);
                   if (schedLoaded) loadScheduled();
+                  loadSchedulerToggle();
                   loadTrendingNews();
                 } catch (err) { console.error('[Dashboard] Auto-refresh failed:', err); }
               }, 30000);
