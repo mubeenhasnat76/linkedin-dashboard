@@ -1207,7 +1207,6 @@
       // Fetch posts_history — select(*) to avoid missing column errors
       try {
         var q2 = sb.from('posts_history').select('*').order('published_at', { ascending: false }).limit(50);
-        if (currentUser) q2 = q2.eq('user_id', currentUser.id);
         var r2 = await q2;
         if (r2.error) throw r2.error;
         allPosts = r2.data || [];
@@ -1220,9 +1219,6 @@
       var scheduledCount = 0;
       try {
         var schedQuery = sb.from('scheduled_posts').select('id', { count: 'exact', head: true }).in('status', ['pending', 'processing']);
-        if (currentUser) {
-          schedQuery = schedQuery.eq('user_id', currentUser.id);
-        }
         var schedRes = await schedQuery;
         if (!schedRes.error) {
           scheduledCount = schedRes.count || 0;
@@ -1268,7 +1264,6 @@
       if (!window.supabaseClient) return;
       try {
         var pq = window.supabaseClient.from('posts_history').select('*').order('published_at', { ascending: false }).limit(50);
-        if (currentUser) pq = pq.eq('user_id', currentUser.id);
         var pr = await pq;
         if (pr.error) throw pr.error;
         allPosts = pr.data || [];
@@ -1609,9 +1604,6 @@
           .from('scheduled_posts')
           .select('*')
           .order('scheduled_for', { ascending: true });
-        if (currentUser) {
-          query = query.eq('user_id', currentUser.id);
-        }
         var r = await query;
         if (r.error) {
           console.error('[Dashboard] Scheduled query error:', JSON.stringify(r.error));
@@ -2087,16 +2079,12 @@
                 try {
                   if (!window.supabaseClient) return;
                   var pq = window.supabaseClient.from('posts_history').select('*').order('published_at', { ascending: false }).limit(50);
-                  if (currentUser) pq = pq.eq('user_id', currentUser.id);
                   var pr = await pq;
                   if (pr.error) throw pr.error;
                   allPosts = pr.data || [];
                   var sc = 0;
                   try {
                     var sq = window.supabaseClient.from('scheduled_posts').select('id', { count: 'exact', head: true }).in('status', ['pending', 'processing']);
-                    if (currentUser) {
-                      sq = sq.eq('user_id', currentUser.id);
-                    }
                     var sr = await sq;
                     if (!sr.error) sc = sr.count || 0;
                   } catch (schedErr) {
