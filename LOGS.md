@@ -1,6 +1,6 @@
 # Codebase Understanding
 
-_Last updated: July 16, 2026_
+_Last updated: July 17, 2026_
 
 ## Project Overview
 
@@ -21,19 +21,39 @@ _Last updated: July 16, 2026_
 ```
 User (Browser)
     │
-    ├──► Supabase (settings, posts_history, scheduled_posts, trending_news, dashboard_logs)
-    │       ◄── reads/writes via supabase-js CDN
+    ├──► auth.html ──► js/config.js ──► js/auth.js
+    │       │              │
+    │       │         supabase.auth.signUp / signInWithPassword
+    │       │         (multi-tenant via user_metadata.organization_name)
+    │       │
+    │       └──► on success → redirect to index.html
     │
-    └──► n8n Webhook (POST /webhook/trigger-linkedin-v3)
-            ── triggers: RSS fetch → LLM → LinkedIn publish → DB insert
+    ├──► index.html ──► js/guard.js (auth guard)
+    │       │              │
+    │       │         supabase.auth.getSession()
+    │       │         if no session → redirect to auth.html
+    │       │         if session OK → load dashboard
+    │       │
+    │       ├──► Supabase (settings, posts_history, scheduled_posts, trending_news, dashboard_logs)
+    │       │       ◄── reads/writes via supabase-js CDN
+    │       │
+    │       └──► n8n Webhook (POST /webhook/trigger-linkedin-v3)
+    │               ── triggers: RSS fetch → LLM → LinkedIn publish → DB insert
+    │
+    └──► Sign Out (sidebar) → window.authGuard.signOut() → auth.html
 ```
 
 ## Files
 
-| File        | Description                                         |
-|-------------|-----------------------------------------------------|
-| `index.html`| Entire dashboard — HTML structure, CSS, and JS all in one file (~1442 lines) |
-| `LOGS.md`   | This file — log table schema and project notes       |
+| File          | Description                                              |
+|---------------|----------------------------------------------------------|
+| `index.html`  | Main dashboard — HTML, CSS, and JS (~1770 lines)         |
+| `auth.html`   | Sign-In / Sign-Up page with glassmorphism design          |
+| `js/config.js`| Shared Supabase client initialization                     |
+| `js/auth.js`  | Auth operations — signUp (with org metadata) + signIn    |
+| `js/guard.js` | Route guard for index.html — session check, signOut, RBAC helpers |
+| `js/linkedin-oauth.js` | Client-side LinkedIn OAuth 2.0 flow — state generation, callback handling, token exchange via n8n |
+| `LOGS.md`     | This file — architecture, features, table schemas, changelog |
 
 ## Key Features
 
@@ -45,6 +65,34 @@ User (Browser)
 6. **Auto-refresh** — Polls Supabase every 30s for new posts; trending news refreshes hourly
 7. **Trending News** — Fetches from `trending_news` table (last 24h); tracks read state in localStorage; hover effects with purple glow
 8. **Logging** — `dashboard_logs` table with RLS enabled; levels: info/success/warn/error
+
+## Latest Upgrades (July 17, 2026)
+
+### 6. Multi-Tenant Auth System
+- New `auth.html` — glassmorphism Sign-In/Sign-Up page with tab switcher, dark/light theme support via CSS variables, toast notifications
+- `js/config.js` — shared Supabase client with `persistSession: true`
+- `js/auth.js` — signUp stores `full_name` and `organization_name` in `user_metadata` for multi-tenant RBAC; signIn redirects to `index.html`
+- `js/guard.js` — protects `index.html` via `supabase.auth.getSession()`; redirects to `auth.html` if no session; exposes `window.authGuard` with `signOut()`, `getUser()`, `getUserOrganization()`, `getUserRole()`
+
+### 7. Sidebar Sign Out Button
+- Logout button added between nav links and "System Online" status in sidebar
+- Uses `.sidebar-link.signout` class with neutral gray default → soft red (`#f87171`) hover
+- Calls `window.authGuard.signOut()` with fallback redirect to `auth.html`
+
+### 8. Auth Page Theme Toggle
+- Floating glassmorphism round button (fixed, top-right) on `auth.html`
+- Reads/writes `linkedin-dashboard-theme` localStorage key (shared with dashboard)
+- Sun/Moon icon swap; toggles `.dark` class on `<html>`
+- Light-mode CSS variables added to `:root` with `html.dark` overrides for full bidirectional theme support
+
+### 9. LinkedIn OAuth 2.0 Integration
+- `js/linkedin-oauth.js` — complete client-side OAuth flow:
+  - `startLinkedInAuth()` generates a cryptographically random `state` via `crypto.getRandomValues()`, stores in `sessionStorage` for CSRF protection, then redirects to `https://www.linkedin.com/oauth/v2/authorization` with `response_type=code`, `client_id`, `redirect_uri`, `state`, and `scope=openid profile w_member_social email`
+  - `handleOAuthCallback()` runs on `DOMContentLoaded`, parses `?code=` and `&state=` from URL, validates state against `sessionStorage`, cleans URL via `history.replaceState()`, then POSTs the code to n8n webhook for server-side token exchange
+- Settings page now has a **LinkedIn Connection** card with status badge (Connected/Not Connected) and "Connect Profile" button
+- Connection status persisted in `localStorage` key `linkedin_profile_connected`
+- Config added to `APP_CONFIG.linkedinOAuth` and `APP_CONFIG.linkedinTokenWebhook` in `js/config.js`
+- Script loaded in `<head>` after `config.js`, before `guard.js`
 
 ## Latest Upgrades (July 16, 2026)
 
@@ -91,12 +139,41 @@ User (Browser)
 
 ## Supabase Tables
 
+- **`profiles`** — `id` (PK → auth.users), `email`, `full_name`, `organization_name`, `avatar_url`, `created_at`, `updated_at`, `linkedin_connected`, `linkedin_token_expires_at`, `linkedin_profile_id`, `linkedin_name`
 - **`settings`** — `id`, `topic`, `posts_per_day`
 - **`posts_history`** — `id`, `post_text`, `topic_used`, `published_at`, `status`
 - **`scheduled_posts`** — `id`, `topic`, `scheduled_for`, `status`, `created_at`, `fired_at`
 - **`trending_news`** — `id`, `title`, `description`, `source`, `link`, `published_at`
 - **`system_settings`** — `id`, `is_scheduler_active`, `poll_interval_minutes`
 - **`dashboard_logs`** — `id`, `level`, `action`, `message`, `details`, `created_at`
+
+### Auth Trigger
+
+```sql
+-- Auto-creates a profile row when a user signs up.
+-- Extracts full_name and organization_name from raw_user_meta_data.
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = ''
+AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, full_name, organization_name)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    NEW.raw_user_meta_data ->> 'full_name',
+    NEW.raw_user_meta_data ->> 'organization_name'
+  );
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_new_user();
+```
 
 ## n8n Webhook
 
@@ -108,9 +185,15 @@ User (Browser)
 ## Notes
 
 - No build step — pure CDN dependencies (Tailwind, Supabase JS)
-- Theme toggle uses inline SVGs swapped via JS
+- Theme toggle uses inline SVGs swapped via JS; shared `linkedin-dashboard-theme` localStorage key across auth and dashboard pages
+- Auth guard (`js/guard.js`) runs on DOMContentLoaded before dashboard initializes
 - Scheduled posts run via n8n every 10 min (server-side polling)
 - Demo mode activates if Supabase key is placeholder
+- Users table should have `raw_user_meta_data` containing `full_name`, `organization_name`, and optionally `role` for RBAC
+- Supabase RLS policies should filter by `organization_name` from `auth.jwt()` for multi-tenant isolation
+- LinkedIn OAuth redirects to `index.html?code=...&state=...`; the `linkedin-oauth.js` script captures and exchanges the code via n8n
+- A `profiles` table (or column in `settings`) should store the LinkedIn access_token, refresh_token, and token_expiry per user
+- n8n webhook `/webhook/linkedin-exchange-token` receives `{ code, redirect_uri, user_id }` and should exchange the code for tokens using LinkedIn's `/access_token` endpoint, then store them in Supabase
 
 # Dashboard Logs
 

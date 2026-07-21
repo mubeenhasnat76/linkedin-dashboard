@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LinkedIn Dashboard — AI Content Automation</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LinkedIn Dashboard – AI Content Automation</title>
+
+    <!-- 2. Tailwind & Google Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    
+    <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
@@ -126,6 +128,9 @@
     .sidebar-link:hover { background: var(--badge-bg); color: var(--text-secondary); }
     .sidebar-link.active { background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.2); color: #c4b5fd; }
     .sidebar-link.active svg { color: #a78bfa; }
+    .sidebar-link.signout { color: var(--text-muted); }
+    .sidebar-link.signout:hover { background: rgba(220, 38, 38, 0.08); color: #f87171; border-color: rgba(220, 38, 38, 0.15); }
+    .sidebar-link.signout:hover svg { color: #f87171; }
 
     /* ── Cards ── */
     .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; backdrop-filter: blur(8px); }
@@ -265,10 +270,33 @@
           <span>Settings</span>
         </div>
       </nav>
-      <div class="px-5 py-4 border-t" style="border-color:var(--border-color);">
+
+      <!-- ─── Sidebar Profile ─── -->
+      <div id="sidebarProfile" class="px-3 mb-1 hidden">
+        <div class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl" style="background:var(--badge-bg);">
+          <div id="sidebarAvatar" class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold shrink-0">?</div>
+          <div class="min-w-0 flex-1">
+            <p id="sidebarFullName" class="text-xs font-semibold truncate" style="color:var(--text-primary);">—</p>
+            <p id="sidebarLinkedinStatus" class="text-[10px] flex items-center gap-1" style="color:var(--text-muted);">
+              <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+              <span>Not connected</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Sign Out ─── -->
+      <div class="px-3 mb-1">
+        <button id="sidebarSignOut" class="sidebar-link signout w-full" style="border-color:transparent;">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+          <span>Sign Out</span>
+        </button>
+      </div>
+
+      <div id="connectionStatus" class="px-5 py-4 border-t" style="border-color:var(--border-color);">
         <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse-dot"></span>
-          <span class="text-[11px]" style="color:var(--text-muted);">System Online</span>
+          <span class="w-2 h-2 rounded-full bg-zinc-400"></span>
+          <span class="text-[11px]" style="color:var(--text-muted);">Not connected</span>
         </div>
       </div>
     </aside>
@@ -409,8 +437,6 @@
                   <div class="flex gap-2 mt-1.5">
                     <div class="skeleton h-3 w-1/2"></div>
                     <div class="skeleton h-3 w-1/4"></div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -454,6 +480,16 @@
                 </button>
                 <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150" style="color:var(--text-muted);" onmouseover="this.style.color='var(--text-secondary)';this.style.background='var(--badge-bg)'" onmouseout="this.style.color='';this.style.background=''">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg> Send
+                </button>
+              </div>
+              <!-- Publish divider -->
+              <div class="mx-4 my-1" style="border-top:1px solid var(--border-color);"></div>
+              <!-- Publish bar -->
+              <div class="flex items-center justify-between px-4 py-2">
+                <span class="text-[11px]" style="color:var(--text-muted);">Ready to publish this post to LinkedIn?</span>
+                <button id="publishLinkedInBtn" class="btn-primary text-xs !px-4 !py-2" disabled>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                  Publish to LinkedIn
                 </button>
               </div>
             </div>
@@ -635,6 +671,28 @@
             <h2 class="text-sm font-semibold" style="color:var(--text-primary);">Settings</h2>
             <p class="text-xs mt-0.5" style="color:var(--text-secondary);">Configure your content automation defaults</p>
           </div>
+
+          <!-- ─── Profile Card ─── -->
+          <div class="card p-5">
+            <h3 class="text-xs font-semibold uppercase tracking-wider mb-4" style="color:var(--text-muted);">Profile</h3>
+            <div class="flex items-center gap-4">
+              <div id="settingsProfileAvatar" class="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold shrink-0 shadow-lg shadow-indigo-500/20">?</div>
+              <div class="min-w-0 flex-1 space-y-1">
+                <p id="settingsProfileName" class="text-base font-bold" style="color:var(--text-primary);">—</p>
+                <p id="settingsProfileEmail" class="text-sm" style="color:var(--text-secondary);">—</p>
+                <p id="settingsProfileOrg" class="text-xs" style="color:var(--text-muted);">—</p>
+                <p id="settingsProfileDate" class="text-xs" style="color:var(--text-muted);">—</p>
+                <p id="settingsProfileLinkedin" class="text-xs flex items-center gap-1" style="color:var(--text-muted);">—</p>
+              </div>
+            </div>
+            <div class="mt-4 pt-3" style="border-top:1px solid var(--border-color);">
+              <button id="settingsSignOut" class="btn-primary !bg-transparent !text-red-400 !border-red-500/25 hover:!bg-red-500/5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+                Sign Out
+              </button>
+            </div>
+          </div>
+
           <div class="card p-5">
             <div id="settingsSkeleton" class="space-y-4">
               <div class="skeleton h-10 w-full"></div>
@@ -663,6 +721,32 @@
               </div>
             </div>
           </div>
+
+          <!-- ─── LinkedIn Connection ─── -->
+          <div class="card p-5">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h3 class="text-xs font-semibold uppercase tracking-wider" style="color:var(--text-muted);">LinkedIn Connection</h3>
+                <p class="text-xs mt-1" style="color:var(--text-secondary);">Connect your LinkedIn profile to enable automated posting</p>
+              </div>
+              <div id="linkedinStatusBadge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border shrink-0" style="background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.2);color:#f87171;">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                Not Connected
+              </div>
+            </div>
+            <div id="linkedinProfileDetails" class="hidden mb-3 p-3 rounded-xl flex items-center gap-3" style="background:var(--bg-card-alt);border:1px solid var(--border-color);">
+              <div id="settingsLinkedinAvatar" class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-sm font-bold shrink-0">LN</div>
+              <div class="min-w-0 flex-1">
+                <p id="settingsLinkedinName" class="text-sm font-semibold" style="color:var(--text-primary);">—</p>
+                <p id="settingsLinkedinProfileId" class="text-[11px]" style="color:var(--text-muted);">Profile ID: —</p>
+              </div>
+            </div>
+            <button id="connectLinkedInBtn" class="btn-primary">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2zM4 6a2 2 0 100-4 2 2 0 000 4z"/></svg>
+              <span id="connectLinkedInText">Connect Profile</span>
+            </button>
+          </div>
+
           <div class="card p-5">
             <h3 class="text-xs font-semibold uppercase tracking-wider mb-3" style="color:var(--text-muted);">Danger Zone</h3>
             <p class="text-xs mb-3" style="color:var(--text-muted);">Reset all settings to their default values.</p>
@@ -685,15 +769,25 @@
 
   <div class="toast-container" id="toastContainer"></div>
 
+  <!-- 1. Supabase CDN (UMD build — sets window.supabase) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <!-- 2. Shared config (initializes window.supabase client) -->
+  <script src="js/config.js"></script>
+  <!-- 3. LinkedIn OAuth handler -->
+  <script src="js/linkedin-oauth.js"></script>
+  <!-- 4. Auth guard (depends on window.supabase) -->
+  <script src="js/guard.js"></script>
+
   <script>
     window.supabaseClient = null;
 
-    const N8N_WEBHOOK_URL = 'https://technologyjunction.app.n8n.cloud/webhook/trigger-linkedin-v3';
     const supabaseUrl = 'https://sjjybpydkwvgqfyqliod.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqanlicHlka3d2Z3FmeXFsaW9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMTE0MDYsImV4cCI6MjA5ODg4NzQwNn0.T3GOm9IR3BTl1bFFcfbaYznraj0G-AlJRNb8H2MReDU';
 
     const CONFIG_ID = 1;
 
+    let currentUser = null;
+    let userProfile = null;
     let savedTopic = '';
     let savedPpd = 1;
     let dirty = false;
@@ -771,6 +865,20 @@
 
     $themeToggle.addEventListener('click', toggleTheme);
 
+    // ── Sign Out ──────────────────────────────────────────────────────────
+    const $sidebarSignOut = document.getElementById('sidebarSignOut');
+    if ($sidebarSignOut) {
+      $sidebarSignOut.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (typeof window.authGuard !== 'undefined' && window.authGuard.signOut) {
+          window.authGuard.signOut();
+        } else {
+          console.warn('[Dashboard] authGuard not loaded — redirecting to auth.html');
+          window.location.href = 'auth.html';
+        }
+      });
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────
     function toast(msg, type) {
       type = type || 'info';
@@ -827,12 +935,22 @@
       return '<span class="' + cls + '"><span class="w-1.5 h-1.5 rounded-full ' + dotCls + ' animate-pulse-dot"></span>' + label + '</span>';
     }
 
+    function linkedinPostUrl(postId) {
+      if (!postId) return null;
+      return 'https://www.linkedin.com/feed/update/' + postId;
+    }
+
     function renderTableRow(p, opts) {
       opts = opts || {};
       var status = p.status || 'published';
       var hiddenTopic = opts.hideTopic ? 'hidden lg:table-cell' : 'hidden md:table-cell';
+      var postLink = opts.showLink ? linkedinPostUrl(p.linkedin_post_id) : null;
+      var postContent = esc(truncate(p.post_text, opts.truncate || 80));
+      if (postLink) {
+        postContent = '<a href="' + esc(postLink) + '" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-400 transition-colors" title="Open on LinkedIn">' + postContent + '</a>';
+      }
       return '<tr class="row-hover animate-fadeIn" style="border-bottom:1px solid var(--border-color);">' +
-        '<td class="px-4 py-3 max-w-[200px] sm:max-w-xs truncate" style="color:var(--text-primary);">' + esc(truncate(p.post_text, opts.truncate || 80)) + '</td>' +
+        '<td class="px-4 py-3 max-w-[200px] sm:max-w-xs truncate" style="color:var(--text-primary);">' + postContent + '</td>' +
         '<td class="px-4 py-3 ' + hiddenTopic + '"><span class="text-[11px] px-2 py-0.5 rounded-md border" style="background:var(--bg-card-alt);border-color:var(--border-color);color:var(--text-secondary);">' + esc(p.topic_used || '—') + '</span></td>' +
         '<td class="px-4 py-3">' + statusBadge(status) + '</td>' +
         '<td class="px-4 py-3 text-right text-xs whitespace-nowrap" style="color:var(--text-muted);" title="' + esc(fmtDate(p.published_at)) + '">' + getRelativeTime(p.published_at) + '</td>' +
@@ -875,7 +993,7 @@
       var frag = document.createDocumentFragment();
       posts.forEach(function (p) {
         var tr = document.createElement('tr');
-        tr.innerHTML = renderTableRow(p, { truncate: 80, hideTopic: false });
+        tr.innerHTML = renderTableRow(p, { truncate: 80, hideTopic: false, showLink: true });
         frag.appendChild(tr);
       });
       $activityBody.appendChild(frag);
@@ -894,7 +1012,7 @@
       var frag = document.createDocumentFragment();
       shown.forEach(function (p) {
         var tr = document.createElement('tr');
-        tr.innerHTML = renderTableRow(p, { truncate: 120, hideTopic: true });
+        tr.innerHTML = renderTableRow(p, { truncate: 120, hideTopic: true, showLink: true });
         frag.appendChild(tr);
       });
       $historyBody.appendChild(frag);
@@ -905,6 +1023,10 @@
       var current = parseInt(el.textContent, 10);
       if (isNaN(current) || target === '—' || target === 'Tomorrow') {
         el.textContent = target;
+        return;
+      }
+      if (target === 0 || target === '0') {
+        el.textContent = '0';
         return;
       }
       var start = 0;
@@ -922,11 +1044,98 @@
       }, interval);
     }
 
-    function updateKpis(posts) {
+    function updateKpis(posts, scheduledCount) {
       var total = posts.length;
       animateKPI($('kpiTotalPosts'), total);
       $('kpiEngagement').textContent = '—';
-      animateKPI($('kpiTrends'), total > 0 ? Math.floor(total * 3.2) : '—');
+      var scheduled = scheduledCount != null ? scheduledCount : '—';
+      $('kpiTrends').textContent = scheduled;
+      $('kpiTrends').parentElement.querySelector('.kpi-label').textContent = 'Scheduled';
+    }
+
+    // ── Profile UI ────────────────────────────────────────────────────────
+    function updateProfileUI(profile) {
+      if (profile) {
+        userProfile = Object.assign({}, userProfile || {}, profile);
+      }
+      var sb = document.getElementById('sidebarProfile');
+      var details = document.getElementById('linkedinProfileDetails');
+      if (!sb) return;
+
+      var p = userProfile || {};
+      var fullName = p.full_name || currentUser?.email || 'User';
+      var initials = (fullName.charAt(0) || '?').toUpperCase();
+      var avatarEl = document.getElementById('sidebarAvatar');
+      if (avatarEl) avatarEl.textContent = initials;
+
+      var nameEl = document.getElementById('sidebarFullName');
+      if (nameEl) nameEl.textContent = fullName;
+
+      var statusEl = document.getElementById('sidebarLinkedinStatus');
+      var isConnected = p.linkedin_connected === true;
+      if (statusEl) {
+        if (isConnected) {
+          var lnName = p.linkedin_name || 'LinkedIn Connected';
+          statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-green-400"></span><span>' + esc(lnName) + '</span>';
+        } else {
+          statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-400"></span><span>Not connected</span>';
+        }
+      }
+
+      sb.classList.remove('hidden');
+
+      // Settings page profile details
+      if (details) {
+        if (isConnected) {
+          details.classList.remove('hidden');
+          var sAvatar = document.getElementById('settingsLinkedinAvatar');
+          if (sAvatar) sAvatar.textContent = (p.linkedin_name || 'LN').charAt(0).toUpperCase();
+          var sName = document.getElementById('settingsLinkedinName');
+          if (sName) sName.textContent = p.linkedin_name || 'LinkedIn User';
+          var sPid = document.getElementById('settingsLinkedinProfileId');
+          if (sPid) sPid.textContent = 'Profile ID: ' + (p.linkedin_profile_id || '—');
+        } else {
+          details.classList.add('hidden');
+        }
+      }
+      updatePublishButtonState();
+      renderSettingsProfile();
+    }
+
+    function renderSettingsProfile() {
+      var avatarEl = $('settingsProfileAvatar');
+      var nameEl = $('settingsProfileName');
+      var emailEl = $('settingsProfileEmail');
+      var orgEl = $('settingsProfileOrg');
+      var dateEl = $('settingsProfileDate');
+      var linkedinEl = $('settingsProfileLinkedin');
+      if (!avatarEl) return;
+
+      var p = userProfile || {};
+      var user = currentUser || {};
+
+      var fullName = p.full_name || (user.user_metadata && user.user_metadata.full_name) || user.email || 'User';
+      var initials = (fullName.charAt(0) || '?').toUpperCase();
+      avatarEl.textContent = initials;
+
+      if (nameEl) nameEl.textContent = fullName;
+      if (emailEl) emailEl.textContent = user.email || '—';
+      if (orgEl) orgEl.textContent = (user.user_metadata && user.user_metadata.organization_name) || p.organization_name || 'No organization';
+
+      if (dateEl && user.created_at) {
+        var d = new Date(user.created_at);
+        dateEl.textContent = 'Member since ' + d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      }
+
+      if (linkedinEl) {
+        var isConnected = p.linkedin_connected === true;
+        if (isConnected) {
+          var lnName = p.linkedin_name || 'Connected';
+          linkedinEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> LinkedIn: ' + esc(lnName);
+        } else {
+          linkedinEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> LinkedIn: Not connected';
+        }
+      }
     }
 
     // ── Supabase ops ─────────────────────────────────────────────────────
@@ -939,6 +1148,31 @@
         return;
       }
       var sb = window.supabaseClient;
+
+      // Fetch user session
+      try {
+        var sessionRes = await sb.auth.getSession();
+        currentUser = sessionRes?.data?.session?.user || null;
+      } catch (err) {
+        console.error('[Dashboard] Session fetch failed:', JSON.stringify(err));
+      }
+
+      // Fetch profile
+      if (currentUser) {
+        try {
+          var profileRes = await sb.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+          if (profileRes.error) {
+            console.warn('[Dashboard] Profile load error:', profileRes.error.code, profileRes.error.message);
+          } else if (profileRes.data) {
+            updateProfileUI(profileRes.data);
+          } else {
+            console.warn('[Dashboard] No profile row found for user', currentUser.id);
+          }
+        } catch (err) {
+          console.warn('[Dashboard] Profile load failed:', err?.message || err);
+        }
+        renderSettingsProfile();
+      }
 
       try {
         var r1 = await sb.from('settings').select('topic, posts_per_day').eq('id', CONFIG_ID).maybeSingle();
@@ -958,7 +1192,7 @@
         refreshSettingsStatus();
         revealSettings();
       } catch (err) {
-        console.error('[Dashboard] Settings load failed:', err);
+        console.error('[Dashboard] Settings load failed:', JSON.stringify(err));
         savedTopic = 'Default Topic';
         savedPpd = 1;
         $settingsTopic.value = savedTopic;
@@ -970,17 +1204,36 @@
         revealSettings();
       }
 
+      // Fetch posts_history — select(*) to avoid missing column errors
       try {
-        var r2 = await sb.from('posts_history').select('id, post_text, topic_used, published_at').order('published_at', { ascending: false }).limit(50);
+        var q2 = sb.from('posts_history').select('*').order('published_at', { ascending: false }).limit(50);
+        if (currentUser) q2 = q2.eq('user_id', currentUser.id);
+        var r2 = await q2;
         if (r2.error) throw r2.error;
         allPosts = r2.data || [];
       } catch (err) {
-        console.error('[Dashboard] History load failed:', err);
+        console.error('[Dashboard] History load failed — query error:', JSON.stringify(err));
         allPosts = [];
-        toast('Could not load post history', 'error');
       }
 
-      showContent(allPosts);
+      // Fetch scheduled count — wrapped defensively so missing table/column never breaks dashboard
+      var scheduledCount = 0;
+      try {
+        var schedQuery = sb.from('scheduled_posts').select('id', { count: 'exact', head: true }).in('status', ['pending', 'processing']);
+        if (currentUser) {
+          schedQuery = schedQuery.eq('user_id', currentUser.id);
+        }
+        var schedRes = await schedQuery;
+        if (!schedRes.error) {
+          scheduledCount = schedRes.count || 0;
+        } else {
+          console.warn('[Dashboard] Scheduled posts query returned error:', JSON.stringify(schedRes.error));
+        }
+      } catch (err) {
+        console.warn('[Dashboard] Scheduled count fetch failed (table may not exist):', JSON.stringify(err));
+      }
+
+      showContent(allPosts, scheduledCount);
     }
 
     async function updateSettings() {
@@ -1003,11 +1256,25 @@
         refreshSettingsStatus();
         toast('Settings saved successfully', 'success');
       } catch (err) {
-        console.error('[Dashboard] Settings update failed:', err);
+        console.error('[Dashboard] Settings update failed:', JSON.stringify(err));
         toast(err && err.message ? err.message : 'Failed to save settings', 'error');
       } finally {
         $saveSettingsBtn.disabled = false;
         $saveSettingsBtn.innerHTML = '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg> Save Settings';
+      }
+    }
+
+    async function loadHistory() {
+      if (!window.supabaseClient) return;
+      try {
+        var pq = window.supabaseClient.from('posts_history').select('*').order('published_at', { ascending: false }).limit(50);
+        if (currentUser) pq = pq.eq('user_id', currentUser.id);
+        var pr = await pq;
+        if (pr.error) throw pr.error;
+        allPosts = pr.data || [];
+        renderHistory(allPosts);
+      } catch (err) {
+        console.error('[Dashboard] loadHistory failed:', JSON.stringify(err));
       }
     }
 
@@ -1021,99 +1288,58 @@
       }
 
       var btn = generateImage ? $generateImageBtn : $generateBtn;
-      var loadingText = generateImage ? 'Generating Post & Image...' : 'Generating...';
       if (generateImage) { isGeneratingImage = true; } else { isGeneratingText = true; }
       btn.disabled = true;
-      btn.innerHTML = '<span class="loader-ring animate-spin"></span> ' + loadingText;
+      btn.innerHTML = '<span class="loader-ring animate-spin"></span> Loading...';
       $generateLoading.classList.remove('hidden');
-      $generateLoadingText.textContent = generateImage ? 'AI is generating your LinkedIn post with image...' : 'AI is generating your LinkedIn post...';
-
-      var pendingPost = {
-        id: 'pending-' + Date.now(),
-        post_text: 'Generating post on "' + topic + '"...',
-        topic_used: topic,
-        published_at: new Date().toISOString(),
-        status: 'pending'
-      };
-      allPosts.unshift(pendingPost);
-      renderActivity(allPosts.slice(0, 10));
-      updateKpis(allPosts);
-
-      // The n8n workflow runs the full pipeline (RSS → LLM → LinkedIn → DB)
-      // before responding, so this call can take 10-30s. Guard it with a timeout
-      // so the button can never hang indefinitely.
-      var controller = new AbortController();
-      var timeoutId = setTimeout(function () { controller.abort(); }, 90000);
+      $generateLoadingText.textContent = 'Running n8n workflow...';
 
       try {
-        var response = await fetch(N8N_WEBHOOK_URL, {
+        var response = await fetch(APP_CONFIG.N8N_LINKEDIN_GENERATE_WEBHOOK, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             topic: topic,
-            posts_per_day: savedPpd,
+            posts_per_day: 1,
             timestamp: new Date().toISOString(),
-            generate_image: generateImage || false
-          }),
-          signal: controller.signal
+            generate_image: generateImage || false,
+            user_id: currentUser ? currentUser.id : 'c6e724ba-74d2-43c0-b0f2-18f5b5b8187b',
+            access_token: userProfile && userProfile.linkedin_access_token ? userProfile.linkedin_access_token : ''
+          })
         });
-        clearTimeout(timeoutId);
 
-        // n8n error responses are not always JSON — parse defensively.
-        var data;
-        var rawText = null;
-        try { rawText = await response.text(); console.log('[N8N] Raw response body:', rawText); data = JSON.parse(rawText); }
-        catch (parseErr) { console.error('[N8N] JSON parse failed — body is not JSON. Raw text:', rawText); data = null; }
-
-        console.log('[N8N] HTTP status:', response.status);
-        console.log('[N8N] Parsed data:', data);
-
-        allPosts = allPosts.filter(function (p) { return p.id !== pendingPost.id; });
-
-        var hasContent = data && (data.post_text || data.post);
-        if (response.ok && !data) {
-          console.warn('[N8N] HTTP 200 with empty body — n8n ran but returned no JSON. Falling back to Supabase refresh.');
-        }
-
-        if (response.ok && hasContent) {
-          toast('Success: Post published!', 'success');
-          showPostPreview(data, topic);
-          var newPost = {
-            id: data.linkedin_post_id || data.id || 'new-' + Date.now(),
-            post_text: data.post_text || data.post || '',
-            topic_used: data.topic_used || topic,
-            published_at: data.published_at || new Date().toISOString(),
-            status: 'published'
-          };
-          allPosts.unshift(newPost);
-        } else if (response.ok) {
-          toast('Workflow completed — refreshing...', 'info');
+        if (response.ok) {
+          toast('Post published successfully! Refreshing dashboard...', 'success');
+          await loadDashboardData();
+          await loadHistory();
+          toast('Dashboard updated', 'success');
         } else {
-          var errMsg = (data && (data.message || data.error)) || ('HTTP ' + response.status);
-          toast('Workflow error: ' + errMsg, 'error');
-          allPosts.unshift({
-            id: 'failed-' + Date.now(),
-            post_text: 'Failed to generate post on "' + topic + '"',
-            topic_used: topic,
-            published_at: new Date().toISOString(),
-            status: 'failed'
-          });
+          var status = response.status;
+          var errMsg = 'Workflow returned HTTP ' + status;
+          if (status === 404) {
+            errMsg = 'n8n webhook not found (HTTP 404). Check that the webhook URL is correct and n8n is running.';
+          } else if (status === 401 || status === 403) {
+            errMsg = 'n8n webhook rejected the request (HTTP ' + status + '). Check authentication.';
+          } else if (status >= 500) {
+            errMsg = 'n8n server error (HTTP ' + status + '). The workflow may have crashed.';
+          }
+          try {
+            var errBody = await response.text();
+            if (errBody && errBody.length > 0) errMsg = errMsg + ': ' + errBody.slice(0, 300);
+          } catch (_) {}
+          toast(errMsg, 'error');
         }
       } catch (err) {
-        clearTimeout(timeoutId);
-        allPosts = allPosts.filter(function (p) { return p.id !== pendingPost.id; });
-        console.error('[Dashboard] n8n call failed:', err);
-        var msg = err.name === 'AbortError'
-          ? 'Timed out waiting for n8n (post may still be publishing)'
-          : (err.message || 'Could not reach n8n webhook');
-        toast('Failed: ' + msg, 'error');
-        allPosts.unshift({
-          id: 'failed-' + Date.now(),
-          post_text: 'Failed to generate post on "' + topic + '"',
-          topic_used: topic,
-          published_at: new Date().toISOString(),
-          status: 'failed'
-        });
+        console.error('[Dashboard] n8n request failed:', err?.message || err);
+        var errMsg = 'Could not reach n8n webhook. ';
+        if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
+          errMsg += 'Network error — check that the generate webhook is reachable.';
+        } else if (err.name === 'AbortError') {
+          errMsg += 'Request timed out. The workflow may be taking too long.';
+        } else {
+          errMsg += err.message || 'Unknown network error.';
+        }
+        toast(errMsg, 'error');
       } finally {
         if (generateImage) { isGeneratingImage = false; } else { isGeneratingText = false; }
         btn.disabled = false;
@@ -1121,29 +1347,88 @@
           ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"/></svg> Generate Post with Image'
           : '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg> Generate Text Post';
         $generateLoading.classList.add('hidden');
-
-        renderActivity(allPosts.slice(0, 10));
-        updateKpis(allPosts);
-
-        try {
-          if (!window.supabaseClient) return;
-          var r = await window.supabaseClient.from('posts_history').select('id, post_text, topic_used, published_at').order('published_at', { ascending: false }).limit(50);
-          if (r.error) throw r.error;
-          allPosts = r.data || [];
-          renderActivity(allPosts.slice(0, 10));
-          renderHistory(allPosts);
-          updateKpis(allPosts);
-          if (allPosts.length > 0 && allPosts[0].topic_used === topic) {
-            showPostPreview(allPosts[0], topic);
-          }
-        } catch (err) {
-          console.error('[Dashboard] History refresh failed:', err);
-        }
       }
     }
 
     function generatePostWithImage() {
       triggerN8n(true);
+    }
+
+    async function publishLinkedInPost() {
+      var postContent = $previewBody.innerText || $previewBody.textContent || '';
+      if (!postContent || postContent === 'Click "Generate" above to see your AI-crafted post draft appear here in real-time...') {
+        toast('No post content to publish. Generate a post first.', 'error');
+        return;
+      }
+
+      if (!userProfile || !userProfile.linkedin_connected) {
+        toast('Please connect your LinkedIn account first.', 'error');
+        return;
+      }
+
+      if (!window.supabaseClient) {
+        toast('Database unavailable – cannot publish', 'error');
+        return;
+      }
+      var sessionRes = await window.supabaseClient.auth.getSession();
+      var session = sessionRes?.data?.session;
+      if (!session) {
+        toast('Your session has expired. Please sign in again.', 'error');
+        return;
+      }
+
+      var imageUrl = '';
+      if (!$previewMediaContainer.classList.contains('hidden') && !$previewImage.classList.contains('hidden')) {
+        imageUrl = $previewImage.src;
+      }
+
+      var btn = $('publishLinkedInBtn');
+      btn.disabled = true;
+      var originalHTML = btn.innerHTML;
+      btn.innerHTML = '<span class="loader-ring animate-spin"></span> Publishing...';
+
+      try {
+        var response = await fetch(APP_CONFIG.N8N_LINKEDIN_PUBLISH_WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: session.user.id,
+            post_content: postContent,
+            image_url: imageUrl,
+            publish_now: true
+          })
+        });
+
+        var result = null;
+        try {
+          result = await response.json();
+        } catch (_) {}
+
+        if (response.ok && result && result.success) {
+          toast('Post published successfully!', 'success');
+          $previewBody.innerHTML = 'Click "Generate" above to see your AI-crafted post draft appear here in real-time...';
+          $previewContainer.classList.remove('draft-active');
+          $previewMediaContainer.classList.add('hidden');
+          updatePublishButtonState();
+          await loadDashboardData();
+          await loadHistory();
+        } else {
+          var errMsg = result && result.error ? result.error : 'Publishing failed (HTTP ' + response.status + ')';
+          toast(errMsg, 'error');
+        }
+      } catch (err) {
+        var errMsg = 'Could not reach the publishing service. ';
+        if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
+          errMsg += 'Network error — check your connection.';
+        } else {
+          errMsg += err.message || 'Unknown error.';
+        }
+        toast(errMsg, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+        updatePublishButtonState();
+      }
     }
 
     function showPostPreview(data, topic) {
@@ -1174,6 +1459,7 @@
       }
 
       $previewContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      updatePublishButtonState();
     }
 
     function updateButtonStates() {
@@ -1182,19 +1468,37 @@
       $generateImageBtn.disabled = !hasTopic;
     }
 
+    function updatePublishButtonState() {
+      var btn = $('publishLinkedInBtn');
+      if (!btn) return;
+      var content = $previewBody.innerText || $previewBody.textContent || '';
+      var hasContent = content && content !== 'Click "Generate" above to see your AI-crafted post draft appear here in real-time...';
+      var connected = userProfile && userProfile.linkedin_connected === true;
+      btn.disabled = !(hasContent && connected);
+    }
+
     function showEmptyState() {
       $activitySkeleton.classList.add('hidden');
       $activityContent.classList.remove('hidden');
       $activityEmpty.classList.remove('hidden');
       $kpiSkeleton.classList.add('hidden');
       $kpiGrid.classList.remove('hidden');
+      $newsSkeleton.classList.add('hidden');
+      $newsScrollWrap.classList.add('hidden');
+      $newsEmpty.classList.remove('hidden');
+      $historySkeleton.classList.add('hidden');
+      $historyEmpty.classList.remove('hidden');
+      $schedSkeleton.classList.add('hidden');
+      $schedEmpty.classList.remove('hidden');
+      $settingsSkeleton.classList.add('hidden');
+      $settingsForm.classList.add('hidden');
       $('kpiTotalPosts').textContent = '0';
       $('kpiEngagement').textContent = '—';
       $('kpiTrends').textContent = '—';
       $('kpiNextScheduled').textContent = '—';
     }
 
-    function showContent(posts) {
+    function showContent(posts, scheduledCount) {
       $activitySkeleton.classList.add('hidden');
       $activityContent.classList.remove('hidden');
       $kpiSkeleton.classList.add('hidden');
@@ -1202,7 +1506,7 @@
       $historySkeleton.classList.add('hidden');
       renderActivity(posts.slice(0, 10));
       renderHistory(posts);
-      updateKpis(posts);
+      updateKpis(posts, scheduledCount);
     }
 
     // ── Scheduled posts ──────────────────────────────────────────────────
@@ -1301,18 +1605,26 @@
     async function loadScheduled() {
       if (!window.supabaseClient) { $schedSkeleton.classList.add('hidden'); return; }
       try {
-        var r = await window.supabaseClient
+        var query = window.supabaseClient
           .from('scheduled_posts')
-          .select('id, topic, scheduled_for, status, created_at, fired_at')
+          .select('*')
           .order('scheduled_for', { ascending: true });
-        if (r.error) throw r.error;
+        if (currentUser) {
+          query = query.eq('user_id', currentUser.id);
+        }
+        var r = await query;
+        if (r.error) {
+          console.error('[Dashboard] Scheduled query error:', JSON.stringify(r.error));
+          throw r.error;
+        }
         allScheduled = r.data || [];
         schedLoaded = true;
         renderScheduled();
         updateNextScheduled();
       } catch (err) {
-        console.error('[Dashboard] Scheduled load failed:', err);
+        console.error('[Dashboard] Scheduled load failed:', JSON.stringify(err));
         $schedSkeleton.classList.add('hidden');
+        $schedEmpty.classList.remove('hidden');
         if (!schedLoaded) toast('Could not load scheduled posts (is the table created?)', 'error');
         $('kpiNextScheduled').textContent = 'No upcoming posts';
         $nextSchedHelper.classList.add('hidden');
@@ -1351,7 +1663,7 @@
         if (r.error) throw r.error;
         if (r.data !== null) applySchedulerUI(!!r.data.is_scheduler_active, r.data.poll_interval_minutes ?? 5);
       } catch (err) {
-        console.warn('[Dashboard] Could not load scheduler toggle:', err);
+        console.warn('[Dashboard] Could not load scheduler toggle:', JSON.stringify(err));
       }
     }
 
@@ -1368,7 +1680,7 @@
       } catch (err) {
         applySchedulerUI(prev, pollInterval);
         toast('Failed to update scheduler state', 'error');
-        console.error('[Dashboard] Toggle error:', err);
+        console.error('[Dashboard] Toggle error:', JSON.stringify(err));
       } finally {
         $masterSchedToggle.disabled = false;
       }
@@ -1388,7 +1700,7 @@
       } catch (err) {
         applySchedulerUI(isSchedulerActive, prev);
         toast('Failed to update polling interval', 'error');
-        console.error('[Dashboard] Interval change error:', err);
+        console.error('[Dashboard] Interval change error:', JSON.stringify(err));
       }
     }
 
@@ -1417,16 +1729,18 @@
       var original = $schedBtn.innerHTML;
       $schedBtn.innerHTML = '<span class="loader-ring animate-spin"></span> Scheduling...';
       try {
+        var sessionRes = await window.supabaseClient.auth.getSession();
+        var userId = sessionRes?.data?.session?.user?.id || null;
         var r = await window.supabaseClient
           .from('scheduled_posts')
-          .insert({ topic: topic, scheduled_for: runAt.toISOString(), status: 'pending', post_type: schedPostType });
+          .insert({ topic: topic, scheduled_for: runAt.toISOString(), status: 'pending', post_type: schedPostType, user_id: userId });
         if (r.error) throw r.error;
         toast('Post scheduled for ' + fmtDate(runAt.toISOString()), 'success');
         $schedTopic.value = '';
         $schedWhen.value = '';
         await loadScheduled();
       } catch (err) {
-        console.error('[Dashboard] Schedule insert failed:', err);
+        console.error('[Dashboard] Schedule insert failed:', JSON.stringify(err));
         toast(err && err.message ? err.message : 'Failed to schedule post', 'error');
       } finally {
         $schedBtn.disabled = false;
@@ -1443,7 +1757,7 @@
         toast('Scheduled post cancelled', 'info');
         await loadScheduled();
       } catch (err) {
-        console.error('[Dashboard] Cancel failed:', err);
+        console.error('[Dashboard] Cancel failed:', JSON.stringify(err));
         toast(err && err.message ? err.message : 'Failed to cancel', 'error');
       }
     }
@@ -1461,7 +1775,7 @@
           .order('created_at', { ascending: false });
         console.log('[TrendingNews] Full response:', r);
         if (r.error) {
-          console.error('[TrendingNews] Supabase error:', r.error);
+          console.error('[TrendingNews] Supabase error:', JSON.stringify(r.error));
           throw r.error;
         }
         var items = r.data || [];
@@ -1514,7 +1828,7 @@
         window.newsLog = window.newsLog || []; window.newsLog.push({ t: new Date().toISOString(), n: items.length });
         console.log('[TrendingNews] Render complete —', items.length, 'articles displayed');
       } catch (err) {
-        console.error('[TrendingNews] Caught error:', err);
+        console.error('[TrendingNews] Caught error:', JSON.stringify(err));
         $newsSkeleton.classList.add('hidden');
         $newsEmpty.classList.remove('hidden');
         $newsCount.textContent = '0 articles';
@@ -1633,6 +1947,27 @@
         var btn = e.target.closest('[data-cancel-id]');
         if (btn) cancelScheduled(btn.getAttribute('data-cancel-id'));
       });
+
+      // LinkedIn Connect / Disconnect — now handled by js/linkedin-oauth.js
+
+      // Publish to LinkedIn button
+      var $publishBtn = $('publishLinkedInBtn');
+      if ($publishBtn) {
+        $publishBtn.addEventListener('click', publishLinkedInPost);
+      }
+
+      // Settings page Sign Out
+      var $settingsSignOut = $('settingsSignOut');
+      if ($settingsSignOut) {
+        $settingsSignOut.addEventListener('click', function (e) {
+          e.preventDefault();
+          if (typeof window.authGuard !== 'undefined' && window.authGuard.signOut) {
+            window.authGuard.signOut();
+          } else {
+            window.location.href = 'auth.html';
+          }
+        });
+      }
     }
 
     // ── Boot ─────────────────────────────────────────────────────────────
@@ -1658,14 +1993,65 @@
       }, 3000);
 
       try {
-        var supabaseLib = window.supabase;
-        if (!supabaseLib) throw new Error('Supabase CDN script not loaded yet');
-        window.supabaseClient = supabaseLib.createClient(supabaseUrl, supabaseKey, {
-          auth: { persistSession: false }
+        if (!window.supabase || !window.supabase.auth) throw new Error('Supabase client not loaded yet');
+        window.supabaseClient = window.supabase;
+        console.log('[Dashboard] Supabase client assigned');
+
+        function updateConnectionStatus(status) {
+          var el = document.getElementById('connectionStatus');
+          if (!el) return;
+          var children = el.querySelectorAll('span');
+          if (children.length < 2) return;
+          if (status === 'System Online') {
+            children[0].className = 'w-2 h-2 rounded-full bg-green-500 animate-pulse-dot';
+            children[1].textContent = 'System Online';
+          } else {
+            children[0].className = 'w-2 h-2 rounded-full bg-zinc-400';
+            children[1].textContent = 'Not connected';
+          }
+        }
+
+        window.supabaseClient.auth.onAuthStateChange(function (event, session) {
+          if (event === 'SIGNED_IN' && session) {
+            updateConnectionStatus('System Online');
+          } else if (event === 'SIGNED_OUT') {
+            updateConnectionStatus('Not connected');
+          }
         });
-        console.log('[Dashboard] Supabase client initialised');
+
+        window.supabaseClient.auth.getSession().then(function (result) {
+          if (result.data && result.data.session) {
+            updateConnectionStatus('System Online');
+          }
+        });
 
         wireEvents();
+
+        // ── LinkedIn OAuth popup callback listener ──────────────
+        window.addEventListener('message', function (event) {
+          if (event.origin !== 'http://127.0.0.1:5500') {
+            console.warn('[Dashboard] Ignored message from unexpected origin:', event.origin);
+            return;
+          }
+          if (event.data.type === 'linkedin-connected') {
+            toast('LinkedIn profile connected successfully!', 'success');
+            setTimeout(function () {
+              if (window.linkedinOAuth && window.linkedinOAuth.checkConnection) {
+                window.linkedinOAuth.checkConnection().then(function (result) {
+                  if (!result.connected) {
+                    toast('LinkedIn connection verified but status shows disconnected. Try reconnecting.', 'error');
+                  }
+                });
+              }
+            }, 500);
+          } else if (event.data.type === 'linkedin-error') {
+            var errMsg = event.data.error || 'Failed to connect LinkedIn. Please try again.';
+            toast(errMsg, 'error');
+            if (window.linkedinOAuth && window.linkedinOAuth.updateConnectButton) {
+              window.linkedinOAuth.updateConnectButton('disconnected');
+            }
+          }
+        });
 
         (async function () {
           try {
@@ -1700,22 +2086,35 @@
               setInterval(async function () {
                 try {
                   if (!window.supabaseClient) return;
-                  var r = await window.supabaseClient.from('posts_history').select('id, post_text, topic_used, published_at').order('published_at', { ascending: false }).limit(50);
-                  if (r.error) throw r.error;
-                  allPosts = r.data || [];
+                  var pq = window.supabaseClient.from('posts_history').select('*').order('published_at', { ascending: false }).limit(50);
+                  if (currentUser) pq = pq.eq('user_id', currentUser.id);
+                  var pr = await pq;
+                  if (pr.error) throw pr.error;
+                  allPosts = pr.data || [];
+                  var sc = 0;
+                  try {
+                    var sq = window.supabaseClient.from('scheduled_posts').select('id', { count: 'exact', head: true }).in('status', ['pending', 'processing']);
+                    if (currentUser) {
+                      sq = sq.eq('user_id', currentUser.id);
+                    }
+                    var sr = await sq;
+                    if (!sr.error) sc = sr.count || 0;
+                  } catch (schedErr) {
+                    console.warn('[Dashboard] Auto-refresh scheduled count failed:', JSON.stringify(schedErr));
+                  }
                   renderActivity(allPosts.slice(0, 10));
                   renderHistory(allPosts);
-                  updateKpis(allPosts);
+                  updateKpis(allPosts, sc);
                   if (schedLoaded) loadScheduled();
                   loadSchedulerToggle();
                   loadTrendingNews();
-                } catch (err) { console.error('[Dashboard] Auto-refresh failed:', err); }
+                } catch (err) { console.error('[Dashboard] Auto-refresh failed:', JSON.stringify(err)); }
               }, 30000);
 
               setInterval(loadTrendingNews, 3600000);
             }
           } catch (err) {
-            console.error('[Dashboard] Data-loading error:', err);
+            console.error('[Dashboard] Data-loading error:', JSON.stringify(err));
             if (overlay) overlay.style.display = 'none';
             revealSettings();
             showEmptyState();
@@ -1725,7 +2124,7 @@
         })();
 
       } catch (error) {
-        console.error('[Dashboard] Initialization failed:', error);
+        console.error('[Dashboard] Initialization failed:', JSON.stringify(error));
         if (overlay) overlay.style.display = 'none';
         revealSettings();
         showEmptyState();

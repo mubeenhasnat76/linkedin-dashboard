@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — LinkedIn AI Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
+
+    :root {
+      --bg-body: #f4f4f6;
+      --bg-card: rgba(255, 255, 255, 0.72);
+      --border-glass: rgba(0, 0, 0, 0.06);
+      --border-glass-hover: rgba(0, 0, 0, 0.1);
+      --text-primary: #18181b;
+      --text-secondary: #52525b;
+      --text-muted: #a1a1aa;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --input-bg: rgba(244, 244, 246, 0.8);
+      --dot-color: rgba(0, 0, 0, 0.04);
+      --shadow-card: rgba(0, 0, 0, 0.08);
+    }
+
+    html.dark {
+      --bg-body: #07070a;
+      --bg-card: rgba(12, 12, 15, 0.75);
+      --border-glass: rgba(255, 255, 255, 0.06);
+      --border-glass-hover: rgba(255, 255, 255, 0.1);
+      --text-primary: #e1e1e3;
+      --text-secondary: #a1a1aa;
+      --text-muted: #52525b;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --input-bg: rgba(17, 17, 20, 0.6);
+      --dot-color: rgba(255, 255, 255, 0.03);
+      --shadow-card: rgba(0, 0, 0, 0.4);
+    }
+
+    body {
+      background: var(--bg-body);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(99, 102, 241, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(100%) translateY(-50%); } to { opacity: 1; transform: translateX(0) translateY(-50%); } }
+    @keyframes slideOut { from { opacity: 1; transform: translateX(0) translateY(-50%); } to { opacity: 0; transform: translateX(100%) translateY(-50%); } }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .animate-fadeIn { animation: fadeIn 0.4s ease forwards; }
+    .animate-slideIn { animation: slideIn 0.3s ease forwards; }
+    .animate-slideOut { animation: slideOut 0.25s ease forwards; }
+    .animate-spin { animation: spin 0.8s linear infinite; }
+
+    .glass-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: 20px;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 8px 32px var(--shadow-card);
+    }
+
+    .glass-input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border-glass);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+      outline: none;
+    }
+    .glass-input::placeholder { color: var(--text-muted); }
+    .glass-input:focus {
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
+      background: rgba(17, 17, 20, 0.8);
+    }
+    .glass-input:-webkit-autofill,
+    .glass-input:-webkit-autofill:hover,
+    .glass-input:-webkit-autofill:focus {
+      -webkit-text-fill-color: var(--text-primary);
+      -webkit-box-shadow: 0 0 0 30px rgba(17, 17, 20, 0.9) inset;
+      caret-color: var(--text-primary);
+    }
+
+    .btn-accent {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-accent::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      background: linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.06) 100%);
+      pointer-events: none;
+    }
+    .btn-accent:hover {
+      background: linear-gradient(135deg, #818cf8, #a78bfa);
+      border-color: rgba(139, 92, 246, 0.4);
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
+      transform: translateY(-1px);
+    }
+    .btn-accent:active { transform: scale(0.98) translateY(0); }
+    .btn-accent:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .tab-btn {
+      flex: 1;
+      padding: 0.625rem 1rem;
+      border-radius: 10px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text-muted);
+      position: relative;
+      z-index: 1;
+    }
+    .tab-btn:hover { color: var(--text-secondary); }
+
+    .tab-indicator {
+      position: absolute;
+      top: 2px;
+      bottom: 2px;
+      left: 2px;
+      width: calc(50% - 4px);
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      border-radius: 9px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 0;
+    }
+
+    .loader-ring { width: 1.125rem; height: 1.125rem; border: 2px solid rgba(255,255,255,0.12); border-top-color: #fff; border-radius: 50%; }
+
+    .toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none; }
+    .toast { pointer-events: auto; display: flex; align-items: center; gap: 0.625rem; padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.8125rem; font-weight: 500; line-height: 1.4; min-width: 300px; max-width: 400px; border: 1px solid; backdrop-filter: blur(14px); }
+    .toast-success { background: rgba(6, 150, 80, 0.14); border-color: rgba(6, 150, 80, 0.3); color: #4ade80; }
+    .toast-error { background: rgba(220, 38, 38, 0.14); border-color: rgba(220, 38, 38, 0.3); color: #f87171; }
+    .toast-info { background: rgba(99, 102, 241, 0.14); border-color: rgba(99, 102, 241, 0.3); color: #a5b4fc; }
+
+    .auth-error {
+      background: rgba(220, 38, 38, 0.08);
+      border: 1px solid rgba(220, 38, 38, 0.2);
+      border-radius: 10px;
+      padding: 0.625rem 0.875rem;
+      font-size: 0.75rem;
+      color: #f87171;
+      transition: opacity 0.25s ease;
+    }
+
+    .theme-float {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text-muted);
+      box-shadow: 0 4px 16px var(--shadow-card);
+    }
+    .theme-float:hover {
+      background: rgba(99, 102, 241, 0.12);
+      border-color: rgba(99, 102, 241, 0.25);
+      color: #a78bfa;
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+      transform: translateY(-1px);
+    }
+    .theme-float:active { transform: scale(0.92); }
+    .theme-float svg { width: 1.125rem; height: 1.125rem; }
+
+    @media (max-width: 480px) {
+      .glass-card { margin: 1rem; border-radius: 16px; }
+      .toast { min-width: auto; max-width: calc(100vw - 2rem); }
+    }
+  </style>
+</head>
+<body>
+  <div class="toast-container" id="authToastContainer"></div>
+
+  <button id="authThemeToggle" class="theme-float" aria-label="Toggle theme">
+    <svg id="authThemeIcon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+    </svg>
+  </button>
+
+  <div class="relative z-10 w-full max-w-[420px] animate-fadeIn">
+    <div class="glass-card p-8 sm:p-10">
+      <div class="flex flex-col items-center text-center mb-8">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 mb-3">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2zM4 6a2 2 0 100-4 2 2 0 000 4z"/>
+          </svg>
+        </div>
+        <h1 class="text-lg font-bold tracking-tight text-white">LinkedIn AI Scheduler</h1>
+        <p class="text-xs mt-1" style="color:var(--text-muted);">Multi-tenant content automation platform</p>
+      </div>
+
+      <div class="relative flex bg-black/20 rounded-xl p-1 mb-6" style="border:1px solid var(--border-glass);">
+        <span class="tab-indicator" id="authTabIndicator"></span>
+        <button type="button" class="tab-btn text-white" id="authTabSignIn">Sign In</button>
+        <button type="button" class="tab-btn" id="authTabSignUp">Sign Up</button>
+      </div>
+
+      <form id="authForm" novalidate>
+        <div id="authError" class="auth-error hidden opacity-0 mb-4" role="alert"></div>
+
+        <div id="authFormSignUp" class="hidden space-y-3.5">
+          <div>
+            <label for="authFullName" class="block text-xs font-medium mb-1.5 tracking-wide uppercase" style="color:var(--text-secondary);">Full Name</label>
+            <input id="authFullName" type="text" class="glass-input auth-input" placeholder="John Doe" spellcheck="false" autocomplete="name" />
+          </div>
+          <div>
+            <label for="authOrgName" class="block text-xs font-medium mb-1.5 tracking-wide uppercase" style="color:var(--text-secondary);">Organization / Workspace</label>
+            <input id="authOrgName" type="text" class="glass-input auth-input" placeholder="Acme Corp" spellcheck="false" autocomplete="organization" />
+          </div>
+          <div>
+            <label for="authEmailSignUp" class="block text-xs font-medium mb-1.5 tracking-wide uppercase" style="color:var(--text-secondary);">Email</label>
+            <input id="authEmailSignUp" type="email" class="glass-input auth-input" placeholder="you@company.com" spellcheck="false" autocomplete="email" />
+          </div>
+          <div>
+            <label for="authPasswordSignUp" class="block text-xs font-medium mb-1.5 tracking-wide uppercase" style="color:var(--text-secondary);">Password</label>
+            <input id="authPasswordSignUp" type="password" class="glass-input auth-input" placeholder="At least 6 characters" autocomplete="new-password" />
+          </div>
+        </div>
+
+        <div id="authFormSignIn" class="space-y-3.5">
+          <div>
+            <label for="authEmail" class="block text-xs font-medium mb-1.5 tracking-wide uppercase" style="color:var(--text-secondary);">Email</label>
+            <input id="authEmail" type="email" class="glass-input auth-input" placeholder="you@company.com" spellcheck="false" autocomplete="email" />
+          </div>
+          <div>
+            <label for="authPassword" class="block text-xs font-medium mb-1.5 tracking-wide uppercase" style="color:var(--text-secondary);">Password</label>
+            <input id="authPassword" type="password" class="glass-input auth-input" placeholder="Your password" autocomplete="current-password" />
+          </div>
+          <div class="flex items-center justify-between pt-1">
+            <label class="flex items-center gap-2 text-xs" style="color:var(--text-muted); cursor:pointer;">
+              <input type="checkbox" class="rounded border-zinc-600 bg-zinc-800 text-indigo-500 focus:ring-indigo-500/30" checked />
+              <span>Remember me</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="mt-6">
+          <button type="submit" id="authSubmitBtn" class="btn-accent">
+            <span id="authSubmitLoader" class="loader-ring animate-spin hidden"></span>
+            <span id="authSubmitText">Sign In</span>
+          </button>
+        </div>
+      </form>
+
+      <p class="text-center text-xs mt-5" style="color:var(--text-muted);">
+        By continuing, you agree to the
+        <a href="#" class="underline underline-offset-2 hover:text-zinc-400 transition-colors">Terms of Service</a>
+        and
+        <a href="#" class="underline underline-offset-2 hover:text-zinc-400 transition-colors">Privacy Policy</a>.
+      </p>
+    </div>
+
+    <p class="text-center text-xs mt-4" style="color:var(--text-muted);">
+      Powered by
+      <span class="font-medium text-zinc-500">Supabase</span>
+      &middot;
+      <span class="font-medium text-zinc-500">n8n</span>
+      &middot;
+      <span class="font-medium text-zinc-500">LinkedIn API</span>
+    </p>
+  </div>
+
+  <!-- Mandatory load order: 1. Supabase CDN  2. config.js  3. auth.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    (function () {
+      var STORAGE_KEY = 'linkedin-dashboard-theme';
+      var html = document.documentElement;
+      var btn = document.getElementById('authThemeToggle');
+      var icon = document.getElementById('authThemeIcon');
+
+      var sunPath = 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z';
+      var moonPath = 'M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z';
+
+      function setTheme(dark) {
+        if (dark) { html.classList.add('dark'); } else { html.classList.remove('dark'); }
+        icon.innerHTML = dark ? '<path d="' + sunPath + '"/>' : '<path d="' + moonPath + '"/>';
+        localStorage.setItem(STORAGE_KEY, dark ? 'dark' : 'light');
+      }
+
+      var stored = localStorage.getItem(STORAGE_KEY);
+      if (stored === 'light') { setTheme(false); }
+      else { setTheme(true); }
+
+      if (btn) {
+        btn.addEventListener('click', function () {
+          setTheme(!html.classList.contains('dark'));
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
