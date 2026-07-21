@@ -4,7 +4,7 @@
   var state = params.get('state');
   var errorParam = params.get('error');
   var errorDescription = params.get('error_description');
-  var OPENER_ORIGIN = 'http://127.0.0.1:5500';
+  var OPENER_ORIGIN = 'https://linkedin-dashboard-murex.vercel.app';
 
   function closePopup(data) {
     if (window.opener && !window.opener.closed) {
