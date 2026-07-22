@@ -1,5 +1,7 @@
 let isSignUpMode = false;
 let authSubmitting = false;
+let lastSignUpEmail = '';
+let pendingVerification = false;
 
 const $authTabSignIn = document.getElementById('authTabSignIn');
 const $authTabSignUp = document.getElementById('authTabSignUp');
@@ -10,9 +12,22 @@ const $authSubmitBtn = document.getElementById('authSubmitBtn');
 const $authSubmitText = document.getElementById('authSubmitText');
 const $authSubmitLoader = document.getElementById('authSubmitLoader');
 const $authError = document.getElementById('authError');
+const $authForm = document.getElementById('authForm');
+const $signupSuccessCard = document.getElementById('signupSuccessCard');
+const $emailVerifiedCard = document.getElementById('emailVerifiedCard');
+const $unverifiedCard = document.getElementById('unverifiedCard');
+const $signupEmailDisplay = document.getElementById('signupEmailDisplay');
+const $resendSignupBtn = document.getElementById('resendSignupBtn');
+const $resendSignupText = document.getElementById('resendSignupText');
+const $resendUnverifiedBtn = document.getElementById('resendUnverifiedBtn');
+const $resendUnverifiedText = document.getElementById('resendUnverifiedText');
+const $backToLoginBtn = document.getElementById('backToLoginBtn');
+const $continueToLoginBtn = document.getElementById('continueToLoginBtn');
+const $backToSignInBtn = document.getElementById('backToSignInBtn');
 
 function switchAuthTab(mode) {
   isSignUpMode = mode;
+  hideStatusCards();
   if ($authTabSignIn) {
     $authTabSignIn.classList.toggle('text-white', !mode);
     $authTabSignIn.classList.toggle('text-zinc-500', mode);
@@ -26,10 +41,103 @@ function switchAuthTab(mode) {
   if ($authIndicator) $authIndicator.style.transform = mode ? 'translateX(100%)' : 'translateX(0)';
   if ($authSubmitText) $authSubmitText.textContent = mode ? 'Create Account' : 'Sign In';
   clearAuthError();
+  showAuthFormPart(true);
 }
 
-if ($authTabSignIn) $authTabSignIn.addEventListener('click', function () { switchAuthTab(false); });
+function showAuthFormPart(show) {
+  if (!$authForm) return;
+  if (show) {
+    $authForm.classList.remove('hidden');
+    $authForm.classList.remove('animate-fadeOut');
+    $authForm.classList.add('animate-fadeIn');
+  } else {
+    $authForm.classList.add('hidden');
+  }
+}
+
+function hideStatusCards() {
+  if ($signupSuccessCard) {
+    $signupSuccessCard.classList.add('hidden');
+    $signupSuccessCard.classList.remove('animate-scaleIn');
+  }
+  if ($emailVerifiedCard) {
+    $emailVerifiedCard.classList.add('hidden');
+    $emailVerifiedCard.classList.remove('animate-scaleIn');
+  }
+  if ($unverifiedCard) {
+    $unverifiedCard.classList.add('hidden');
+  }
+}
+
+function showSignupSuccessCard(email) {
+  lastSignUpEmail = email;
+  if ($signupEmailDisplay) $signupEmailDisplay.textContent = email;
+  showAuthFormPart(false);
+  if ($signupSuccessCard) {
+    $signupSuccessCard.classList.remove('hidden');
+    void $signupSuccessCard.offsetWidth;
+    $signupSuccessCard.classList.add('animate-scaleIn');
+  }
+  hideAuthTabs();
+}
+
+function showEmailVerifiedCard() {
+  showAuthFormPart(false);
+  if ($emailVerifiedCard) {
+    $emailVerifiedCard.classList.remove('hidden');
+    void $emailVerifiedCard.offsetWidth;
+    $emailVerifiedCard.classList.add('animate-scaleIn');
+  }
+  hideAuthTabs();
+}
+
+function showUnverifiedCard() {
+  if ($unverifiedCard) {
+    $unverifiedCard.classList.remove('hidden');
+    $authError.classList.add('hidden', 'opacity-0');
+  }
+}
+
+function hideUnverifiedCard() {
+  if ($unverifiedCard) {
+    $unverifiedCard.classList.add('hidden');
+  }
+}
+
+function hideAuthTabs() {
+  var tabBar = document.querySelector('.relative.flex.bg-black\\/20.rounded-xl.p-1.mb-6');
+  if (tabBar) tabBar.style.display = 'none';
+}
+
+function showAuthTabs() {
+  var tabBar = document.querySelector('.relative.flex.bg-black\\/20.rounded-xl.p-1.mb-6');
+  if (tabBar) tabBar.style.display = 'flex';
+}
+
+if ($authTabSignIn) $authTabSignIn.addEventListener('click', function () {
+  hideUnverifiedCard();
+  switchAuthTab(false);
+});
 if ($authTabSignUp) $authTabSignUp.addEventListener('click', function () { switchAuthTab(true); });
+
+if ($backToLoginBtn) $backToLoginBtn.addEventListener('click', function () {
+  switchAuthTab(false);
+  showAuthTabs();
+  var emailInput = document.getElementById('authEmail');
+  if (emailInput && lastSignUpEmail) emailInput.value = lastSignUpEmail;
+});
+
+if ($continueToLoginBtn) $continueToLoginBtn.addEventListener('click', function () {
+  switchAuthTab(false);
+  showAuthTabs();
+  var emailInput = document.getElementById('authEmail');
+  if (emailInput && lastSignUpEmail) emailInput.value = lastSignUpEmail;
+});
+
+if ($backToSignInBtn) $backToSignInBtn.addEventListener('click', function () {
+  hideUnverifiedCard();
+  clearAuthError();
+});
 
 function showAuthError(msg) {
   if (!$authError) return;
@@ -81,10 +189,87 @@ async function handleSignUp(fullName, orgName, email, password) {
   return data;
 }
 
+function startResendCooldown(btnEl, textEl, seconds) {
+  if (!btnEl) return;
+  btnEl.disabled = true;
+  var countdown = seconds;
+  var updateText = function () {
+    if (textEl) textEl.textContent = 'Resend (' + countdown + 's)';
+  };
+  updateText();
+  var timer = setInterval(function () {
+    countdown--;
+    if (countdown <= 0) {
+      clearInterval(timer);
+      btnEl.disabled = false;
+      if (textEl) textEl.textContent = 'Resend Verification Email';
+    } else {
+      if (textEl) textEl.textContent = 'Resend (' + countdown + 's)';
+    }
+  }, 1000);
+}
+
+async function resendVerificationEmail(email) {
+  try {
+    var response = await fetch(APP_CONFIG.supabaseUrl + '/auth/v1/resend', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': APP_CONFIG.supabaseKey
+      },
+      body: JSON.stringify({
+        type: 'signup',
+        email: email
+      })
+    });
+    if (!response.ok) {
+      var errData = {};
+      try { errData = await response.json(); } catch (_) {}
+      throw new Error(errData.msg || errData.error || 'Failed to resend verification email');
+    }
+    return true;
+  } catch (err) {
+    throw err;
+  }
+}
+
+if ($resendSignupBtn) {
+  $resendSignupBtn.addEventListener('click', async function () {
+    if (!lastSignUpEmail) return;
+    if ($resendSignupBtn.disabled) return;
+    try {
+      await resendVerificationEmail(lastSignUpEmail);
+      showAuthToast('Verification email resent successfully.', 'success');
+      startResendCooldown($resendSignupBtn, $resendSignupText, 60);
+    } catch (err) {
+      showAuthToast(err.message || 'Failed to resend verification email.', 'error');
+    }
+  });
+}
+
+if ($resendUnverifiedBtn) {
+  $resendUnverifiedBtn.addEventListener('click', async function () {
+    var email = document.getElementById('authEmail').value.trim();
+    if (!email || !validateEmail(email)) {
+      showAuthError('Please enter a valid email address first.');
+      return;
+    }
+    if ($resendUnverifiedBtn.disabled) return;
+    try {
+      await resendVerificationEmail(email);
+      showAuthToast('Verification email resent successfully.', 'success');
+      startResendCooldown($resendUnverifiedBtn, $resendUnverifiedText, 60);
+    } catch (err) {
+      showAuthToast(err.message || 'Failed to resend verification email.', 'error');
+    }
+  });
+}
+
 async function onAuthSubmit(e) {
   if (e) e.preventDefault();
   if (authSubmitting) return;
   clearAuthError();
+  hideUnverifiedCard();
 
   if (isSignUpMode) {
     const fullName = document.getElementById('authFullName').value.trim();
@@ -107,15 +292,7 @@ async function onAuthSubmit(e) {
         return;
       }
 
-      showAuthToast('Account created! Check your email for a confirmation link.', 'success');
-
-      setTimeout(function () {
-        switchAuthTab(false);
-        const emailInput = document.getElementById('authEmail');
-        const passInput = document.getElementById('authPassword');
-        if (emailInput) emailInput.value = email;
-        if (passInput) passInput.value = '';
-      }, 2000);
+      showSignupSuccessCard(email);
     } catch (err) {
       const msg = err?.message || 'Something went wrong. Please try again.';
       showAuthError(msg);
@@ -135,8 +312,13 @@ async function onAuthSubmit(e) {
       await handleSignIn(email, password);
       window.location.href = 'index.html';
     } catch (err) {
-      const msg = err?.message || 'Invalid email or password.';
-      showAuthError(msg);
+      var msg = err?.message || 'Invalid email or password.';
+      var code = err?.code || err?.status || '';
+      if (msg.toLowerCase().indexOf('email not confirmed') !== -1 || msg.toLowerCase().indexOf('email_not_confirmed') !== -1) {
+        showUnverifiedCard();
+      } else {
+        showAuthError(msg);
+      }
       console.error('[Auth] Sign in error:', err);
     } finally {
       setAuthLoading(false);
@@ -185,8 +367,39 @@ function showAuthToast(msg, type) {
   }, 4000);
 }
 
+// ── Email Verification Detection ─────────────────────────────
+(function detectEmailVerification() {
+  var hash = window.__authHash || window.location.hash;
+  if (!hash) return;
+
+  if (hash.indexOf('type=signup') !== -1 || hash.indexOf('type=email') !== -1 || hash.indexOf('type=invite') !== -1) {
+    pendingVerification = true;
+
+    var extractEmail = function (h) {
+      var match = h.match(/email=([^&]+)/);
+      if (match) return decodeURIComponent(match[1]);
+      return '';
+    };
+    var verifiedEmail = extractEmail(hash);
+
+    setTimeout(async function () {
+      try {
+        var sr = await window.supabase.auth.getSession();
+        var session = sr.data?.session;
+        if (session) {
+          await window.supabase.auth.signOut();
+        }
+      } catch (_) {}
+
+      if (verifiedEmail) lastSignUpEmail = verifiedEmail;
+      showEmailVerifiedCard();
+    }, 100);
+  }
+})();
+
 if (typeof window.supabase !== 'undefined' && window.supabase.auth) {
   window.supabase.auth.onAuthStateChange(function (event, session) {
+    if (pendingVerification) return;
     if (event === 'SIGNED_IN' && session && window.location.pathname.includes('auth')) {
       window.location.href = 'index.html';
     }
@@ -196,6 +409,7 @@ if (typeof window.supabase !== 'undefined' && window.supabase.auth) {
 (async function checkExistingSession() {
   if (typeof window.supabase === 'undefined' || !window.supabase.auth) return;
   if (!window.location.pathname.includes('auth')) return;
+  if (pendingVerification) return;
   try {
     var { data } = await window.supabase.auth.getSession();
     if (data?.session) {
@@ -203,4 +417,3 @@ if (typeof window.supabase !== 'undefined' && window.supabase.auth) {
     }
   } catch (_) {}
 })();
-

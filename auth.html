@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sign In — LinkedIn AI Dashboard</title>
+  <script>window.__authHash = window.location.hash;</script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -202,6 +203,101 @@
       transition: opacity 0.25s ease;
     }
 
+    .status-card {
+      text-align: center;
+      padding: 0.5rem 0;
+    }
+    .status-card .icon-wrap {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+    }
+    .status-card h2 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 0.375rem;
+    }
+    .status-card p {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+    }
+    .status-card .email-display {
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.5rem 0.75rem;
+      border-radius: 10px;
+      display: inline-block;
+      margin: 0.75rem 0;
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.15);
+      color: #c4b5fd;
+    }
+    .status-card .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+    }
+    .btn-card {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: 1px solid;
+    }
+    .btn-card-primary {
+      color: #fff;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border-color: rgba(139, 92, 246, 0.25);
+    }
+    .btn-card-primary:hover {
+      background: linear-gradient(135deg, #818cf8, #a78bfa);
+      border-color: rgba(139, 92, 246, 0.4);
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
+      transform: translateY(-1px);
+    }
+    .btn-card-primary:active { transform: scale(0.98); }
+    .btn-card-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-card-secondary {
+      background: transparent;
+      border-color: var(--border-glass);
+      color: var(--text-muted);
+    }
+    .btn-card-secondary:hover {
+      border-color: var(--border-glass-hover);
+      color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .btn-card-success {
+      color: #4ade80;
+      background: rgba(6, 150, 80, 0.1);
+      border-color: rgba(6, 150, 80, 0.2);
+    }
+    .btn-card-success:hover {
+      background: rgba(6, 150, 80, 0.18);
+      border-color: rgba(6, 150, 80, 0.35);
+    }
+    .status-card .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+      margin: 0.75rem 0;
+    }
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+    .animate-scaleIn { animation: scaleIn 0.25s ease forwards; }
+    @keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
+    .animate-fadeOut { animation: fadeOut 0.2s ease forwards; }
+
     .theme-float {
       position: fixed;
       top: 1rem;
@@ -267,6 +363,21 @@
 
       <form id="authForm" novalidate>
         <div id="authError" class="auth-error hidden opacity-0 mb-4" role="alert"></div>
+        <div id="unverifiedCard" class="hidden auth-error mb-4" style="background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.2);color:#fbbf24;">
+          <div style="display:flex;align-items:flex-start;gap:0.625rem;">
+            <svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+            <div>
+              <p style="font-weight:600;font-size:0.8125rem;">Your email has not been verified.</p>
+              <p style="font-size:0.75rem;margin-top:0.25rem;">Please verify your email first.</p>
+              <div style="display:flex;gap:0.5rem;margin-top:0.625rem;">
+                <button id="resendUnverifiedBtn" type="button" class="btn-card btn-card-primary" style="width:auto;padding:0.5rem 1rem;font-size:0.75rem;">
+                  <span id="resendUnverifiedText">Resend Verification Email</span>
+                </button>
+                <button id="backToSignInBtn" type="button" class="btn-card btn-card-secondary" style="width:auto;padding:0.5rem 1rem;font-size:0.75rem;">Back</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div id="authFormSignUp" class="hidden space-y-3.5">
           <div>
@@ -318,6 +429,45 @@
         and
         <a href="#" class="underline underline-offset-2 hover:text-zinc-400 transition-colors">Privacy Policy</a>.
       </p>
+
+      <!-- ─── Signup Success Card ─── -->
+      <div id="signupSuccessCard" class="hidden status-card animate-scaleIn">
+        <div class="icon-wrap" style="background:rgba(6,150,80,0.12);">
+          <svg class="w-7 h-7" fill="none" stroke="#4ade80" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <h2 style="color:var(--text-primary);">Account Created Successfully</h2>
+        <p style="color:var(--text-secondary);">We've sent a verification email to:</p>
+        <span id="signupEmailDisplay" class="email-display"></span>
+        <div class="btn-group">
+          <a href="https://mail.google.com" target="_blank" rel="noopener noreferrer" class="btn-card btn-card-success">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            Open Gmail
+          </a>
+          <button id="resendSignupBtn" class="btn-card btn-card-primary">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span id="resendSignupText">Resend Verification Email</span>
+          </button>
+          <button id="backToLoginBtn" class="btn-card btn-card-secondary">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+            Back to Login
+          </button>
+        </div>
+      </div>
+
+      <!-- ─── Email Verified Card ─── -->
+      <div id="emailVerifiedCard" class="hidden status-card animate-scaleIn">
+        <div class="icon-wrap" style="background:rgba(6,150,80,0.12);">
+          <svg class="w-7 h-7" fill="none" stroke="#4ade80" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <h2 style="color:var(--text-primary);">Email Verified Successfully</h2>
+        <p style="color:var(--text-secondary);">Your account is now active.</p>
+        <div style="margin-top:1.5rem;">
+          <button id="continueToLoginBtn" class="btn-card btn-card-primary" style="width:100%;">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+            Continue to Login
+          </button>
+        </div>
+      </div>
     </div>
 
     <p class="text-center text-xs mt-4" style="color:var(--text-muted);">

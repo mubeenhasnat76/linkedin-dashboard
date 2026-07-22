@@ -2039,7 +2039,7 @@
 
         // ── LinkedIn OAuth popup callback listener ──────────────
         window.addEventListener('message', function (event) {
-          if (event.origin !== 'https://linkedin-dashboard-murex.vercel.app') {
+          if (event.origin !== window.location.origin) {
             console.warn('[Dashboard] Ignored message from unexpected origin:', event.origin);
             return;
           }
