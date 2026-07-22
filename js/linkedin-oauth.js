@@ -147,18 +147,28 @@
   }
 
   function startLinkedInAuth() {
+    console.log('[LinkedInOAuth] startLinkedInAuth entered');
+    console.log('[LinkedInOAuth] window.location.origin:', window.location.origin);
+    console.log('[LinkedInOAuth] APP_CONFIG.REDIRECT_URI:', APP_CONFIG.REDIRECT_URI);
+    console.log('[LinkedInOAuth] APP_CONFIG.LINKEDIN_CLIENT_ID:', APP_CONFIG.LINKEDIN_CLIENT_ID);
+    console.log('[LinkedInOAuth] APP_CONFIG.LINKEDIN_EDGE_FUNCTION:', APP_CONFIG.LINKEDIN_EDGE_FUNCTION);
+    console.log('[LinkedInOAuth] currentSession:', currentSession);
+
     if (!currentSession) {
+      console.log('[LinkedInOAuth] early return: no currentSession');
       showToast('You must be signed in to connect LinkedIn.', 'error');
       return;
     }
 
     var clientId = APP_CONFIG.LINKEDIN_CLIENT_ID;
     if (!clientId || clientId === 'YOUR_LINKEDIN_CLIENT_ID') {
+      console.log('[LinkedInOAuth] early return: clientId not configured');
       showToast('LinkedIn Client ID is not configured in config.js.', 'error');
       return;
     }
 
     if (!APP_CONFIG.LINKEDIN_EDGE_FUNCTION || APP_CONFIG.LINKEDIN_EDGE_FUNCTION.indexOf('YOUR_EDGE_FUNCTION') !== -1) {
+      console.log('[LinkedInOAuth] early return: edge function not configured');
       showToast('LinkedIn Edge Function URL is not configured in config.js.', 'error');
       return;
     }
@@ -174,10 +184,23 @@
       '&state=' + encodeURIComponent(state) +
       '&scope=' + encodeURIComponent(scopes);
 
+    console.log('[LinkedInOAuth] generated authUrl:', authUrl);
+
     updateConnectButton('connecting');
 
-    var popup = window.open(authUrl, 'linkedin-oauth', 'width=600,height=700');
+    var popup;
+    try {
+      popup = window.open(authUrl, 'linkedin-oauth', 'width=600,height=700');
+    } catch (ex) {
+      console.log('[LinkedInOAuth] window.open threw exception:', ex);
+      showToast('Popup was blocked. Please allow popups for this site and try again.', 'error');
+      updateConnectButton(currentState === 'connecting' ? 'disconnected' : currentState);
+      return;
+    }
+    console.log('[LinkedInOAuth] window.open returned:', popup);
+    console.log('[LinkedInOAuth] popup.closed:', popup ? popup.closed : 'N/A');
     if (!popup || popup.closed) {
+      console.log('[LinkedInOAuth] early return: popup was blocked or closed immediately');
       showToast('Popup was blocked. Please allow popups for this site and try again.', 'error');
       updateConnectButton(currentState === 'connecting' ? 'disconnected' : currentState);
     }
