@@ -77,8 +77,8 @@
     });
 
     document.getElementById('modal-continue-btn').addEventListener('click', function () {
-      overlay.remove();
       if (typeof onConfirm === 'function') onConfirm();
+      overlay.remove();
     });
 
     overlay.addEventListener('click', function (e) {
