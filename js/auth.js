@@ -7,7 +7,6 @@ const $authTabSignIn = document.getElementById('authTabSignIn');
 const $authTabSignUp = document.getElementById('authTabSignUp');
 const $authFormSignIn = document.getElementById('authFormSignIn');
 const $authFormSignUp = document.getElementById('authFormSignUp');
-const $authIndicator = document.getElementById('authTabIndicator');
 const $authSubmitBtn = document.getElementById('authSubmitBtn');
 const $authSubmitText = document.getElementById('authSubmitText');
 const $authSubmitLoader = document.getElementById('authSubmitLoader');
@@ -28,20 +27,33 @@ const $backToSignInBtn = document.getElementById('backToSignInBtn');
 function switchAuthTab(mode) {
   isSignUpMode = mode;
   hideStatusCards();
+  clearAllFieldErrors();
   if ($authTabSignIn) {
-    $authTabSignIn.classList.toggle('text-white', !mode);
-    $authTabSignIn.classList.toggle('text-zinc-500', mode);
+    $authTabSignIn.classList.toggle('active', !mode);
+    $authTabSignIn.setAttribute('aria-selected', String(!mode));
   }
   if ($authTabSignUp) {
-    $authTabSignUp.classList.toggle('text-white', mode);
-    $authTabSignUp.classList.toggle('text-zinc-500', !mode);
+    $authTabSignUp.classList.toggle('active', mode);
+    $authTabSignUp.setAttribute('aria-selected', String(mode));
   }
   if ($authFormSignIn) $authFormSignIn.classList.toggle('hidden', mode);
   if ($authFormSignUp) $authFormSignUp.classList.toggle('hidden', !mode);
-  if ($authIndicator) $authIndicator.style.transform = mode ? 'translateX(100%)' : 'translateX(0)';
   if ($authSubmitText) $authSubmitText.textContent = mode ? 'Create Account' : 'Sign In';
   clearAuthError();
   showAuthFormPart(true);
+  toggleFormAutofill(mode);
+}
+
+function toggleFormAutofill(isSignUp) {
+  var signInFields = $authFormSignIn ? $authFormSignIn.querySelectorAll('input') : [];
+  var signUpFields = $authFormSignUp ? $authFormSignUp.querySelectorAll('input') : [];
+  if (isSignUp) {
+    signInFields.forEach(function (el) { el.setAttribute('readonly', ''); el.value = ''; });
+    signUpFields.forEach(function (el) { el.removeAttribute('readonly'); });
+  } else {
+    signUpFields.forEach(function (el) { el.setAttribute('readonly', ''); el.value = ''; });
+    signInFields.forEach(function (el) { el.removeAttribute('readonly'); });
+  }
 }
 
 function showAuthFormPart(show) {
@@ -105,12 +117,12 @@ function hideUnverifiedCard() {
 }
 
 function hideAuthTabs() {
-  var tabBar = document.querySelector('.relative.flex.bg-black\\/20.rounded-xl.p-1.mb-6');
+  var tabBar = document.querySelector('.auth-tabs');
   if (tabBar) tabBar.style.display = 'none';
 }
 
 function showAuthTabs() {
-  var tabBar = document.querySelector('.relative.flex.bg-black\\/20.rounded-xl.p-1.mb-6');
+  var tabBar = document.querySelector('.auth-tabs');
   if (tabBar) tabBar.style.display = 'flex';
 }
 
@@ -141,16 +153,63 @@ if ($backToSignInBtn) $backToSignInBtn.addEventListener('click', function () {
 
 function showAuthError(msg) {
   if (!$authError) return;
-  $authError.textContent = msg;
-  $authError.classList.remove('hidden', 'opacity-0');
-  $authError.classList.add('opacity-100');
+  var textEl = document.getElementById('authErrorText');
+  if (textEl) textEl.textContent = msg;
+  $authError.classList.remove('hidden');
 }
 
 function clearAuthError() {
   if (!$authError) return;
-  $authError.textContent = '';
-  $authError.classList.add('hidden', 'opacity-0');
-  $authError.classList.remove('opacity-100');
+  $authError.classList.add('hidden');
+}
+
+function showFieldError(fieldId, message) {
+  var el = document.getElementById(fieldId + 'Error');
+  var input = document.getElementById(fieldId);
+  if (el) { el.textContent = message; el.classList.add('visible'); }
+  if (input) { input.classList.add('has-error'); }
+}
+
+function clearFieldError(fieldId) {
+  var el = document.getElementById(fieldId + 'Error');
+  var input = document.getElementById(fieldId);
+  if (el) { el.textContent = ''; el.classList.remove('visible'); }
+  if (input) { input.classList.remove('has-error'); }
+}
+
+function clearAllFieldErrors() {
+  ['authFullName','authOrgName','authEmailSignUp','authPasswordSignUp','authEmail','authPassword'].forEach(clearFieldError);
+}
+
+function initPasswordToggles() {
+  document.querySelectorAll('.password-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var input = document.getElementById(this.dataset.for);
+      if (!input) return;
+      var isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      var open = this.querySelector('.eye-open');
+      var closed = this.querySelector('.eye-closed');
+      if (open) open.classList.toggle('hidden', !isPassword);
+      if (closed) closed.classList.toggle('hidden', isPassword);
+    });
+  });
+}
+
+function attachFieldValidation(fieldId, validator) {
+  var input = document.getElementById(fieldId);
+  if (!input) return;
+  input.addEventListener('blur', function () {
+    var val = this.value.trim();
+    if (val) {
+      var err = validator(val);
+      if (err) showFieldError(fieldId, err);
+      else clearFieldError(fieldId);
+    }
+  });
+  input.addEventListener('input', function () {
+    clearFieldError(fieldId);
+  });
 }
 
 function setAuthLoading(loading) {
@@ -269,6 +328,7 @@ async function onAuthSubmit(e) {
   if (e) e.preventDefault();
   if (authSubmitting) return;
   clearAuthError();
+  clearAllFieldErrors();
   hideUnverifiedCard();
 
   if (isSignUpMode) {
@@ -277,10 +337,12 @@ async function onAuthSubmit(e) {
     const email = document.getElementById('authEmailSignUp').value.trim();
     const password = document.getElementById('authPasswordSignUp').value;
 
-    if (!fullName) { showAuthError('Please enter your full name.'); return; }
-    if (!orgName) { showAuthError('Please enter your organization or workspace name.'); return; }
-    if (!email || !validateEmail(email)) { showAuthError('Please enter a valid email address.'); return; }
-    if (!password || !validatePassword(password)) { showAuthError('Password must be at least 6 characters.'); return; }
+    var hasErr = false;
+    if (!fullName) { showFieldError('authFullName', 'Please enter your full name.'); hasErr = true; }
+    if (!orgName) { showFieldError('authOrgName', 'Please enter your organization or workspace name.'); hasErr = true; }
+    if (!email || !validateEmail(email)) { showFieldError('authEmailSignUp', 'Please enter a valid email address.'); hasErr = true; }
+    if (!password || !validatePassword(password)) { showFieldError('authPasswordSignUp', 'Password must be at least 6 characters.'); hasErr = true; }
+    if (hasErr) return;
 
     setAuthLoading(true);
     try {
@@ -304,8 +366,10 @@ async function onAuthSubmit(e) {
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value;
 
-    if (!email || !validateEmail(email)) { showAuthError('Please enter a valid email address.'); return; }
-    if (!password) { showAuthError('Please enter your password.'); return; }
+    var hasErr = false;
+    if (!email || !validateEmail(email)) { showFieldError('authEmail', 'Please enter a valid email address.'); hasErr = true; }
+    if (!password) { showFieldError('authPassword', 'Please enter your password.'); hasErr = true; }
+    if (hasErr) return;
 
     setAuthLoading(true);
     try {
@@ -329,45 +393,31 @@ async function onAuthSubmit(e) {
 const authForm = document.getElementById('authForm');
 if (authForm) authForm.addEventListener('submit', onAuthSubmit);
 
-document.querySelectorAll('.auth-input').forEach(function (el) {
+document.querySelectorAll('.input-field').forEach(function (el) {
   el.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') onAuthSubmit(e);
+    if (e.key === 'Enter' && !e.target.readonly) onAuthSubmit(e);
   });
 });
-
-const passField = document.getElementById('authPassword');
-if (passField) {
-  passField.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') onAuthSubmit(e);
-  });
-}
-
-const passSignUpField = document.getElementById('authPasswordSignUp');
-if (passSignUpField) {
-  passSignUpField.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') onAuthSubmit(e);
-  });
-}
 
 function showAuthToast(msg, type) {
   type = type || 'info';
   var c = document.getElementById('authToastContainer');
   if (!c) return;
   var el = document.createElement('div');
-  el.className = 'toast toast-' + type + ' animate-slideIn';
+  el.className = 'toast toast-' + type;
   var icons = {
-    success: '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>',
-    error: '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>'
+    success: '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>',
+    error: '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>'
   };
-  el.innerHTML = (icons[type] || '') + '<span>' + msg + '</span>';
+  el.innerHTML = (icons[type] || '') + '<span>' + msg + '</span><div class="toast-progress"></div>';
   c.appendChild(el);
   setTimeout(function () {
-    el.className = el.className.replace('animate-slideIn', 'animate-slideOut');
+    el.classList.add('toast-out');
     setTimeout(function () { el.remove(); }, 260);
   }, 4000);
 }
 
-// ── Email Verification Detection ─────────────────────────────
+// Email Verification Detection
 (function detectEmailVerification() {
   var hash = window.__authHash || window.location.hash;
   if (!hash) return;
@@ -417,3 +467,12 @@ if (typeof window.supabase !== 'undefined' && window.supabase.auth) {
     }
   } catch (_) {}
 })();
+
+initPasswordToggles();
+attachFieldValidation('authFullName', function (v) { return v.trim() ? null : 'Please enter your full name.'; });
+attachFieldValidation('authOrgName', function (v) { return v.trim() ? null : 'Please enter your organization name.'; });
+attachFieldValidation('authEmailSignUp', function (v) { return validateEmail(v) ? null : 'Please enter a valid email address.'; });
+attachFieldValidation('authPasswordSignUp', function (v) { return validatePassword(v) ? null : 'Password must be at least 6 characters.'; });
+attachFieldValidation('authEmail', function (v) { return validateEmail(v) ? null : 'Please enter a valid email address.'; });
+attachFieldValidation('authPassword', function (v) { return v ? null : 'Please enter your password.'; });
+toggleFormAutofill(false);

@@ -27,7 +27,7 @@
       error: '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>',
       info: '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
     };
-    el.innerHTML = (icons[type] || icons.info) + '<span>' + msg + '</span>';
+    el.innerHTML = (icons[type] || icons.info) + '<span>' + msg + '</span><div class="toast-progress"></div>';
     c.appendChild(el);
     setTimeout(function () {
       el.className = el.className.replace('animate-slideIn', 'animate-slideOut');
@@ -41,32 +41,32 @@
 
     var overlay = document.createElement('div');
     overlay.id = 'linkedin-account-modal';
-    overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);animation:fadeIn 0.2s ease;font-family:Inter,sans-serif;';
+    overlay.className = 'modal-overlay';
 
     var modal = document.createElement('div');
-    modal.style.cssText = 'background:var(--bg-card,#0c0c0f);border:1px solid var(--border-color,#1c1c22);border-radius:16px;padding:1.75rem;max-width:440px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.4);animation:scaleIn 0.2s ease;';
+    modal.className = 'modal-card';
 
     modal.innerHTML =
       '<div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">' +
-        '<div style="width:2.5rem;height:2.5rem;border-radius:10px;background:rgba(245,158,11,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
+        '<div class="modal-icon" style="background:rgba(245,158,11,0.12);">' +
           '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>' +
         '</div>' +
-        '<h3 style="font-size:1rem;font-weight:700;color:var(--text-primary,#e1e1e3);margin:0;">Connect LinkedIn Account</h3>' +
+        '<h3 class="modal-title">Connect LinkedIn Account</h3>' +
       '</div>' +
-      '<p style="font-size:0.8125rem;color:var(--text-secondary,#a1a1aa);line-height:1.5;margin:0 0 0.75rem 0;">' +
+      '<p class="modal-body" style="margin:0 0 0.75rem 0;">' +
         'If you are already signed in to LinkedIn in this browser, LinkedIn will automatically connect that account.' +
       '</p>' +
-      '<p style="font-size:0.8125rem;color:var(--text-secondary,#a1a1aa);line-height:1.5;margin:0 0 0.5rem 0;">' +
+      '<p class="modal-body" style="margin:0 0 0.5rem 0;">' +
         'If you want to connect a different LinkedIn account:' +
       '</p>' +
-      '<ul style="font-size:0.8125rem;color:var(--text-secondary,#a1a1aa);line-height:1.6;margin:0 0 1rem 0;padding-left:1.25rem;">' +
+      '<ul class="modal-body" style="line-height:1.6;margin:0 0 1rem 0;padding-left:1.25rem;">' +
         '<li>Sign out of LinkedIn first, or</li>' +
         '<li>Use an Incognito / Private window, or</li>' +
         '<li>Use another browser where the desired LinkedIn account is signed in.</li>' +
       '</ul>' +
       '<div style="display:flex;gap:0.625rem;justify-content:flex-end;">' +
-        '<button id="modal-cancel-btn" style="padding:0.5rem 1rem;border-radius:10px;font-size:0.8125rem;font-weight:600;border:1px solid var(--border-color,#1c1c22);background:transparent;color:var(--text-secondary,#a1a1aa);cursor:pointer;">Cancel</button>' +
-        '<button id="modal-continue-btn" style="padding:0.5rem 1.25rem;border-radius:10px;font-size:0.8125rem;font-weight:600;border:none;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;cursor:pointer;">Continue</button>' +
+        '<button id="modal-cancel-btn" class="modal-btn modal-btn-secondary">Cancel</button>' +
+        '<button id="modal-continue-btn" class="modal-btn modal-btn-primary">Continue</button>' +
       '</div>';
 
     overlay.appendChild(modal);
@@ -102,6 +102,7 @@
       btn.innerHTML = LINKEDIN_ICON_SVG + '<span id="' + TEXT_ID + '">Connecting...</span>';
       if (badge) {
         badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span> Connecting';
+        badge.className = 'linkedin-badge';
         badge.style.background = 'rgba(234,179,8,0.08)';
         badge.style.borderColor = 'rgba(234,179,8,0.2)';
         badge.style.color = '#facc15';
@@ -115,6 +116,7 @@
       btn.className = 'btn-primary !bg-transparent !text-red-400 !border-red-500/25 hover:!bg-red-500/5';
       if (badge) {
         badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Connected';
+        badge.className = 'linkedin-badge';
         badge.style.background = 'rgba(6,150,80,0.08)';
         badge.style.borderColor = 'rgba(6,150,80,0.2)';
         badge.style.color = '#4ade80';
@@ -128,6 +130,7 @@
       btn.className = 'btn-primary';
       if (badge) {
         badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span> Token Expired';
+        badge.className = 'linkedin-badge';
         badge.style.background = 'rgba(249,115,22,0.08)';
         badge.style.borderColor = 'rgba(249,115,22,0.2)';
         badge.style.color = '#fb923c';
@@ -140,6 +143,7 @@
     btn.innerHTML = LINKEDIN_ICON_SVG + '<span id="' + TEXT_ID + '">Connect Profile</span>';
     if (badge) {
       badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> Not Connected';
+      badge.className = 'linkedin-badge';
       badge.style.background = 'rgba(239,68,68,0.08)';
       badge.style.borderColor = 'rgba(239,68,68,0.2)';
       badge.style.color = '#f87171';
