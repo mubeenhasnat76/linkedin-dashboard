@@ -16,79 +16,84 @@
     html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
 
-    /* ── Theme Variables ── */
     :root {
-      --bg-body: #f4f4f6;
-      --bg-body-rgb: 244, 244, 246;
+      --bg-body: #f5f5f7;
+      --bg-body-rgb: 245, 245, 247;
       --bg-card: #ffffff;
-      --bg-card-alt: #fafafa;
-      --bg-sidebar: #f0f0f3;
-      --bg-topbar: #fafafc;
-      --bg-input: #f4f4f6;
+      --bg-card-alt: #f9f9fb;
+      --bg-sidebar: #ececf0;
+      --bg-topbar: rgba(255,255,255,0.72);
+      --bg-input: #f2f2f5;
       --bg-input-focus: #ffffff;
-      --bg-overlay: #f4f4f6;
-      --border-color: #e2e2e6;
-      --border-color-light: #eeeef0;
-      --text-primary: #18181b;
-      --text-secondary: #71717a;
-      --text-muted: #a1a1aa;
-      --scrollbar-thumb: #d4d4d8;
-      --scrollbar-hover: #a1a1aa;
-      --skeleton-from: #e8e8ec;
-      --skeleton-to: #f0f0f3;
-      --badge-bg: rgba(0,0,0,0.04);
-      --table-row-hover: rgba(0,0,0,0.02);
-      --theme-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f59e0b' stroke-width='2'%3E%3Cpath d='M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z'/%3E%3C/svg%3E");
-      --radius-sm: 8px;
+      --bg-overlay: #f5f5f7;
+      --border-color: #e2e2e8;
+      --border-color-light: #ebebf0;
+      --text-primary: #1a1a2e;
+      --text-secondary: #6b6b80;
+      --text-muted: #9d9db0;
+      --scrollbar-thumb: #d0d0d8;
+      --scrollbar-hover: #b0b0be;
+      --skeleton-from: #eaeaf0;
+      --skeleton-to: #f2f2f7;
+      --badge-bg: rgba(0,0,0,0.035);
+      --table-row-hover: rgba(99,102,241,0.025);
+      --radius-sm: 6px;
       --radius-md: 10px;
-      --radius-lg: 12px;
-      --radius-xl: 16px;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-      --shadow-md: 0 4px 16px rgba(99,102,241,0.06);
-      --shadow-lg: 0 8px 24px rgba(99,102,241,0.06);
+      --radius-lg: 14px;
+      --radius-xl: 18px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02);
+      --shadow-xl: 0 16px 40px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.02);
+      --kpi-purple: #8b5cf6;
+      --kpi-emerald: #10b981;
+      --kpi-amber: #f59e0b;
+      --kpi-blue: #3b82f6;
+      --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+      --accent-subtle: rgba(99,102,241,0.08);
     }
 
     html.dark {
-      --bg-body: #07070a;
-      --bg-body-rgb: 7, 7, 10;
-      --bg-card: #0c0c0f;
-      --bg-card-alt: #0a0a0d;
-      --bg-sidebar: #0a0a0d;
-      --bg-topbar: #0a0a0d;
-      --bg-input: #111114;
-      --bg-input-focus: #1a1a20;
-      --bg-overlay: #07070a;
-      --border-color: #1c1c22;
-      --border-color-light: #16161a;
-      --text-primary: #e1e1e3;
-      --text-secondary: #a1a1aa;
-      --text-muted: #52525b;
-      --scrollbar-thumb: #25252b;
-      --scrollbar-hover: #35353b;
-      --skeleton-from: #16161a;
-      --skeleton-to: #1e1e24;
-      --badge-bg: rgba(255,255,255,0.04);
-      --table-row-hover: rgba(255,255,255,0.02);
+      --bg-body: #08080c;
+      --bg-body-rgb: 8, 8, 12;
+      --bg-card: #0e0e14;
+      --bg-card-alt: #0a0a10;
+      --bg-sidebar: #0c0c12;
+      --bg-topbar: rgba(12,12,18,0.82);
+      --bg-input: #12121a;
+      --bg-input-focus: #1a1a24;
+      --bg-overlay: #08080c;
+      --border-color: #1e1e2a;
+      --border-color-light: #16161f;
+      --text-primary: #e4e4ed;
+      --text-secondary: #9898b0;
+      --text-muted: #585870;
+      --scrollbar-thumb: #28283a;
+      --scrollbar-hover: #38384a;
+      --skeleton-from: #16161f;
+      --skeleton-to: #1e1e2a;
+      --badge-bg: rgba(255,255,255,0.035);
+      --table-row-hover: rgba(99,102,241,0.04);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.2), 0 1px 3px rgba(0,0,0,0.15);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.02);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.02);
+      --shadow-xl: 0 16px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.02);
     }
 
     body { background: var(--bg-body); color: var(--text-primary); }
-    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 9999px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
+    * { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
 
-    /* ── Background Pattern ── */
     body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: radial-gradient(rgba(var(--bg-body-rgb), 0.4) 1px, transparent 1px);
+      content: ''; position: fixed; inset: 0;
+      background-image: radial-gradient(rgba(99,102,241,0.03) 1px, transparent 1px);
       background-size: 24px 24px;
-      pointer-events: none;
-      z-index: 0;
+      pointer-events: none; z-index: 0;
     }
 
-    /* ── Animations ── */
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes slideIn { from { opacity: 0; transform: translateX(100%) translateY(-50%); } to { opacity: 1; transform: translateX(0) translateY(-50%); } }
@@ -99,6 +104,7 @@
     @keyframes scaleIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
     @keyframes countUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    @keyframes skeletonPulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
 
     .animate-fadeIn { animation: fadeIn 0.35s ease forwards; }
     .animate-fadeInUp { animation: fadeInUp 0.4s ease forwards; }
@@ -109,90 +115,116 @@
     .animate-scaleIn { animation: scaleIn 0.2s ease forwards; }
     .animate-countUp { animation: countUp 0.5s ease forwards; }
 
-    .skeleton { background: linear-gradient(90deg, var(--skeleton-from) 25%, var(--skeleton-to) 50%, var(--skeleton-from) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+    .skeleton { background: linear-gradient(90deg, var(--skeleton-from) 25%, var(--skeleton-to) 50%, var(--skeleton-from) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: var(--radius-md); }
 
-    /* ── Custom Scrollbar ── */
     .news-scroll::-webkit-scrollbar { width: 4px; }
     .news-scroll::-webkit-scrollbar-track { background: transparent; }
-    .news-scroll::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 9999px; }
-    .news-scroll::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
-    .news-scroll { scrollbar-width: thin; scrollbar-color: #d4d4d8 transparent; }
+    .news-scroll::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 9999px; }
+    .news-scroll::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
+    .news-scroll { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
 
     /* ── Toast ── */
     .toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none; max-height: 100vh; overflow: hidden; }
-    .toast { pointer-events: auto; display: flex; align-items: center; gap: 0.625rem; padding: 0.75rem 1rem; border-radius: var(--radius-md); font-size: 0.8125rem; font-weight: 500; line-height: 1.4; min-width: 300px; max-width: 400px; border: 1px solid; backdrop-filter: blur(14px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
-    .toast-success { background: rgba(6, 150, 80, 0.14); border-color: rgba(6, 150, 80, 0.3); color: #4ade80; }
-    .toast-error { background: rgba(220, 38, 38, 0.14); border-color: rgba(220, 38, 38, 0.3); color: #f87171; }
-    .toast-info { background: rgba(99, 102, 241, 0.14); border-color: rgba(99, 102, 241, 0.3); color: #a5b4fc; }
-    .toast-warning { background: rgba(245, 158, 11, 0.14); border-color: rgba(245, 158, 11, 0.3); color: #fbbf24; }
+    .toast { pointer-events: auto; display: flex; align-items: center; gap: 0.625rem; padding: 0.75rem 1rem; border-radius: var(--radius-md); font-size: 0.8125rem; font-weight: 500; line-height: 1.4; min-width: 300px; max-width: 400px; border: 1px solid; backdrop-filter: blur(16px); box-shadow: var(--shadow-lg); }
+    .toast-success { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.25); color: #34d399; }
+    .toast-error { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.25); color: #f87171; }
+    .toast-info { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.25); color: #a5b4fc; }
+    .toast-warning { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.25); color: #fbbf24; }
     @keyframes toastProgress { to { width: 0%; } }
-    .toast .toast-progress { position: absolute; bottom: 0; left: 0; height: 2px; background: rgba(255,255,255,0.2); border-radius: 0 0 var(--radius-md) var(--radius-md); animation: toastProgress 4s linear forwards; }
+    .toast .toast-progress { position: absolute; bottom: 0; left: 0; height: 2px; background: rgba(255,255,255,0.15); border-radius: 0 0 var(--radius-md) var(--radius-md); animation: toastProgress 4s linear forwards; }
     .toast { position: relative; overflow: hidden; }
 
     /* ── Badges ── */
     .badge { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.2rem 0.625rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.01em; border: 1px solid; transition: all 0.15s ease; }
-    .badge-published { background: rgba(6, 150, 80, 0.12); border-color: rgba(6, 150, 80, 0.25); color: #4ade80; }
-    .badge-pending { background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.25); color: #fbbf24; }
-    .badge-failed { background: rgba(220, 38, 38, 0.12); border-color: rgba(220, 38, 38, 0.25); color: #f87171; }
+    .badge-published { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.2); color: #34d399; }
+    .badge-pending { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.2); color: #fbbf24; }
+    .badge-failed { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.2); color: #f87171; }
+    .badge-draft { background: rgba(99,102,241,0.08); border-color: rgba(99,102,241,0.18); color: #a5b4fc; }
 
     /* ── Sidebar ── */
-    .sidebar { background: var(--bg-sidebar); border-color: var(--border-color); }
-    .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0.875rem; border-radius: var(--radius-md); font-size: 0.8125rem; font-weight: 500; color: var(--text-muted); transition: all 0.15s ease; cursor: pointer; border: 1px solid transparent; }
+    .sidebar { background: var(--bg-sidebar); border-color: var(--border-color); display: flex; flex-direction: column; }
+    .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; border-radius: var(--radius-md); font-size: 0.8125rem; font-weight: 500; color: var(--text-muted); transition: all 0.15s ease; cursor: pointer; border: 1px solid transparent; position: relative; text-decoration: none; }
     .sidebar-link:hover { background: var(--badge-bg); color: var(--text-secondary); }
-    .sidebar-link.active { background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.2); color: #c4b5fd; }
-    .sidebar-link.active svg { color: #a78bfa; }
-    .sidebar-link.signout { color: var(--text-muted); }
-    .sidebar-link.signout:hover { background: rgba(220, 38, 38, 0.08); color: #f87171; border-color: rgba(220, 38, 38, 0.15); }
+    .sidebar-link:active { transform: scale(0.98); }
+    .sidebar-link.active { background: rgba(99,102,241,0.1); border-color: rgba(99,102,241,0.2); color: #a5b4fc; }
+    .sidebar-link.active::before { content: ''; position: absolute; left: -0.625rem; top: 50%; transform: translateY(-50%); width: 3px; height: 1.25rem; border-radius: 0 2px 2px 0; background: linear-gradient(180deg, #6366f1, #a855f7); }
+    .sidebar-link.active svg { color: #818cf8; }
+    .sidebar-link.signout { color: var(--text-muted); margin-top: auto; }
+    .sidebar-link.signout:hover { background: rgba(239,68,68,0.08); color: #f87171; border-color: rgba(239,68,68,0.15); }
     .sidebar-link.signout:hover svg { color: #f87171; }
-    .sidebar-link svg { transition: color 0.15s ease; }
+    .sidebar-link svg { transition: color 0.15s ease; width: 1.25rem; height: 1.25rem; flex-shrink: 0; }
+    .sidebar-link span { line-height: 1; }
+
+    /* ── Sidebar Logo ── */
+    .sidebar-logo { display: flex; align-items: center; gap: 0.625rem; padding: 1rem 1.125rem; border-bottom: 1px solid var(--border-color); }
+    .sidebar-logo-icon { width: 1.75rem; height: 1.75rem; border-radius: var(--radius-md); background: linear-gradient(135deg, #6366f1, #a855f7); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(99,102,241,0.25); flex-shrink: 0; }
+    .sidebar-logo-text { display: block; font-size: 0.8125rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; color: var(--text-primary); }
+    .sidebar-logo-sub { display: block; font-size: 0.5625rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; line-height: 1; margin-top: 0.125rem; color: var(--text-muted); }
+
+    /* ── Sidebar Nav ── */
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 0.75rem; display: flex; flex-direction: column; gap: 0.125rem; }
+
+    /* ── Sidebar Profile ── */
+    .sidebar-profile-wrap { padding: 0.625rem; }
+    .sidebar-profile-card { background: var(--badge-bg); border-radius: var(--radius-lg); padding: 0.625rem 0.75rem; display: flex; align-items: center; gap: 0.625rem; }
+    .sidebar-avatar { width: 2rem; height: 2rem; border-radius: 9999px; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+
+    /* ── Sidebar Sign Out ── */
+    .sidebar-signout-wrap { padding: 0 0.625rem 0.5rem; }
+    .sidebar-signout-wrap .sidebar-link { padding: 0.5rem 0.75rem; border-radius: var(--radius-md); }
+
+    /* ── Sidebar Status ── */
+    .sidebar-status-wrap { padding: 0.75rem 1rem; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.5rem; }
 
     /* ── Cards ── */
-    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); backdrop-filter: blur(8px); }
-    .card-elevated { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); backdrop-filter: blur(8px); }
+    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); }
+    .card-elevated { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
     .stat-card { position: relative; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem; transition: all 0.2s ease; cursor: default; overflow: hidden; }
-    .stat-card::before { content: ''; position: absolute; inset: 0; border-radius: var(--radius-lg); opacity: 0; transition: opacity 0.2s ease; background: linear-gradient(135deg, rgba(139,92,246,0.03), transparent 60%); }
-    .stat-card:hover { transform: translateY(-2px); border-color: rgba(139,92,246,0.2); box-shadow: var(--shadow-lg); }
+    .stat-card::before { content: ''; position: absolute; inset: 0; border-radius: var(--radius-lg); opacity: 0; transition: opacity 0.3s ease; background: linear-gradient(135deg, rgba(99,102,241,0.035), transparent 60%); }
+    .stat-card:hover { transform: translateY(-2px); border-color: rgba(99,102,241,0.2); box-shadow: var(--shadow-lg); }
     .stat-card:hover::before { opacity: 1; }
     .stat-card .icon-wrap { width: 2.5rem; height: 2.5rem; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; }
-    .stat-card .kpi-value { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; position: relative; z-index: 1; }
-    .stat-card .kpi-label { font-size: 0.6875rem; color: var(--text-muted); margin-top: 0.125rem; position: relative; z-index: 1; }
+    .stat-card .kpi-value { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; position: relative; z-index: 1; line-height: 1.1; }
+    .stat-card .kpi-label { font-size: 0.6875rem; color: var(--text-muted); margin-top: 0.25rem; position: relative; z-index: 1; font-weight: 500; }
 
     /* ── Inputs ── */
     .input-field { width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-size: 0.875rem; color: var(--text-primary); transition: all 0.15s ease; outline: none; }
     .input-field::placeholder { color: var(--text-muted); }
-    .input-field:focus { background: var(--bg-input-focus); border-color: rgba(139, 92, 246, 0.4); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08); }
+    .input-field:focus { background: var(--bg-input-focus); border-color: rgba(99,102,241,0.4); box-shadow: 0 0 0 3px rgba(99,102,241,0.08); }
 
     /* ── Focus-visible ── */
-    :focus-visible { outline: 2px solid rgba(139, 92, 246, 0.6); outline-offset: 2px; border-radius: var(--radius-sm); }
-    .input-field:focus-visible { outline: 2px solid rgba(139, 92, 246, 0.4); outline-offset: -1px; }
+    :focus-visible { outline: 2px solid rgba(99,102,241,0.6); outline-offset: 2px; border-radius: var(--radius-sm); }
+    .input-field:focus-visible { outline: 2px solid rgba(99,102,241,0.4); outline-offset: -1px; }
     .sidebar-link:focus-visible, .btn-ghost:focus-visible, .theme-toggle:focus-visible, .sched-toggle:focus-visible { outline-offset: 2px; }
+    .segmented-btn:focus-visible, .quick-action-card:focus-visible, #schedPostTypeGroup button:focus-visible { outline-offset: 2px; }
+    .modal-btn:focus-visible { outline-offset: 2px; }
+    .ln-action:focus-visible { outline-offset: 2px; border-radius: 0.375rem; }
 
     /* ── Buttons ── */
-    .btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.625rem 1.25rem; border-radius: var(--radius-md); font-size: 0.8125rem; font-weight: 600; color: #fff; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: 1px solid rgba(139, 92, 246, 0.25); transition: all 0.15s ease; cursor: pointer; }
-    .btn-primary:hover { background: linear-gradient(135deg, #7c7cf8, #a07bfe); border-color: rgba(139, 92, 246, 0.4); box-shadow: 0 4px 16px rgba(99,102,241,0.15); }
+    .btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.625rem 1.25rem; border-radius: var(--radius-md); font-size: 0.8125rem; font-weight: 600; color: #fff; background: var(--accent-gradient); border: 1px solid rgba(139,92,246,0.25); transition: all 0.15s ease; cursor: pointer; }
+    .btn-primary:hover { box-shadow: 0 4px 16px rgba(99,102,241,0.2); border-color: rgba(139,92,246,0.4); }
     .btn-primary:active { transform: scale(0.97); }
-    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
-    .btn-primary:focus-visible { outline-offset: 2px; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    .btn-generate-text { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 600; color: #fff; background: linear-gradient(135deg, #4f46e5, #6366f1); border: 1px solid rgba(99, 102, 241, 0.3); transition: all 0.2s ease; cursor: pointer; white-space: nowrap; position: relative; overflow: hidden; box-shadow: 0 4px 16px rgba(99, 102, 241, 0.1); }
-    .btn-generate-text::after { content: ''; position: absolute; inset: 0; border-radius: var(--radius-md); background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.06) 100%); pointer-events: none; }
-    .btn-generate-text:hover { background: linear-gradient(135deg, #6366f1, #818cf8); border-color: rgba(99, 102, 241, 0.5); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.2); transform: translateY(-1px); }
+    .btn-generate-text { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: var(--radius-lg); font-size: 0.875rem; font-weight: 600; color: #fff; background: linear-gradient(135deg, #4f46e5, #6366f1); border: 1px solid rgba(99,102,241,0.3); transition: all 0.2s ease; cursor: pointer; white-space: nowrap; position: relative; overflow: hidden; box-shadow: 0 4px 16px rgba(99,102,241,0.1); }
+    .btn-generate-text::after { content: ''; position: absolute; inset: 0; border-radius: var(--radius-lg); background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.06) 100%); pointer-events: none; }
+    .btn-generate-text:hover { box-shadow: 0 6px 20px rgba(99,102,241,0.2); transform: translateY(-1px); }
     .btn-generate-text:active { transform: scale(0.97) translateY(0); }
     .btn-generate-text:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; background: var(--text-muted); border-color: var(--border-color); }
 
-    .btn-generate-image { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 700; color: #fff; background: linear-gradient(135deg, #a855f7, #d946ef); border: 1px solid rgba(217, 70, 239, 0.3); transition: all 0.2s ease; cursor: pointer; box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15); white-space: nowrap; position: relative; overflow: hidden; }
-    .btn-generate-image::after { content: ''; position: absolute; inset: 0; border-radius: var(--radius-md); background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.08) 100%); pointer-events: none; }
-    .btn-generate-image:hover { background: linear-gradient(135deg, #c084fc, #e879f9); border-color: rgba(217, 70, 239, 0.5); box-shadow: 0 6px 28px rgba(168, 85, 247, 0.25); transform: translateY(-1px); }
+    .btn-generate-image { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: var(--radius-lg); font-size: 0.875rem; font-weight: 700; color: #fff; background: linear-gradient(135deg, #a855f7, #d946ef); border: 1px solid rgba(217,70,239,0.3); transition: all 0.2s ease; cursor: pointer; box-shadow: 0 4px 20px rgba(168,85,247,0.15); white-space: nowrap; position: relative; overflow: hidden; }
+    .btn-generate-image::after { content: ''; position: absolute; inset: 0; border-radius: var(--radius-lg); background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.08) 100%); pointer-events: none; }
+    .btn-generate-image:hover { box-shadow: 0 6px 28px rgba(168,85,247,0.25); transform: translateY(-1px); }
     .btn-generate-image:active { transform: scale(0.97) translateY(0); }
     .btn-generate-image:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; background: var(--text-muted); border-color: var(--border-color); }
 
     .btn-ghost { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: var(--radius-md); transition: all 0.15s ease; cursor: pointer; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); }
     .btn-ghost:hover { background: var(--badge-bg); border-color: var(--border-color); color: var(--text-primary); }
 
-    .segmented-btn { flex: 1; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 500; transition: all 0.15s ease; border: 1px solid; cursor: pointer; text-align: center; }
+    .segmented-btn { flex: 1; padding: 0.5rem 0.75rem; border-radius: var(--radius-md); font-size: 0.75rem; font-weight: 500; transition: all 0.15s ease; border: 1px solid; cursor: pointer; text-align: center; }
     .segmented-btn-inactive { background: var(--bg-card); border-color: var(--border-color); color: var(--text-muted); }
-    .segmented-btn-inactive:hover { border-color: var(--text-muted); color: var(--text-secondary); }
-    .segmented-btn-active { background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.35); color: #c4b5fd; }
+    .segmented-btn-inactive:hover { border-color: var(--text-secondary); color: var(--text-secondary); }
+    .segmented-btn-active { background: rgba(99,102,241,0.1); border-color: rgba(99,102,241,0.35); color: #a5b4fc; }
 
     .loader-ring { width: 1.125rem; height: 1.125rem; border: 2px solid rgba(255,255,255,0.12); border-top-color: #fff; border-radius: 50%; }
 
@@ -207,7 +239,7 @@
     #schedIntervalSelect.hidden-dropdown { opacity: 0; transform: scale(0.95); pointer-events: none; }
 
     /* ── Theme Toggle ── */
-    .theme-toggle { position: relative; width: 2.5rem; height: 1.375rem; border-radius: 9999px; cursor: pointer; transition: all 0.25s ease; border: none; outline: none; background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+    .theme-toggle { position: relative; width: 2.5rem; height: 1.375rem; border-radius: 9999px; cursor: pointer; transition: all 0.25s ease; border: none; outline: none; background: var(--accent-gradient); }
     .theme-toggle .thumb { position: absolute; top: 0.1875rem; left: 0.1875rem; width: 1rem; height: 1rem; border-radius: 50%; background: #fff; transition: all 0.25s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
     .theme-toggle .thumb svg { width: 0.625rem; height: 0.625rem; }
     html.dark .theme-toggle .thumb { transform: translateX(1.125rem); }
@@ -223,8 +255,8 @@
     /* ── Draft Preview ── */
     #linkedin-preview-container.draft-active { opacity: 1 !important; }
     #linkedin-preview-container.draft-active #preview-card { border-style: solid; border-color: var(--border-color); }
-    #linkedin-preview-container.draft-active #preview-body { font-style: normal; color: #18181b !important; }
-    html.dark #linkedin-preview-container.draft-active #preview-body { color: #e1e1e3 !important; }
+    #linkedin-preview-container.draft-active #preview-body { font-style: normal; color: #1a1a2e !important; }
+    html.dark #linkedin-preview-container.draft-active #preview-body { color: #e4e4ed !important; }
     @keyframes textReveal { 0% { opacity: 0; transform: translateY(4px); } 100% { opacity: 1; transform: translateY(0); } }
     #linkedin-preview-container.draft-active #preview-body > * { animation: textReveal 0.4s ease forwards; }
     #linkedin-preview-container.draft-active #preview-body > *:nth-child(1) { animation-delay: 0s; }
@@ -241,41 +273,290 @@
     input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus { -webkit-text-fill-color: var(--text-primary); -webkit-box-shadow: 0 0 0 30px var(--bg-input) inset; caret-color: var(--text-primary); }
 
     /* ── Responsive ── */
-    @media (max-width: 768px) {
-      .sidebar { width: 100%; height: auto; position: fixed; bottom: 0; left: 0; z-index: 50; flex-direction: row; padding: 0.375rem 0.5rem; border-top: 1px solid var(--border-color); border-right: none; }
-      .sidebar .logo-area { display: none; }
-      .sidebar nav { flex-direction: row; width: 100%; justify-content: space-around; }
-      .sidebar-link { flex-direction: column; gap: 0.125rem; padding: 0.375rem 0.5rem; font-size: 0.625rem; border: none; border-radius: 8px; }
-      .sidebar-link svg { width: 1.25rem; height: 1.25rem; }
-      .main-wrapper { margin-left: 0; padding-bottom: 3.5rem; }
+    @media (max-width: 1024px) {
+      #newsScrollWrap { height: 320px; }
+      .welcome-hero { padding: 1.25rem 1.25rem; }
+      .welcome-greeting { font-size: 1.25rem; }
     }
+    @media (max-width: 768px) {
+      .sidebar { width: 100%; height: auto; position: fixed; bottom: 0; left: 0; z-index: 50; flex-direction: row; padding: 0.25rem 0.25rem; border-top: 1px solid var(--border-color); border-right: none; gap: 0; }
+      .sidebar .sidebar-logo { display: none; }
+      .sidebar .sidebar-nav { flex-direction: row; width: 100%; justify-content: space-around; padding: 0; overflow: visible; }
+      .sidebar .sidebar-profile-wrap { display: none; }
+      .sidebar .sidebar-signout-wrap { display: none; }
+      .sidebar #connectionStatus { display: none; }
+      .sidebar-link { flex-direction: column; gap: 0.125rem; padding: 0.25rem 0.25rem; font-size: 0.625rem; border: none; border-radius: var(--radius-md); }
+      .sidebar-link.active::before { display: none; }
+      .sidebar-link svg { width: 1.25rem; height: 1.25rem; }
+      .sidebar-link span { font-size: 0.55rem; }
+      .main-wrapper { margin-left: 0; padding-bottom: 3.75rem; }
+      .main-wrapper .p-6 { padding: 0.75rem; }
+      .main-wrapper header.px-6, .main-wrapper footer.px-6 { padding-left: 0.75rem; padding-right: 0.75rem; }
+      .space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
+      .stat-card .kpi-value { font-size: 1.25rem; }
+      .stat-card { padding: 1rem; }
+      .stat-card .icon-wrap { width: 2rem; height: 2rem; }
+      .stat-card .icon-wrap svg { width: 0.875rem; height: 0.875rem; }
+      .welcome-hero { padding: 1rem 1rem; }
+      .welcome-greeting { font-size: 1.125rem; }
+      .welcome-sub { font-size: 0.75rem; }
+      .quick-action-card { padding: 0.875rem; gap: 0.75rem; }
+      .quick-action-icon { width: 2.5rem; height: 2.5rem; }
+      .quick-action-icon svg { width: 1.125rem; height: 1.125rem; }
+      .quick-action-text { font-size: 0.75rem; }
+      #activityBody tr { padding: 0.75rem 0.875rem 0.75rem 2.75rem; }
+      #activityBody tr::before { left: 1rem; top: 1rem; width: 0.625rem; height: 0.625rem; }
+      #activityTableWrap::before { left: 1.3125rem; }
+      .toast-container { right: 0.5rem; left: 0.5rem; }
+      .toast { min-width: 0; max-width: 100%; }
+      .card .p-5 { padding: 1rem; }
+      #newsScrollWrap { height: 280px; }
+      .btn-generate-text, .btn-generate-image { white-space: normal; padding: 0.625rem 1rem; font-size: 0.8125rem; }
+      .grid-cols-2.lg\\:grid-cols-4 { gap: 0.625rem; }
+    }
+    @media (max-width: 480px) {
+      .sidebar-link { gap: 0.0625rem; padding: 0.1875rem 0.1875rem; }
+      .sidebar-link svg { width: 1.125rem; height: 1.125rem; }
+      .sidebar-link span { font-size: 0.5rem; }
+      .stat-card .kpi-value { font-size: 1.125rem; }
+      .stat-card .kpi-label { font-size: 0.625rem; }
+      .quick-action-card { flex-direction: column; text-align: center; padding: 0.75rem; gap: 0.5rem; }
+      .quick-action-card .text-left { text-align: center; }
+      #activityBody tr { padding: 0.625rem 0.75rem 0.625rem 2.5rem; }
+      .grid-cols-2.lg\\:grid-cols-4 { gap: 0.5rem; }
+    }
+
+    /* ── Dark mode overrides for Tailwind classes used by JS ── */
+    html.dark .text-zinc-900 { color: var(--text-primary) !important; }
+    html.dark .text-zinc-600 { color: var(--text-secondary) !important; }
+    html.dark .text-zinc-500 { color: var(--text-muted) !important; }
+    html.dark .text-zinc-400 { color: var(--text-muted) !important; }
+    html.dark .border-zinc-200 { border-color: var(--border-color) !important; }
 
     /* ── LinkedIn Status Badges (OVERRIDES for inline JS styles) ── */
     .linkedin-badge { display: inline-flex !important; align-items: center !important; gap: 0.375rem !important; padding: 0.2rem 0.625rem !important; border-radius: 9999px !important; font-size: 0.7rem !important; font-weight: 600 !important; border: 1px solid !important; }
 
     /* ── Modal ── */
     .modal-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); animation: fadeIn 0.2s ease; }
-    .modal-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 1.75rem; max-width: 440px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.4); animation: scaleIn 0.2s ease; }
+    .modal-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 1.75rem; max-width: 440px; width: 90%; box-shadow: var(--shadow-xl); animation: scaleIn 0.2s ease; }
     .modal-icon { width: 2.5rem; height: 2.5rem; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .modal-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
     .modal-body { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
     .modal-btn { padding: 0.5rem 1rem; border-radius: var(--radius-md); font-size: 0.8125rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease; }
     .modal-btn-secondary { border: 1px solid var(--border-color); background: transparent; color: var(--text-secondary); }
     .modal-btn-secondary:hover { background: var(--badge-bg); color: var(--text-primary); }
-    .modal-btn-primary { border: none; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; padding: 0.5rem 1.25rem; }
+    .modal-btn-primary { border: none; background: var(--accent-gradient); color: #fff; padding: 0.5rem 1.25rem; }
     .modal-btn-primary:hover { box-shadow: 0 4px 16px rgba(99,102,241,0.15); transform: translateY(-1px); }
-
-    /* ── Sidebar profile card ── */
-    .sidebar-profile-card { background: var(--badge-bg); border-radius: var(--radius-lg); }
-    .sidebar-avatar { width: 2rem; height: 2rem; border-radius: 9999px; background: linear-gradient(135deg, #6366f1, #8b5cf6); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
 
     /* ── System status dot ── */
     .status-dot { width: 0.5rem; height: 0.5rem; border-radius: 9999px; display: inline-block; }
     .status-dot.online { background: #22c55e; animation: pulse-dot 1.8s ease-in-out infinite; }
-    .status-dot.offline { background: #a1a1aa; }
+    .status-dot.offline { background: var(--text-muted); }
+
+    /* ── Quick action cards ── */
+    .quick-action-card { display: flex; align-items: center; gap: 1rem; padding: 1.25rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); background: var(--bg-card); transition: all 0.2s ease; cursor: pointer; }
+    .quick-action-card:hover { border-color: rgba(99,102,241,0.25); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+    .quick-action-card:active { transform: scale(0.98); }
+    .quick-action-icon { width: 3rem; height: 3rem; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .quick-action-text { font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+    .quick-action-sub { font-size: 0.6875rem; color: var(--text-muted); margin-top: 0.125rem; }
+
+    /* ── News card enhanced ── */
+    .news-card { border-radius: var(--radius-lg); border: 1px solid var(--border-color); background: var(--bg-card); transition: all 0.2s ease; overflow: hidden; }
+    .news-card:hover { border-color: rgba(99,102,241,0.2); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+    /* ── Welcome Hero ── */
+    .welcome-hero { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 1.5rem 2rem; position: relative; overflow: hidden; }
+    .welcome-hero::before { content: ''; position: absolute; top: -50%; right: -20%; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%); pointer-events: none; }
+    .welcome-hero::after { content: ''; position: absolute; bottom: -30%; left: -10%; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(139,92,246,0.04) 0%, transparent 70%); pointer-events: none; }
+    .welcome-greeting { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; }
+    .welcome-sub { font-size: 0.8125rem; color: var(--text-secondary); margin-top: 0.25rem; max-width: 480px; }
+
+    /* ── Activity Timeline ── */
+    .activity-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+    .activity-header h2 { font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); }
+    .activity-header #activityCount { margin-left: auto; }
+
+    /* Skeleton */
+    #activitySkeleton .skeleton { border-radius: var(--radius-lg); height: 5rem; }
+
+    /* Timeline container */
+    #activityContent { position: relative; }
+    #activityTableWrap { position: relative; background: transparent !important; border: none !important; box-shadow: none !important; overflow: visible !important; }
+    #activityTableWrap .overflow-x-auto { overflow: visible !important; }
+
+    /* ── Timeline line (drawn behind rows) ── */
+    #activityTableWrap::before {
+      content: ''; position: absolute; left: 1.75rem; top: 0.75rem; bottom: 0.75rem;
+      width: 2px; background: linear-gradient(180deg, var(--border-color), var(--border-color) 60%, transparent);
+      z-index: 0; pointer-events: none;
+    }
+
+    /* ── Each row = timeline card ── */
+    #activityBody {
+      display: block;
+    }
+    #activityBody tr {
+      display: block; position: relative;
+      padding: 1rem 1.25rem 1rem 3.25rem;
+      margin-bottom: 0.75rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color) !important;
+      border-bottom: 1px solid var(--border-color) !important;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+      animation: fadeInUp 0.3s ease forwards;
+    }
+    #activityBody tr:hover {
+      border-color: rgba(99,102,241,0.2) !important;
+      box-shadow: var(--shadow-md);
+      transform: translateX(2px);
+    }
+
+    /* ── Timeline dot ── */
+    #activityBody tr::before {
+      content: ''; position: absolute; left: 1.375rem; top: 1.375rem;
+      width: 0.75rem; height: 0.75rem; border-radius: 50%;
+      background: var(--bg-card);
+      border: 2px solid #818cf8;
+      z-index: 1;
+      box-shadow: 0 0 0 3px var(--bg-body);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    #activityBody tr:hover::before {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px var(--bg-body), 0 0 0 5px rgba(99,102,241,0.1);
+    }
+
+    /* ── First dot connects from top ── */
+    #activityBody tr:first-child::before { top: 1.375rem; }
+    /* ── Last dot connects to bottom ── */
+
+    /* ── TD: post content ── */
+    #activityBody tr td {
+      display: block; padding: 0 !important; border: none !important;
+      background: transparent !important;
+    }
+    #activityBody tr td:first-child {
+      color: var(--text-primary) !important;
+      font-size: 0.8125rem; font-weight: 500; line-height: 1.55;
+      margin-bottom: 0.5rem;
+      max-width: 100% !important;
+      white-space: normal; overflow: hidden;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    }
+    #activityBody tr td:first-child a {
+      color: var(--text-primary); text-decoration: none; transition: color 0.15s ease;
+    }
+    #activityBody tr td:first-child a:hover { color: #818cf8; }
+
+    /* ── TD: topic, status, time — inline meta row ── */
+    #activityBody tr td:nth-child(2),
+    #activityBody tr td:nth-child(3),
+    #activityBody tr td:nth-child(4) {
+      display: inline-block !important; vertical-align: middle;
+      margin-top: 0 !important;
+    }
+    #activityBody tr td:nth-child(2) { margin-right: 0.5rem; }
+    #activityBody tr td:nth-child(3) { margin-right: 0.5rem; }
+    #activityBody tr td:nth-child(4) {
+      float: none !important; font-size: 0.6875rem !important;
+      color: var(--text-muted) !important; text-align: left !important;
+    }
+    #activityBody tr td:nth-child(2) span {
+      font-size: 0.6875rem !important;
+      padding: 0.125rem 0.5rem !important;
+    }
+    #activityBody tr td:nth-child(4) { white-space: nowrap; }
+
+    /* ── Hide thead on activity table ── */
+    #activityTableWrap thead { display: none; }
+
+    /* ── Empty state ── */
+    #activityEmpty { border-radius: var(--radius-xl); padding: 2.5rem 1.5rem; text-align: center; background: var(--bg-card); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
+    #activityEmpty .activity-empty-icon { width: 4rem; height: 4rem; margin: 0 auto 1rem; border-radius: 1rem; display: flex; align-items: center; justify-content: center; background: var(--bg-card-alt); border: 1px solid var(--border-color); }
+    #activityEmpty .activity-empty-icon svg { width: 1.75rem; height: 1.75rem; color: var(--text-muted); }
+    #activityEmpty p:first-of-type { font-size: 0.8125rem; font-weight: 600; color: var(--text-secondary); }
+    #activityEmpty p:last-of-type { font-size: 0.75rem; color: var(--text-muted); max-width: 260px; margin: 0.375rem auto 0; line-height: 1.5; }
+
+    /* ── News Feed ── */
+    .news-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+    .news-header h2 { font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); }
+    #newsScrollWrap { max-height: 420px; height: 420px; overflow-y: auto; padding-right: 0.25rem; margin-right: -0.25rem; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
+    #newsScrollWrap::-webkit-scrollbar { width: 4px; }
+    #newsScrollWrap::-webkit-scrollbar-track { background: transparent; }
+    #newsScrollWrap::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 9999px; }
+    #newsScrollWrap::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
+
+    /* Override dynamically injected Tailwind classes */
+    #newsContainer { display: flex; flex-direction: column; gap: 0.625rem; }
+    #newsContainer > a { background: var(--bg-card) !important; border: 1px solid var(--border-color) !important; border-radius: var(--radius-lg) !important; padding: 1rem 1.25rem !important; box-shadow: var(--shadow-sm); transition: all 0.2s ease; position: relative; overflow: hidden; cursor: pointer; text-decoration: none; }
+    #newsContainer > a::before { content: ''; position: absolute; left: 0; top: 1rem; bottom: 1rem; width: 3px; background: linear-gradient(180deg, #6366f1, #a855f7); border-radius: 0 2px 2px 0; opacity: 0; transition: opacity 0.2s ease, top 0.2s ease, bottom 0.2s ease; }
+    #newsContainer > a:hover { border-color: rgba(99,102,241,0.25) !important; box-shadow: var(--shadow-lg) !important; transform: translateY(-2px) !important; }
+    #newsContainer > a:hover::before { opacity: 1; top: 0; bottom: 0; }
+    #newsContainer > a:active { transform: translateY(0) scale(0.99) !important; }
+    #newsContainer > a .flex.items-start { gap: 0.75rem !important; }
+    #newsContainer > a .text-base.font-semibold { color: var(--text-primary) !important; font-size: 0.875rem !important; font-weight: 600 !important; line-height: 1.45 !important; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0.375rem !important; }
+    #newsContainer > a .text-xs.text-zinc-600 { color: var(--text-secondary) !important; font-size: 0.75rem !important; line-height: 1.5 !important; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0.625rem !important; }
+    #newsContainer > a .gap-2 { gap: 0.5rem !important; align-items: center; }
+    #newsContainer > a .text-xs.text-zinc-500 { color: var(--text-muted) !important; font-size: 0.6875rem !important; display: flex; align-items: center; gap: 0.5rem; }
+    #newsContainer > a .text-xs.text-zinc-500 span:first-child { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.125rem 0.5rem; border-radius: 9999px; background: var(--badge-bg); border: 1px solid var(--border-color); font-weight: 500; color: var(--text-secondary); }
+    #newsContainer > a > div > svg { color: var(--text-muted) !important; width: 1rem !important; height: 1rem !important; margin-top: 0.25rem !important; transition: transform 0.2s ease, color 0.2s ease; }
+    #newsContainer > a:hover > div > svg { transform: translate(2px, -2px); color: #818cf8 !important; }
+    #newsContainer > a.bg-white { background: var(--bg-card) !important; }
+    #newsContainer > a.bg-zinc-50 { background: var(--bg-card-alt) !important; opacity: 0.8; }
+    #newsContainer > a.animate-fadeIn { animation: fadeIn 0.35s ease forwards; }
+    #newsContainer > a .text-zinc-900 { color: var(--text-primary) !important; }
+    #newsContainer > a .text-zinc-600 { color: var(--text-secondary) !important; }
+    #newsContainer > a .text-zinc-500 { color: var(--text-muted) !important; }
+    #newsContainer > a .text-zinc-400 { color: var(--text-muted) !important; }
+    #newsContainer > a .border-zinc-200 { border-color: var(--border-color) !important; }
+
+    /* News skeleton */
+    #newsSkeleton .skeleton { border-radius: var(--radius-lg); height: 7rem; }
+
+    /* News empty state */
+    #newsEmpty { border-radius: var(--radius-xl); padding: 2.5rem 1.5rem; text-align: center; background: var(--bg-card); border: 1px solid var(--border-color); }
+    #newsEmpty .news-empty-icon { width: 4rem; height: 4rem; margin: 0 auto 1rem; border-radius: 1rem; display: flex; align-items: center; justify-content: center; background: var(--bg-card-alt); border: 1px solid var(--border-color); }
+    #newsEmpty .news-empty-icon svg { width: 1.75rem; height: 1.75rem; color: var(--text-muted); }
+    #newsEmpty p:first-of-type { font-size: 0.8125rem; font-weight: 600; color: var(--text-secondary); }
+    #newsEmpty p:last-of-type { font-size: 0.75rem; color: var(--text-muted); max-width: 260px; margin: 0.375rem auto 0; line-height: 1.5; }
+
+    /* ── LinkedIn Preview (realistic post) ── */
+    .ln-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 0.75rem; overflow: hidden; transition: all 0.3s ease; }
+    .ln-avatar { width: 2.75rem; height: 2.75rem; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem; color: #fff; flex-shrink: 0; background: linear-gradient(135deg, #6366f1, #8b5cf6); box-shadow: 0 2px 8px rgba(99,102,241,0.15); }
+    .ln-name { font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); line-height: 1.2; }
+    .ln-name:hover { color: #0a66c2; text-decoration: underline; cursor: pointer; }
+    .ln-verified { display: inline-flex; align-items: center; justify-content: center; width: 1rem; height: 1rem; border-radius: 9999px; color: #0a66c2; flex-shrink: 0; }
+    .ln-headline { font-size: 0.6875rem; color: var(--text-secondary); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .ln-timestamp { font-size: 0.6875rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.25rem; margin-top: 0.25rem; }
+    .ln-timestamp:hover { color: #0a66c2; text-decoration: underline; cursor: pointer; }
+    .ln-three-dot { width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; border-radius: 9999px; cursor: pointer; transition: all 0.15s ease; color: var(--text-muted); background: transparent; border: none; flex-shrink: 0; margin-top: 0.125rem; }
+    .ln-three-dot:hover { background: var(--badge-bg); color: var(--text-secondary); }
+    .ln-body { padding: 0.25rem 1rem 0.5rem; font-size: 0.875rem; line-height: 1.5; white-space: pre-wrap; }
+    .ln-body.placeholder { font-style: italic; color: var(--text-muted); }
+    .ln-body.has-content { font-style: normal; }
+    .ln-media-wrap { padding: 0 1rem 0.5rem; }
+    .ln-engagement { display: flex; align-items: center; justify-content: space-between; padding: 0.375rem 1rem; font-size: 0.6875rem; color: var(--text-muted); }
+    .ln-actions { display: flex; align-items: center; padding: 0.125rem 0.25rem; }
+    .ln-action { display: flex; align-items: center; justify-content: center; gap: 0.375rem; flex: 1; padding: 0.5rem 0.25rem; border-radius: 0.375rem; font-size: 0.8125rem; font-weight: 500; color: var(--text-muted); transition: all 0.15s ease; cursor: pointer; background: transparent; border: none; }
+    .ln-action:hover { background: var(--badge-bg); color: var(--text-secondary); }
+    .ln-action svg { width: 1.25rem; height: 1.25rem; flex-shrink: 0; }
+    .ln-comment-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem 0.75rem; }
+    .ln-comment-avatar { width: 2rem; height: 2rem; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.625rem; color: #fff; flex-shrink: 0; background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+    .ln-comment-input { flex: 1; padding: 0.5rem 0.75rem; border-radius: 9999px; font-size: 0.8125rem; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); outline: none; transition: all 0.15s ease; }
+    .ln-comment-input::placeholder { color: var(--text-muted); font-weight: 400; }
+    .ln-comment-input:focus { border-color: rgba(10,102,194,0.3); box-shadow: 0 0 0 3px rgba(10,102,194,0.08); }
+    .ln-publish-row { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-top: 1px solid var(--border-color); }
+    .ln-publish-text { font-size: 0.75rem; color: var(--text-muted); }
+    .ln-divider { margin: 0 1rem; border-top: 1px solid var(--border-color); }
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      .sidebar-link, .stat-card, .quick-action-card, .btn-primary, .btn-generate-text, .btn-generate-image, .row-hover, .news-card, #newsContainer > a, .ln-three-dot { transition: none !important; }
+      .sidebar-link:hover, .stat-card:hover, .quick-action-card:hover, .btn-primary:hover, .btn-generate-text:hover, .btn-generate-image:hover, .news-card:hover, #newsContainer > a:hover { transform: none !important; }
+      .sidebar-link:active, .stat-card:active, .quick-action-card:active, .btn-primary:active, .btn-generate-text:active, .btn-generate-image:active, .row-hover:active { transform: none !important; }
     }
   </style>
 </head>
@@ -289,35 +570,42 @@
   <div class="flex min-h-screen" style="position:relative;z-index:1;">
 
     <!-- ─── Sidebar ─── -->
-    <aside class="sidebar fixed left-0 top-0 h-full w-56 flex flex-col border-r z-40">
-      <div class="logo-area flex items-center gap-2.5 px-5 h-14 border-b" style="border-color:var(--border-color);">
-        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/15" aria-hidden="true">
-          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2zM4 6a2 2 0 100-4 2 2 0 000 4z"/></svg>
+    <aside class="sidebar fixed left-0 top-0 h-full w-56 border-r z-40">
+
+      <!-- Brand -->
+      <div class="sidebar-logo" style="border-color:var(--border-color);">
+        <div class="sidebar-logo-icon" aria-hidden="true">
+          <svg class="w-[18px] h-[18px] text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2zM4 6a2 2 0 100-4 2 2 0 000 4z"/></svg>
         </div>
-        <span class="text-sm font-bold tracking-tight" style="color:var(--text-primary);">LinkedIn AI</span>
+        <div>
+          <span class="sidebar-logo-text">LinkedIn AI</span>
+          <span class="sidebar-logo-sub">Dashboard</span>
+        </div>
       </div>
-      <nav class="flex-1 px-3 py-4 space-y-1" aria-label="Main navigation">
+
+      <!-- Navigation -->
+      <div class="sidebar-nav" aria-label="Main navigation">
         <div class="sidebar-link active" data-page="dashboard" role="button" tabindex="0" aria-current="page">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
           <span>Dashboard</span>
         </div>
         <div class="sidebar-link" data-page="history" role="button" tabindex="0">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           <span>History</span>
         </div>
         <div class="sidebar-link" data-page="schedule" role="button" tabindex="0">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
           <span>Schedule</span>
         </div>
         <div class="sidebar-link" data-page="settings" role="button" tabindex="0">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
           <span>Settings</span>
         </div>
-      </nav>
+      </div>
 
-      <!-- ─── Sidebar Profile ─── -->
-      <div id="sidebarProfile" class="px-3 mb-1 hidden">
-        <div class="flex items-center gap-2.5 px-3 py-2.5 sidebar-profile-card">
+      <!-- Profile -->
+      <div id="sidebarProfile" class="sidebar-profile-wrap hidden">
+        <div class="sidebar-profile-card">
           <div id="sidebarAvatar" class="sidebar-avatar">?</div>
           <div class="min-w-0 flex-1">
             <p id="sidebarFullName" class="text-xs font-semibold truncate" style="color:var(--text-primary);">—</p>
@@ -329,20 +617,19 @@
         </div>
       </div>
 
-      <!-- ─── Sign Out ─── -->
-      <div class="px-3 mb-1">
+      <!-- Sign Out -->
+      <div class="sidebar-signout-wrap">
         <button id="sidebarSignOut" class="sidebar-link signout w-full" style="border-color:transparent;">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
           <span>Sign Out</span>
         </button>
       </div>
 
-      <div id="connectionStatus" class="px-5 py-4 border-t" style="border-color:var(--border-color);">
-        <div class="flex items-center gap-2">
-          <span class="status-dot offline"></span>
-          <span class="text-[11px] status-label" style="color:var(--text-muted);">Not connected</span>
-        </div>
+      <div id="connectionStatus" class="sidebar-status-wrap" style="border-color:var(--border-color);">
+        <span class="status-dot offline"></span>
+        <span class="text-[11px] status-label" style="color:var(--text-muted);">Not connected</span>
       </div>
+
     </aside>
 
     <!-- ─── Main ─── -->
@@ -352,7 +639,6 @@
       <header class="h-14 flex items-center justify-between px-6 border-b shrink-0" style="background:var(--bg-topbar);border-color:var(--border-color);">
         <div class="flex items-center gap-3">
           <h1 class="text-sm font-semibold" id="pageTitle" style="color:var(--text-primary);">Dashboard</h1>
-          <span class="text-[11px] hidden sm:inline" id="liveTimestamp" style="color:var(--text-muted);"></span>
         </div>
         <div class="flex items-center gap-2.5">
           <!-- Theme Toggle -->
@@ -370,209 +656,304 @@
 
       <!-- ─── Page: Dashboard ─── -->
       <div id="page-dashboard" class="page active flex-1">
-        <div class="p-6 space-y-6">
+        <div class="p-6 space-y-8">
 
-          <!-- ── KPI Cards ── -->
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" id="kpiGrid">
-            <div class="stat-card" style="animation-delay:0.05s;">
-              <div class="flex items-center justify-between mb-3">
-                <div class="icon-wrap" style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.15);">
-                  <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+          <!-- ── Welcome Back ── -->
+          <div class="welcome-hero">
+            <div class="flex items-start justify-between relative" style="z-index:1;">
+              <div>
+                <div class="flex items-center gap-2.5 mb-2">
+                  <span id="liveTimestamp" class="text-xs font-medium" style="color:var(--text-muted);"></span>
+                  <span class="w-1 h-1 rounded-full" style="background:var(--text-muted);"></span>
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium" style="color:var(--text-secondary);">
+                    <span class="status-dot online"></span>
+                    System Online
+                  </span>
                 </div>
-                <span class="text-[11px]" style="color:var(--text-muted);">Total</span>
+                <h1 class="welcome-greeting" style="color:var(--text-primary);">Welcome Back</h1>
+                <p class="welcome-sub">Your AI-powered LinkedIn content dashboard — generate, preview, and publish with ease.</p>
               </div>
-              <p class="kpi-value" id="kpiTotalPosts" style="color:var(--text-primary);">—</p>
-              <p class="kpi-label">Posts published</p>
-            </div>
-            <div class="stat-card" style="animation-delay:0.1s;">
-              <div class="flex items-center justify-between mb-3">
-                <div class="icon-wrap" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.15);">
-                  <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></svg>
-                </div>
-                <span class="text-[11px]" style="color:var(--text-muted);">Avg</span>
-              </div>
-              <p class="kpi-value" id="kpiEngagement" style="color:var(--text-primary);">—</p>
-              <p class="kpi-label">Engagement rate</p>
-            </div>
-            <div class="stat-card" style="animation-delay:0.15s;">
-              <div class="flex items-center justify-between mb-3">
-                <div class="icon-wrap" style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);">
-                  <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.061 12.061 0 0116.5 7.605"/></svg>
-                </div>
-                <span class="text-[11px]" style="color:var(--text-muted);">Today</span>
-              </div>
-              <p class="kpi-value" id="kpiTrends" style="color:var(--text-primary);">—</p>
-              <p class="kpi-label">Trends analyzed</p>
-            </div>
-            <div class="stat-card" style="animation-delay:0.2s;" id="nextSchedCard">
-              <div class="flex items-center justify-between mb-3">
-                <div class="icon-wrap" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.15);">
-                  <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z"/></svg>
-                </div>
-                <span class="text-[11px]" style="color:var(--text-muted);">ETA</span>
-              </div>
-              <p class="kpi-value" id="kpiNextScheduled" style="color:var(--text-primary);">—</p>
-              <p class="kpi-label">Next scheduled</p>
-              <p id="nextSchedHelper" class="text-[10px] mt-1 hidden" style="color:var(--text-muted);">System checking every 05 minutes</p>
-              <div id="nextSchedFailed" class="hidden mt-1 flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse-dot"></span>
-                <span class="text-[10px]" style="color:#f87171;">Failed</span>
+              <div class="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl" style="background:var(--badge-bg);border:1px solid var(--border-color);">
+                <svg class="w-4 h-4" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5"/></svg>
+                <span class="text-xs font-medium" style="color:var(--text-secondary);">n8n Connected</span>
               </div>
             </div>
           </div>
 
-          <div id="kpiSkeleton" class="hidden grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="skeleton h-[114px] w-full"></div>
-            <div class="skeleton h-[114px] w-full"></div>
-            <div class="skeleton h-[114px] w-full"></div>
-            <div class="skeleton h-[114px] w-full"></div>
-          </div>
-
-          <!-- ── Trending News ── -->
+          <!-- ── Analytics Overview ── -->
           <div>
-            <div class="flex items-center justify-between mb-3">
-              <h2 class="text-sm font-semibold" style="color:var(--text-primary);">Trending News</h2>
-              <span class="text-xs" id="newsCount" style="color:var(--text-muted);"></span>
-            </div>
-            <div id="newsSkeleton" class="space-y-3">
-              <div class="skeleton h-28 w-full"></div>
-              <div class="skeleton h-28 w-full"></div>
-              <div class="skeleton h-28 w-full"></div>
-            </div>
-            <div id="newsScrollWrap" class="h-[400px] overflow-y-auto news-scroll scrollbar-thin scrollbar-thumb-zinc-300 -mr-1 pr-1 hidden">
-              <div id="newsContainer" class="space-y-3"></div>
-            </div>
-            <div id="newsEmpty" class="card p-10 text-center hidden">
-              <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:var(--bg-card-alt);border:1px solid var(--border-color);">
-                <svg class="w-7 h-7" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm0 8.625a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25z"/></svg>
-              </div>
-              <p class="text-sm font-medium" style="color:var(--text-secondary);">No trending news yet</p>
-              <p class="text-xs mt-1" style="color:var(--text-muted);">Check back later for curated trending stories.</p>
-            </div>
-          </div>
-
-          <!-- ── Generate Area ── -->
-          <div class="card p-5">
-            <div class="flex items-center gap-2 mb-3">
+            <div class="flex items-center gap-2 mb-4">
+              <h2 class="text-sm font-semibold" style="color:var(--text-primary);">Analytics Overview</h2>
               <div class="glow-line flex-1"></div>
             </div>
-            <div class="flex flex-col sm:flex-row gap-3">
-              <div class="flex-1 relative">
-                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
-                <input id="topicInput" type="text" class="input-field pl-10" placeholder='Search a trending topic, e.g. "Artificial Intelligence" OR "DevOps"' spellcheck="false" />
-              </div>
-              <button id="generateBtn" class="btn-generate-text shrink-0">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
-                Generate Text Post
-              </button>
-              <button id="generateImageBtn" class="btn-generate-image shrink-0">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"/></svg>
-                Generate Post with Image
-              </button>
-            </div>
-            <div id="generateLoading" class="hidden mt-4">
-              <div class="flex items-center gap-3 px-1">
-                <div class="loader-ring animate-spin shrink-0"></div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium" id="generateLoadingText" style="color:#c4b5fd;">AI is generating your LinkedIn post...</p>
-                  <div class="flex gap-2 mt-1.5">
-                    <div class="skeleton h-3 w-3/4"></div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" id="kpiGrid">
+              <div class="stat-card" style="animation-delay:0.05s;" data-kpi>
+                <div class="flex items-center justify-between mb-3">
+                  <div class="icon-wrap" style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.15);">
+                    <svg class="w-4 h-5 text-indigo-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
                   </div>
-                  <div class="flex gap-2 mt-1.5">
-                    <div class="skeleton h-3 w-1/2"></div>
-                    <div class="skeleton h-3 w-1/4"></div>
+                  <span class="text-[10px] font-medium uppercase tracking-wide" style="color:var(--text-muted);">Total</span>
+                </div>
+                <p class="kpi-value" id="kpiTotalPosts" style="color:var(--text-primary);">—</p>
+                <p class="kpi-label">Posts published</p>
+              </div>
+              <div class="stat-card" style="animation-delay:0.1s;" data-kpi>
+                <div class="flex items-center justify-between mb-3">
+                  <div class="icon-wrap" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.15);">
+                    <svg class="w-4 h-5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></svg>
+                  </div>
+                  <span class="text-[10px] font-medium uppercase tracking-wide" style="color:var(--text-muted);">Avg</span>
+                </div>
+                <p class="kpi-value" id="kpiEngagement" style="color:var(--text-primary);">—</p>
+                <p class="kpi-label">Engagement rate</p>
+              </div>
+              <div class="stat-card" style="animation-delay:0.15s;" data-kpi>
+                <div class="flex items-center justify-between mb-3">
+                  <div class="icon-wrap" style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.15);">
+                    <svg class="w-4 h-5 text-violet-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.061 12.061 0 0116.5 7.605"/></svg>
+                  </div>
+                  <span class="text-[10px] font-medium uppercase tracking-wide" style="color:var(--text-muted);">Today</span>
+                </div>
+                <p class="kpi-value" id="kpiTrends" style="color:var(--text-primary);">—</p>
+                <p class="kpi-label">Trends analyzed</p>
+              </div>
+              <div class="stat-card" style="animation-delay:0.2s;" id="nextSchedCard" data-kpi>
+                <div class="flex items-center justify-between mb-3">
+                  <div class="icon-wrap" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.15);">
+                    <svg class="w-4 h-5 text-amber-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z"/></svg>
+                  </div>
+                  <span class="text-[10px] font-medium uppercase tracking-wide" style="color:var(--text-muted);">ETA</span>
+                </div>
+                <p class="kpi-value" id="kpiNextScheduled" style="color:var(--text-primary);">—</p>
+                <p class="kpi-label">Next scheduled</p>
+                <p id="nextSchedHelper" class="text-[10px] mt-1 hidden" style="color:var(--text-muted);">System checking every 5 minutes</p>
+                <div id="nextSchedFailed" class="hidden mt-1 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse-dot"></span>
+                  <span class="text-[10px]" style="color:#f87171;">Failed</span>
+                </div>
               </div>
             </div>
-          </div>
-          </div>
+
+            <div id="kpiSkeleton" class="hidden grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="skeleton h-[130px] w-full"></div>
+              <div class="skeleton h-[130px] w-full"></div>
+              <div class="skeleton h-[130px] w-full"></div>
+              <div class="skeleton h-[130px] w-full"></div>
+            </div>
           </div>
 
-          <!-- ── LinkedIn Feed Preview Card ── -->
-          <div id="linkedin-preview-container" class="transition-all duration-700 opacity-60">
-            <div id="preview-card" class="rounded-xl border-2 border-dashed shadow-lg overflow-hidden" style="background:var(--bg-card);border-color:var(--border-color);">
-              <!-- Header -->
-              <div class="flex items-start gap-3 px-4 pt-4 pb-2">
-                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shrink-0 shadow-md shadow-indigo-500/20">HM</div>
-                <div class="min-w-0 flex-1">
-                  <p class="text-sm font-semibold leading-tight" style="color:var(--text-primary);">Hasnat Mubeen</p>
-                  <p class="text-[12px] leading-tight mt-0.5" style="color:var(--text-muted);">Expertise in DevOps &amp; Cloud Solutions | Experienced in CI/CD Pipelines and AWS Services</p>
-                  <p class="flex items-center gap-1 text-[12px] mt-1" style="color:var(--text-muted);">1m &bull;
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/></svg>
-                  </p>
+          <!-- ── Quick Actions ── -->
+          <div>
+            <div class="flex items-center gap-2 mb-4">
+              <h2 class="text-sm font-semibold" style="color:var(--text-primary);">Quick Actions</h2>
+              <div class="glow-line flex-1"></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button class="quick-action-card" onclick="document.getElementById('topicInput').focus()" type="button">
+                <div class="quick-action-icon" style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.15);">
+                  <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
                 </div>
-                <button class="btn-ghost !w-7 !h-7 shrink-0 mt-0.5">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/></svg>
+                <div class="text-left">
+                  <p class="quick-action-text">Generate Post</p>
+                  <p class="quick-action-sub">Create AI-powered content</p>
+                </div>
+              </button>
+              <button class="quick-action-card" onclick="document.getElementById('publishLinkedInBtn').click()" type="button">
+                <div class="quick-action-icon" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.15);">
+                  <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"/></svg>
+                </div>
+                <div class="text-left">
+                  <p class="quick-action-text">Publish to LinkedIn</p>
+                  <p class="quick-action-sub">Share with your network</p>
+                </div>
+              </button>
+              <button class="quick-action-card" onclick="switchPage('schedule')" type="button">
+                <div class="quick-action-icon" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.15);">
+                  <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z"/></svg>
+                </div>
+                <div class="text-left">
+                  <p class="quick-action-text">Schedule Post</p>
+                  <p class="quick-action-sub">Plan future content</p>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- ── AI Content Generator ── -->
+          <div class="card">
+            <div class="px-5 pt-4 pb-3 border-b" style="border-color:var(--border-color);">
+              <div class="flex items-center gap-2">
+                <h2 class="text-sm font-semibold" style="color:var(--text-primary);">Generate Content</h2>
+                <div class="glow-line flex-1"></div>
+              </div>
+            </div>
+            <div class="p-5">
+              <div class="flex flex-col sm:flex-row gap-3">
+                <div class="flex-1 relative">
+                  <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                  <input id="topicInput" type="text" class="input-field pl-10" placeholder='Search a topic, e.g. "Artificial Intelligence" OR "DevOps"' spellcheck="false" />
+                </div>
+                <button id="generateBtn" class="btn-generate-text shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                  Generate Text Post
+                </button>
+                <button id="generateImageBtn" class="btn-generate-image shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"/></svg>
+                  Generate Post with Image
                 </button>
               </div>
+              <div id="generateLoading" class="hidden mt-4">
+                <div class="flex items-center gap-3 p-4 rounded-xl" style="background:var(--accent-subtle);border:1px solid rgba(99,102,241,0.15);">
+                  <div class="loader-ring animate-spin shrink-0"></div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium" id="generateLoadingText" style="color:#a5b4fc;">AI is generating your LinkedIn post...</p>
+                    <div class="flex gap-2 mt-2">
+                      <div class="skeleton h-2.5 w-3/4"></div>
+                    </div>
+                    <div class="flex gap-2 mt-1.5">
+                      <div class="skeleton h-2.5 w-1/2"></div>
+                      <div class="skeleton h-2.5 w-1/4"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Live LinkedIn Preview ── -->
+          <div id="linkedin-preview-container" class="transition-all duration-700 opacity-60">
+            <div id="preview-card" class="ln-card border-2 border-dashed" style="border-color:var(--border-color);">
+
+              <!-- Author Header -->
+              <div class="flex items-start gap-3 px-4 pt-4 pb-1">
+                <div class="ln-avatar">HM</div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-1">
+                    <span class="ln-name">Hasnat Mubeen</span>
+                    <span class="ln-verified" title="Verified">
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M23 12l-2.44-2.78.34-3.68-3.61-.82-1.89-3.18L12 3 8.6 1.54 6.71 4.72l-3.61.81.34 3.68L1 12l2.44 2.78-.34 3.69 3.61.82 1.89 3.18L12 21l3.4 1.46 1.89-3.18 3.61-.82-.34-3.68L23 12zm-12.91 4.72l-3.8-3.81 1.48-1.48 2.32 2.33 5.85-5.87 1.48 1.48-7.33 7.35z"/></svg>
+                    </span>
+                  </div>
+                  <p class="ln-headline">Expertise in DevOps &amp; Cloud Solutions | Experienced in CI/CD Pipelines and AWS Services</p>
+                  <span class="ln-timestamp">1m &bull;
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/></svg>
+                  </span>
+                </div>
+                <button class="ln-three-dot" aria-label="More options">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+                </button>
+              </div>
+
               <!-- Body -->
-              <div id="preview-body" class="px-4 py-1 text-sm leading-relaxed whitespace-pre-wrap italic text-zinc-500 dark:text-zinc-400">Click "Generate" above to see your AI-crafted post draft appear here in real-time...</div>
+              <div id="preview-body" class="ln-body placeholder">Click "Generate" above to see your AI-crafted post draft appear here in real-time...</div>
+
               <!-- Media -->
-              <div id="preview-media-container" class="hidden px-4 pb-2 mt-2">
+              <div id="preview-media-container" class="ln-media-wrap hidden">
                 <div id="preview-image-skeleton" class="skeleton w-full aspect-video rounded-xl"></div>
                 <img id="preview-image" class="w-full aspect-video object-cover rounded-xl hidden" alt="Generated post image" />
               </div>
-              <!-- Divider -->
-              <div class="mx-4 mt-2" style="border-top:1px solid var(--border-color);"></div>
+
+              <!-- Engagement stats -->
+              <div class="ln-engagement">
+                <span>0 likes</span>
+                <span>0 comments</span>
+              </div>
+
               <!-- Action Bar -->
-              <div class="flex items-center justify-around px-2 py-1.5">
-                <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150" style="color:var(--text-muted);" onmouseover="this.style.color='var(--text-secondary)';this.style.background='var(--badge-bg)'" onmouseout="this.style.color='';this.style.background=''">
+              <div class="ln-divider"></div>
+              <div class="ln-actions">
+                <button class="ln-action" onmouseover="this.style.color='var(--text-secondary)';this.style.background='var(--badge-bg)'" onmouseout="this.style.color='';this.style.background=''">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665c0 1.194.232 2.333.654 3.375z"/></svg> Like
                 </button>
-                <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150" style="color:var(--text-muted);" onmouseover="this.style.color='var(--text-secondary)';this.style.background='var(--badge-bg)'" onmouseout="this.style.color='';this.style.background=''">
+                <button class="ln-action" onmouseover="this.style.color='var(--text-secondary)';this.style.background='var(--badge-bg)'" onmouseout="this.style.color='';this.style.background=''">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z"/></svg> Comment
                 </button>
-                <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150" style="color:var(--text-muted);" onmouseover="this.style.color='var(--text-secondary)';this.style.background='var(--badge-bg)'" onmouseout="this.style.color='';this.style.background=''">
+                <button class="ln-action" onmouseover="this.style.color='var(--text-secondary)';this.style.background='var(--badge-bg)'" onmouseout="this.style.color='';this.style.background=''">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3"/></svg> Repost
                 </button>
-                <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150" style="color:var(--text-muted);" onmouseover="this.style.color='var(--text-secondary)';this.style.background='var(--badge-bg)'" onmouseout="this.style.color='';this.style.background=''">
+                <button class="ln-action" onmouseover="this.style.color='var(--text-secondary)';this.style.background='var(--badge-bg)'" onmouseout="this.style.color='';this.style.background=''">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg> Send
                 </button>
               </div>
-              <!-- Publish divider -->
-              <div class="mx-4 my-1" style="border-top:1px solid var(--border-color);"></div>
+
+              <!-- Comment Box -->
+              <div class="ln-divider"></div>
+              <div class="ln-comment-row">
+                <div class="ln-comment-avatar">HM</div>
+                <input type="text" class="ln-comment-input" placeholder="Add a comment..." disabled />
+              </div>
+
               <!-- Publish bar -->
-              <div class="flex items-center justify-between px-4 py-2">
-                <span class="text-[11px]" style="color:var(--text-muted);">Ready to publish this post to LinkedIn?</span>
+              <div class="ln-publish-row">
+                <span class="ln-publish-text">Ready to publish this post to LinkedIn?</span>
                 <button id="publishLinkedInBtn" class="btn-primary text-xs !px-4 !py-2" disabled>
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
                   Publish to LinkedIn
                 </button>
               </div>
+
+            </div>
+          </div>
+
+          <!-- ── Trending News ── -->
+          <div>
+            <div class="news-header">
+              <svg class="w-4 h-4" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/></svg>
+              <h2>Trending News</h2>
+              <div class="glow-line flex-1"></div>
+              <span class="text-xs" id="newsCount" style="color:var(--text-muted);"></span>
+            </div>
+            <div id="newsSkeleton" class="space-y-2.5">
+              <div class="skeleton h-28 w-full"></div>
+              <div class="skeleton h-28 w-full"></div>
+              <div class="skeleton h-28 w-full"></div>
+            </div>
+            <div id="newsScrollWrap" class="hidden">
+              <div id="newsContainer"></div>
+            </div>
+            <div id="newsEmpty" class="hidden">
+              <div class="news-empty-icon">
+                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm0 8.625a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25z"/></svg>
+              </div>
+              <p>No trending news yet</p>
+              <p>Trending stories from your industry will appear here once fetched by the n8n workflow.</p>
             </div>
           </div>
 
           <!-- ── Recent Activity ── -->
           <div>
-            <div class="flex items-center justify-between mb-3">
-              <h2 class="text-sm font-semibold" style="color:var(--text-primary);">Recent Activity</h2>
+            <div class="activity-header">
+              <svg class="w-4 h-4" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <h2>Recent Activity</h2>
+              <div class="glow-line flex-1"></div>
               <span class="text-xs" id="activityCount" style="color:var(--text-muted);"></span>
             </div>
 
-            <div id="activitySkeleton" class="space-y-2">
-              <div class="skeleton h-14 w-full"></div>
-              <div class="skeleton h-14 w-full"></div>
-              <div class="skeleton h-14 w-full"></div>
+            <div id="activitySkeleton" class="space-y-3">
+              <div class="skeleton h-20 w-full"></div>
+              <div class="skeleton h-20 w-full"></div>
+              <div class="skeleton h-20 w-full"></div>
             </div>
 
             <div id="activityContent" class="hidden">
 
-              <div id="activityEmpty" class="card p-10 text-center">
-                <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:var(--bg-card-alt);border:1px solid var(--border-color);">
-                  <svg class="w-7 h-7" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+              <div id="activityEmpty">
+                <div class="activity-empty-icon">
+                  <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
                 </div>
-                <p class="text-sm font-medium" style="color:var(--text-secondary);">No posts yet</p>
-                <p class="text-xs mt-1" style="color:var(--text-muted);">Enter a topic above and click Generate to publish your first post.</p>
+                <p>No posts yet</p>
+                <p>Enter a topic above and click Generate to create your first post. Published posts will appear here as timeline entries.</p>
               </div>
 
-              <div id="activityTableWrap" class="card overflow-hidden">
-                <div class="overflow-x-auto">
-                  <table class="w-full text-sm">
+              <div id="activityTableWrap">
+                <div>
+                  <table>
                     <thead>
-                      <tr style="border-bottom:1px solid var(--border-color);">
-                        <th class="text-left font-medium px-4 py-3 text-[11px] uppercase tracking-wider" style="color:var(--text-muted);">Post</th>
-                        <th class="text-left font-medium px-4 py-3 text-[11px] uppercase tracking-wider hidden md:table-cell" style="color:var(--text-muted);">Topic</th>
-                        <th class="text-left font-medium px-4 py-3 text-[11px] uppercase tracking-wider" style="color:var(--text-muted);">Status</th>
-                        <th class="text-right font-medium px-4 py-3 text-[11px] uppercase tracking-wider" style="color:var(--text-muted);">Published</th>
+                      <tr>
+                        <th>Post</th>
+                        <th>Topic</th>
+                        <th>Status</th>
+                        <th>Published</th>
                       </tr>
                     </thead>
                     <tbody id="activityBody"></tbody>
@@ -612,12 +993,12 @@
               </table>
             </div>
           </div>
-          <div id="historyEmpty" class="card p-10 text-center hidden">
-            <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:var(--bg-card-alt);border:1px solid var(--border-color);">
-              <svg class="w-7 h-7" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+          <div id="historyEmpty" class="card p-12 text-center hidden">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style="background:var(--bg-card-alt);border:1px solid var(--border-color);">
+              <svg class="w-8 h-8" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
             </div>
-            <p class="text-sm font-medium" style="color:var(--text-secondary);">No posts yet</p>
-            <p class="text-xs mt-1" style="color:var(--text-muted);">Your generated posts will appear here.</p>
+            <p class="text-sm font-semibold" style="color:var(--text-secondary);">No posts yet</p>
+            <p class="text-xs mt-1.5" style="color:var(--text-muted);">Your generated posts will appear here.</p>
           </div>
         </div>
       </div>
@@ -643,11 +1024,11 @@
             <div>
               <label class="block text-xs font-medium mb-2 tracking-wide uppercase" style="color:var(--text-secondary);">Post Type</label>
               <div class="grid grid-cols-2 gap-3" id="schedPostTypeGroup">
-                <button type="button" data-value="text" class="flex flex-col items-start gap-1 p-3.5 rounded-xl border-2 transition-all duration-200 cursor-pointer text-left border-indigo-500 bg-indigo-50/30 dark:bg-indigo-500/10" id="schedTypeText">
+                <button type="button" data-value="text" class="sched-type-btn flex flex-col items-start gap-1 p-3.5 rounded-xl border-2 transition-all duration-200 cursor-pointer text-left border-indigo-500 bg-indigo-50/30 dark:bg-indigo-500/10" id="schedTypeText">
                   <span class="text-sm font-semibold" style="color:var(--text-primary);">📝 Text Post</span>
                   <span class="text-[11px]" style="color:var(--text-muted);">Engaging text and hashtags only</span>
                 </button>
-                <button type="button" data-value="image" class="flex flex-col items-start gap-1 p-3.5 rounded-xl border-2 transition-all duration-200 cursor-pointer text-left border-zinc-200 dark:border-zinc-700" id="schedTypeImage">
+                <button type="button" data-value="image" class="sched-type-btn flex flex-col items-start gap-1 p-3.5 rounded-xl border-2 transition-all duration-200 cursor-pointer text-left border-zinc-200 dark:border-zinc-700" id="schedTypeImage">
                   <span class="text-sm font-semibold" style="color:var(--text-primary);">🖼️ Post with Image</span>
                   <span class="text-[11px]" style="color:var(--text-muted);">AI-generated text &amp; matching graphic</span>
                 </button>
@@ -684,12 +1065,12 @@
               <div class="skeleton h-14 w-full"></div>
               <div class="skeleton h-14 w-full"></div>
             </div>
-            <div id="schedEmpty" class="card p-10 text-center hidden">
-              <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:var(--bg-card-alt);border:1px solid var(--border-color);">
-                <svg class="w-7 h-7" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <div id="schedEmpty" class="card p-12 text-center hidden">
+              <div class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style="background:var(--bg-card-alt);border:1px solid var(--border-color);">
+                <svg class="w-8 h-8" style="color:var(--text-muted);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
               </div>
-              <p class="text-sm font-medium" style="color:var(--text-secondary);">No scheduled posts</p>
-              <p class="text-xs mt-1" style="color:var(--text-muted);">Schedule a post above and it will appear here.</p>
+              <p class="text-sm font-semibold" style="color:var(--text-secondary);">No scheduled posts</p>
+              <p class="text-xs mt-1.5" style="color:var(--text-muted);">Schedule a post above and it will appear here.</p>
             </div>
             <div id="schedWrap" class="card overflow-hidden hidden">
               <div class="overflow-x-auto">
