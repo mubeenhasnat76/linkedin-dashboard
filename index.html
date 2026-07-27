@@ -2074,14 +2074,26 @@
 
     async function loadSchedulerToggle() {
       if (!window.supabaseClient) return;
+      if (!currentUser) return;
+      console.log('Loading scheduler settings...');
       try {
         var r = await window.supabaseClient
-          .from('system_settings')
+          .from('scheduler_settings')
           .select('is_scheduler_active, poll_interval_minutes')
-          .eq('id', 1)
+          .eq('user_id', currentUser.id)
           .maybeSingle();
         if (r.error) throw r.error;
-        if (r.data !== null) applySchedulerUI(!!r.data.is_scheduler_active, r.data.poll_interval_minutes ?? 5);
+        if (r.data !== null) {
+          console.log('Scheduler row found');
+          applySchedulerUI(!!r.data.is_scheduler_active, r.data.poll_interval_minutes ?? 5);
+        } else {
+          console.log('Creating scheduler row...');
+          await window.supabaseClient
+            .from('scheduler_settings')
+            .insert({ user_id: currentUser.id, is_scheduler_active: true, poll_interval_minutes: 5 });
+          console.log('Scheduler row created');
+          applySchedulerUI(true, 5);
+        }
       } catch (err) {
         console.warn('[Dashboard] Could not load scheduler toggle:', JSON.stringify(err));
       }
@@ -2089,14 +2101,18 @@
 
     async function toggleSchedulerHandler() {
       if (!window.supabaseClient) { toast('Supabase unavailable', 'error'); return; }
+      if (!currentUser) { toast('User not authenticated', 'error'); return; }
       var prev = isSchedulerActive;
       applySchedulerUI(!isSchedulerActive, pollInterval);
       $masterSchedToggle.disabled = true;
+      console.log('Updating scheduler...');
       try {
         var r = await window.supabaseClient
-          .from('system_settings')
-          .upsert({ id: 1, is_scheduler_active: !prev, poll_interval_minutes: pollInterval }, { onConflict: 'id' });
+          .from('scheduler_settings')
+          .update({ is_scheduler_active: !prev, poll_interval_minutes: pollInterval })
+          .eq('user_id', currentUser.id);
         if (r.error) throw r.error;
+        console.log('Scheduler updated');
       } catch (err) {
         applySchedulerUI(prev, pollInterval);
         toast('Failed to update scheduler state', 'error');
@@ -2108,14 +2124,18 @@
 
     async function schedIntervalChangeHandler() {
       if (!window.supabaseClient) { toast('Supabase unavailable', 'error'); return; }
+      if (!currentUser) { toast('User not authenticated', 'error'); return; }
       var prev = pollInterval;
       var newVal = parseInt($schedIntervalSelect.value, 10);
       applySchedulerUI(isSchedulerActive, newVal);
+      console.log('Updating scheduler...');
       try {
         var r = await window.supabaseClient
-          .from('system_settings')
-          .upsert({ id: 1, is_scheduler_active: isSchedulerActive, poll_interval_minutes: newVal }, { onConflict: 'id' });
+          .from('scheduler_settings')
+          .update({ is_scheduler_active: isSchedulerActive, poll_interval_minutes: newVal })
+          .eq('user_id', currentUser.id);
         if (r.error) throw r.error;
+        console.log('Scheduler updated');
         toast('Polling interval updated to every ' + newVal + ' min', 'success');
       } catch (err) {
         applySchedulerUI(isSchedulerActive, prev);
