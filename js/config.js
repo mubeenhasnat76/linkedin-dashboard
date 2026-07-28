@@ -15,7 +15,17 @@ const APP_CONFIG = {
     authUrl: 'https://www.linkedin.com/oauth/v2/authorization',
     scopes: 'openid profile w_member_social email'
   },
-  N8N_LINKEDIN_PUBLISH_WEBHOOK: 'https://rajahasnat.app.n8n.cloud/webhook/linkedin-publish'
+  N8N_LINKEDIN_PUBLISH_WEBHOOK: 'https://rajahasnat.app.n8n.cloud/webhook/linkedin-publish',
+  FACEBOOK_CLIENT_ID: '1599897371479994',
+  FACEBOOK_REDIRECT_URI: (function () {
+    var host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return 'http://127.0.0.1:5500/facebook-callback.html';
+    }
+    return 'https://linkedin-dashboard-murex.vercel.app/facebook-callback.html';
+  })(),
+  FACEBOOK_SCOPES: 'public_profile,pages_show_list,pages_read_engagement,pages_manage_posts',
+  FACEBOOK_API_VERSION: 'v22.0'
 };
 
 window.supabase = window.supabase.createClient(APP_CONFIG.supabaseUrl, APP_CONFIG.supabaseKey, {

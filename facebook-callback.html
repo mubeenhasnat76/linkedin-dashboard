@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authorization Callback</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      margin: 0; display: flex; align-items: center; justify-content: center;
+      height: 100vh; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f9fafb; color: #111827; transition: background 0.3s ease, color 0.3s ease;
+    }
+    @media (prefers-color-scheme: dark) {
+      body { background: #030712; color: #f9fafb; }
+      .card { background: #111827; border-color: #374151; }
+      .spinner { border-color: #374151; border-top-color: #6366f1; }
+      p { color: #9ca3af; }
+    }
+    .card {
+      background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px;
+      padding: 2.5rem; max-width: 360px; width: 90%; text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+    }
+    .spinner {
+      width: 32px; height: 32px; border: 3px solid #e5e7eb;
+      border-top-color: #6366f1; border-radius: 50%;
+      animation: spin 0.7s linear infinite; margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .card { animation: fadeIn 0.3s ease forwards; }
+    p { font-size: 0.875rem; color: #6b7280; line-height: 1.5; }
+    .logo-icon {
+      width: 2.5rem; height: 2.5rem; border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem; box-shadow: 0 4px 12px rgba(99,102,241,0.2);
+    }
+    .logo-icon svg { width: 1.25rem; height: 1.25rem; color: #fff; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo-icon" aria-hidden="true">
+      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+    </div>
+    <div class="spinner" role="status" aria-label="Loading"></div>
+    <p>Completing Facebook authorization...</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var code = params.get('code');
+      var state = params.get('state');
+      var errorParam = params.get('error');
+      var errorDescription = params.get('error_description');
+      var OPENER_ORIGIN = window.location.origin;
+
+      function closePopup(data) {
+        if (window.opener && !window.opener.closed) {
+          try {
+            window.opener.postMessage(data, OPENER_ORIGIN);
+          } catch (e) {
+            console.error('[FacebookCallback] postMessage failed:', e);
+          }
+        }
+        setTimeout(function () { window.close(); }, 200);
+      }
+
+      function displayFallbackMessage(message) {
+        document.body.innerHTML = '<div style="font-family:sans-serif;padding:2rem;max-width:500px;margin:0 auto;text-align:center;">' +
+          '<h2 style="font-size:1.25rem;margin-bottom:0.75rem;">Facebook Authorization</h2>' +
+          '<p style="color:#6b7280;margin-bottom:1rem;">' + escapeHtml(message) + '</p>' +
+          '<p style="font-size:0.875rem;color:#9ca3af;">You can close this window.</p>' +
+          '</div>';
+      }
+
+      function escapeHtml(s) {
+        if (typeof s !== 'string') return '';
+        return s.replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; });
+      }
+
+      if (errorParam) {
+        closePopup({ type: 'facebook-error', error: errorDescription || errorParam });
+        displayFallbackMessage(errorDescription || 'Facebook returned an error: ' + errorParam);
+        return;
+      }
+
+      if (!code || !state) {
+        var errMsg = 'Missing authorization code or state parameter. Please try connecting again.';
+        closePopup({ type: 'facebook-error', error: errMsg });
+        displayFallbackMessage(errMsg);
+        return;
+      }
+
+      var expectedState = localStorage.getItem('facebook_oauth_state');
+      localStorage.removeItem('facebook_oauth_state');
+
+      if (!expectedState || state !== expectedState) {
+        var errMsg = 'State mismatch — possible CSRF attack. Please try again.';
+        closePopup({ type: 'facebook-error', error: errMsg });
+        displayFallbackMessage(errMsg);
+        return;
+      }
+
+      var codeVerifier = localStorage.getItem('facebook_code_verifier');
+      localStorage.removeItem('facebook_code_verifier');
+
+      if (!codeVerifier) {
+        var errMsg = 'Missing code verifier. Please try connecting again.';
+        closePopup({ type: 'facebook-error', error: errMsg });
+        displayFallbackMessage(errMsg);
+        return;
+      }
+
+      if (!window.opener || window.opener.closed) {
+        displayFallbackMessage('The original dashboard window is no longer open. You can close this window and go back to the dashboard.');
+        return;
+      }
+
+      (async function () {
+        try {
+          if (!window.opener.supabase || !window.opener.supabase.auth) {
+            closePopup({ type: 'facebook-error', error: 'Supabase client not available in the parent window. Please refresh the dashboard and try again.' });
+            return;
+          }
+
+          var sessionResult = await window.opener.supabase.auth.getSession();
+          var session = sessionResult.data?.session;
+          if (!session) {
+            closePopup({ type: 'facebook-error', error: 'Your session has expired. Please sign in again and retry.' });
+            return;
+          }
+
+          // Exchange authorization code for access token using Facebook Graph API with PKCE
+          var clientId = APP_CONFIG.FACEBOOK_CLIENT_ID;
+          var redirectUri = APP_CONFIG.FACEBOOK_REDIRECT_URI;
+          var apiVersion = APP_CONFIG.FACEBOOK_API_VERSION;
+
+          var tokenUrl = 'https://graph.facebook.com/' + apiVersion + '/oauth/access_token' +
+            '?client_id=' + encodeURIComponent(clientId) +
+            '&redirect_uri=' + encodeURIComponent(redirectUri) +
+            '&code=' + encodeURIComponent(code) +
+            '&code_verifier=' + encodeURIComponent(codeVerifier);
+
+          console.log('[FacebookCallback] Exchanging code for token...');
+          var tokenResponse = await fetch(tokenUrl);
+          var tokenData = await tokenResponse.json();
+
+          if (!tokenResponse.ok || tokenData.error) {
+            var errMsg = tokenData.error?.message || tokenData.error || 'Failed to exchange authorization code.';
+            console.error('[FacebookCallback] Token exchange error:', errMsg);
+            closePopup({ type: 'facebook-error', error: 'Facebook token exchange failed: ' + errMsg });
+            return;
+          }
+
+          var accessToken = tokenData.access_token;
+          console.log('[FacebookCallback] Token obtained successfully');
+
+          // Fetch Facebook user info
+          console.log('[FacebookCallback] Fetching user info...');
+          var meResponse = await fetch('https://graph.facebook.com/' + apiVersion + '/me?fields=id,name&access_token=' + encodeURIComponent(accessToken));
+          var meData = await meResponse.json();
+
+          if (!meResponse.ok || meData.error) {
+            var errMsg = meData.error?.message || meData.error || 'Failed to fetch Facebook user info.';
+            console.error('[FacebookCallback] User info error:', errMsg);
+            closePopup({ type: 'facebook-error', error: 'Failed to fetch Facebook profile: ' + errMsg });
+            return;
+          }
+
+          console.log('[FacebookCallback] User info:', meData.id, meData.name);
+
+          // Fetch pages the user manages
+          console.log('[FacebookCallback] Fetching pages...');
+          var pagesResponse = await fetch('https://graph.facebook.com/' + apiVersion + '/me/accounts?access_token=' + encodeURIComponent(accessToken));
+          var pagesData = await pagesResponse.json();
+
+          var pageId = null;
+          var pageName = null;
+          if (pagesData && pagesData.data && pagesData.data.length > 0) {
+            pageId = pagesData.data[0].id;
+            pageName = pagesData.data[0].name;
+            console.log('[FacebookCallback] Found page:', pageName, '(' + pageId + ')');
+          } else {
+            console.log('[FacebookCallback] No pages found for this user');
+          }
+
+          // Remove any existing Facebook connection for this user
+          var { error: deleteError } = await window.opener.supabase
+            .from('facebook_connections')
+            .delete()
+            .eq('user_id', session.user.id);
+
+          if (deleteError) {
+            console.error('[FacebookCallback] Delete existing connection error:', deleteError);
+          }
+
+          // Save the new connection
+          console.log('[FacebookCallback] Saving connection to Supabase...');
+          var { error: insertError } = await window.opener.supabase
+            .from('facebook_connections')
+            .insert({
+              user_id: session.user.id,
+              facebook_user_id: meData.id,
+              facebook_name: meData.name,
+              page_id: pageId,
+              page_name: pageName,
+              access_token: accessToken,
+              connected_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            });
+
+          if (insertError) {
+            console.error('[FacebookCallback] Insert error:', insertError);
+            closePopup({ type: 'facebook-error', error: 'Failed to save Facebook connection: ' + (insertError.message || insertError) });
+            return;
+          }
+
+          console.log('[FacebookCallback] Facebook connected successfully');
+          closePopup({ type: 'facebook-connected', success: true });
+        } catch (err) {
+          var msg = 'Cannot complete Facebook authorization.';
+          if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
+            msg = 'Network error: Could not reach Facebook API. Check your internet connection.';
+          } else if (err.message) {
+            msg = err.message;
+          }
+          console.error('[FacebookCallback] Error:', msg, err);
+          closePopup({ type: 'facebook-error', error: msg });
+        }
+      })();
+    })();
+  </script>
+</body>
+</html>
