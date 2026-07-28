@@ -238,11 +238,13 @@
     var redirectUri = APP_CONFIG.FACEBOOK_REDIRECT_URI;
     var scopes = APP_CONFIG.FACEBOOK_SCOPES;
     var apiVersion = APP_CONFIG.FACEBOOK_API_VERSION;
+    var configId = APP_CONFIG.FACEBOOK_CONFIG_ID;
 
     var authUrl = 'https://www.facebook.com/' + apiVersion + '/dialog/oauth' +
       '?client_id=' + encodeURIComponent(clientId) +
       '&redirect_uri=' + encodeURIComponent(redirectUri) +
       '&state=' + encodeURIComponent(state) +
+      '&config_id=' + encodeURIComponent(configId) +
       '&scope=' + encodeURIComponent(scopes) +
       '&response_type=code' +
       '&code_challenge=' + encodeURIComponent(challenge) +
