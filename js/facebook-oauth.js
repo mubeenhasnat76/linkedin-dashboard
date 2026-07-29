@@ -219,7 +219,8 @@
       '&redirect_uri=' + encodeURIComponent(redirectUri) +
       '&state=' + encodeURIComponent(state) +
       '&config_id=' + encodeURIComponent(configId) +
-      '&response_type=code';
+      '&response_type=code' +
+      '&override_default_response_type=true';
 
     updateFacebookUI('connecting');
 
