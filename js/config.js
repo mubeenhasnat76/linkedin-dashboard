@@ -26,7 +26,7 @@ const APP_CONFIG = {
   })(),
   FACEBOOK_SCOPES: 'public_profile,pages_show_list,pages_read_engagement,pages_manage_posts',
   FACEBOOK_API_VERSION: 'v22.0',
-  FACEBOOK_CONFIG_ID: '1799245444760184',
+  FACEBOOK_CONFIG_ID: '1709628160091196',
   FACEBOOK_EDGE_FUNCTION: 'https://sjjybpydkwvgqfyqliod.supabase.co/functions/v1/facebook-token-exchange'
 };
 
