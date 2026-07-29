@@ -174,7 +174,7 @@
         if (pageNameEl) pageNameEl.textContent = data.page_name || '—';
         if (pageIdEl) pageIdEl.textContent = data.page_id ? data.page_id.slice(0, 12) + '...' : '—';
         if (sinceEl) {
-          var d = data.connected_at ? new Date(data.connected_at) : null;
+          var d = data.created_at ? new Date(data.created_at) : null;
           sinceEl.textContent = d ? d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : '—';
         }
       }
@@ -293,7 +293,7 @@
 
       var { data, error } = await window.supabase
         .from('facebook_connections')
-        .select('facebook_name, page_id, page_name, connected_at')
+        .select('facebook_name, page_id, page_name, created_at')
         .eq('user_id', session.user.id)
         .maybeSingle();
 

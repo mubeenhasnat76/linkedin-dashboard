@@ -189,9 +189,11 @@
 
           var pageId = null;
           var pageName = null;
+          var pageAccessToken = null;
           if (pagesData && pagesData.data && pagesData.data.length > 0) {
             pageId = pagesData.data[0].id;
             pageName = pagesData.data[0].name;
+            pageAccessToken = pagesData.data[0].access_token;
             console.log('[FacebookCallback] Found page:', pageName, '(' + pageId + ')');
           } else {
             console.log('[FacebookCallback] No pages found for this user');
@@ -218,7 +220,8 @@
               page_id: pageId,
               page_name: pageName,
               access_token: accessToken,
-              connected_at: new Date().toISOString(),
+              page_access_token: pageAccessToken,
+              created_at: new Date().toISOString(),
               updated_at: new Date().toISOString()
             });
 
