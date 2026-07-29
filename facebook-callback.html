@@ -114,16 +114,6 @@
         return;
       }
 
-      var codeVerifier = localStorage.getItem('facebook_code_verifier');
-      localStorage.removeItem('facebook_code_verifier');
-
-      if (!codeVerifier) {
-        var errMsg = 'Missing code verifier. Please try connecting again.';
-        closePopup({ type: 'facebook-error', error: errMsg });
-        displayFallbackMessage(errMsg);
-        return;
-      }
-
       if (!window.opener || window.opener.closed) {
         displayFallbackMessage('The original dashboard window is no longer open. You can close this window and go back to the dashboard.');
         return;
@@ -143,101 +133,67 @@
             return;
           }
 
-          // Exchange authorization code for access token using Facebook Graph API with PKCE
-          var clientId = APP_CONFIG.FACEBOOK_CLIENT_ID;
-          var redirectUri = APP_CONFIG.FACEBOOK_REDIRECT_URI;
-          var apiVersion = APP_CONFIG.FACEBOOK_API_VERSION;
-
-          var tokenUrl = 'https://graph.facebook.com/' + apiVersion + '/oauth/access_token' +
-            '?client_id=' + encodeURIComponent(clientId) +
-            '&redirect_uri=' + encodeURIComponent(redirectUri) +
-            '&code=' + encodeURIComponent(code) +
-            '&code_verifier=' + encodeURIComponent(codeVerifier);
-
-          console.log('[FacebookCallback] Exchanging code for token...');
-          var tokenResponse = await fetch(tokenUrl);
-          var tokenData = await tokenResponse.json();
-
-          if (!tokenResponse.ok || tokenData.error) {
-            var errMsg = tokenData.error?.message || tokenData.error || 'Failed to exchange authorization code.';
-            console.error('[FacebookCallback] Token exchange error:', errMsg);
-            closePopup({ type: 'facebook-error', error: 'Facebook token exchange failed: ' + errMsg });
+          var jwt = session.access_token;
+          if (!jwt) {
+            closePopup({ type: 'facebook-error', error: 'No access token found in session. Please sign in again.' });
             return;
           }
 
-          var accessToken = tokenData.access_token;
-          console.log('[FacebookCallback] Token obtained successfully');
+          var edgeFunctionUrl = APP_CONFIG.FACEBOOK_EDGE_FUNCTION;
 
-          // Fetch Facebook user info
-          console.log('[FacebookCallback] Fetching user info...');
-          var meResponse = await fetch('https://graph.facebook.com/' + apiVersion + '/me?fields=id,name&access_token=' + encodeURIComponent(accessToken));
-          var meData = await meResponse.json();
-
-          if (!meResponse.ok || meData.error) {
-            var errMsg = meData.error?.message || meData.error || 'Failed to fetch Facebook user info.';
-            console.error('[FacebookCallback] User info error:', errMsg);
-            closePopup({ type: 'facebook-error', error: 'Failed to fetch Facebook profile: ' + errMsg });
+          if (!edgeFunctionUrl) {
+            closePopup({ type: 'facebook-error', error: 'Facebook Edge Function URL is not configured in config.js.' });
             return;
           }
 
-          console.log('[FacebookCallback] User info:', meData.id, meData.name);
+          console.log('[FacebookCallback] Calling Edge Function:', edgeFunctionUrl);
 
-          // Fetch pages the user manages
-          console.log('[FacebookCallback] Fetching pages...');
-          var pagesResponse = await fetch('https://graph.facebook.com/' + apiVersion + '/me/accounts?access_token=' + encodeURIComponent(accessToken));
-          var pagesData = await pagesResponse.json();
+          var response = await fetch(edgeFunctionUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + jwt
+            },
+            body: JSON.stringify({
+              code: code,
+              redirect_uri: APP_CONFIG.FACEBOOK_REDIRECT_URI
+            })
+          });
 
-          var pageId = null;
-          var pageName = null;
-          var pageAccessToken = null;
-          if (pagesData && pagesData.data && pagesData.data.length > 0) {
-            pageId = pagesData.data[0].id;
-            pageName = pagesData.data[0].name;
-            pageAccessToken = pagesData.data[0].access_token;
-            console.log('[FacebookCallback] Found page:', pageName, '(' + pageId + ')');
-          } else {
-            console.log('[FacebookCallback] No pages found for this user');
-          }
-
-          // Remove any existing Facebook connection for this user
-          var { error: deleteError } = await window.opener.supabase
-            .from('facebook_connections')
-            .delete()
-            .eq('user_id', session.user.id);
-
-          if (deleteError) {
-            console.error('[FacebookCallback] Delete existing connection error:', deleteError);
-          }
-
-          // Save the new connection
-          console.log('[FacebookCallback] Saving connection to Supabase...');
-          var { error: insertError } = await window.opener.supabase
-            .from('facebook_connections')
-            .insert({
-              user_id: session.user.id,
-              facebook_user_id: meData.id,
-              facebook_name: meData.name,
-              page_id: pageId,
-              page_name: pageName,
-              access_token: accessToken,
-              page_access_token: pageAccessToken,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            });
-
-          if (insertError) {
-            console.error('[FacebookCallback] Insert error:', insertError);
-            closePopup({ type: 'facebook-error', error: 'Failed to save Facebook connection: ' + (insertError.message || insertError) });
+          if (!response.ok) {
+            var errBody = '';
+            try { errBody = await response.text(); } catch (_) {}
+            var status = response.status;
+            var msg = '';
+            if (status === 401) {
+              msg = 'Authentication failed (HTTP 401). Your session may have expired. Please refresh the dashboard and try again.';
+            } else if (status === 500) {
+              msg = 'The authentication server encountered an error (HTTP 500). The Edge Function may need configuration.';
+            } else {
+              msg = 'Token exchange failed (HTTP ' + status + '): ' + errBody;
+            }
+            console.error('[FacebookCallback] ' + msg);
+            closePopup({ type: 'facebook-error', error: msg });
             return;
           }
 
-          console.log('[FacebookCallback] Facebook connected successfully');
+          var result = null;
+          try {
+            result = await response.json();
+          } catch (_) {}
+
+          if (result && !result.success) {
+            closePopup({ type: 'facebook-error', error: result.error || 'Edge Function returned an unsuccessful response.' });
+            return;
+          }
+
+          console.log('[FacebookCallback] Edge Function returned OK');
           closePopup({ type: 'facebook-connected', success: true });
         } catch (err) {
-          var msg = 'Cannot complete Facebook authorization.';
+          var msg = 'Cannot reach the authentication server. Make sure the Edge Function is deployed and the Supabase project is active.';
           if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
-            msg = 'Network error: Could not reach Facebook API. Check your internet connection.';
-          } else if (err.message) {
+            msg = 'Network error: Could not reach the Edge Function. Check your internet connection and that the function URL is correct.';
+          } else if (err.message && err.message.indexOf('Failed to fetch') === -1) {
             msg = err.message;
           }
           console.error('[FacebookCallback] Error:', msg, err);

@@ -17,28 +17,6 @@
   var FACEBOOK_ICON_SVG = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>';
   var SPINNER_SVG = '<span class="loader-ring animate-spin" style="width:14px;height:14px;border-width:2px;"></span>';
 
-  function base64URLEncode(buffer) {
-    var str = '';
-    var bytes = new Uint8Array(buffer);
-    for (var i = 0; i < bytes.length; i++) {
-      str += String.fromCharCode(bytes[i]);
-    }
-    return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-  }
-
-  function generateCodeVerifier() {
-    var arr = new Uint8Array(32);
-    crypto.getRandomValues(arr);
-    return base64URLEncode(arr);
-  }
-
-  async function generateCodeChallenge(verifier) {
-    var encoder = new TextEncoder();
-    var data = encoder.encode(verifier);
-    var digest = await crypto.subtle.digest('SHA-256', data);
-    return base64URLEncode(digest);
-  }
-
   function generateState() {
     var arr = new Uint8Array(32);
     crypto.getRandomValues(arr);
@@ -231,12 +209,8 @@
     }
 
     var state = generateState();
-    var verifier = generateCodeVerifier();
-    localStorage.setItem('facebook_code_verifier', verifier);
-    var challenge = await generateCodeChallenge(verifier);
 
     var redirectUri = APP_CONFIG.FACEBOOK_REDIRECT_URI;
-    var scopes = APP_CONFIG.FACEBOOK_SCOPES;
     var apiVersion = APP_CONFIG.FACEBOOK_API_VERSION;
     var configId = APP_CONFIG.FACEBOOK_CONFIG_ID;
 
@@ -245,10 +219,7 @@
       '&redirect_uri=' + encodeURIComponent(redirectUri) +
       '&state=' + encodeURIComponent(state) +
       '&config_id=' + encodeURIComponent(configId) +
-      '&scope=' + encodeURIComponent(scopes) +
-      '&response_type=code' +
-      '&code_challenge=' + encodeURIComponent(challenge) +
-      '&code_challenge_method=S256';
+      '&response_type=code';
 
     updateFacebookUI('connecting');
 
