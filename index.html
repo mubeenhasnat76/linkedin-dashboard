@@ -895,6 +895,19 @@
                   Publish to LinkedIn
                 </button>
               </div>
+              <div class="ln-publish-row" style="border-top:none;padding-top:0;">
+                <div class="flex items-center gap-2">
+                  <span class="ln-publish-text">Facebook:</span>
+                  <div class="flex gap-1" id="fbTargetGroup">
+                    <button type="button" data-value="profile" class="segmented-btn segmented-btn-active" style="padding:0.25rem 0.625rem;font-size:0.7rem;">Profile</button>
+                    <button type="button" data-value="page" class="segmented-btn segmented-btn-inactive" style="padding:0.25rem 0.625rem;font-size:0.7rem;">Page</button>
+                  </div>
+                </div>
+                <button id="publishFacebookBtn" class="btn-primary text-xs !px-4 !py-2" disabled>
+                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                  Publish to Facebook
+                </button>
+              </div>
 
             </div>
           </div>
@@ -1706,6 +1719,9 @@
           settingsFb.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> Facebook: Not connected';
         }
       }
+      if (typeof updateFacebookPublishButtonState === 'function') {
+        updateFacebookPublishButtonState();
+      }
     }
 
     async function checkFacebookConnection() {
@@ -2039,6 +2055,117 @@
       }
     }
 
+    var fbTarget = 'profile';
+    var isPublishingFb = false;
+
+    function setFbTarget(val) {
+      fbTarget = val === 'page' ? 'page' : 'profile';
+      var group = document.getElementById('fbTargetGroup');
+      if (!group) return;
+      group.querySelectorAll('button[data-value]').forEach(function (b) {
+        var active = b.dataset.value === fbTarget;
+        b.className = active
+          ? 'segmented-btn segmented-btn-active'
+          : 'segmented-btn segmented-btn-inactive';
+        if (!active) {
+          b.style.padding = '0.25rem 0.625rem';
+          b.style.fontSize = '0.7rem';
+        }
+      });
+    }
+
+    function updateFacebookPublishButtonState() {
+      var btn = $('publishFacebookBtn');
+      if (!btn) return;
+      var content = $previewBody.innerText || $previewBody.textContent || '';
+      var hasContent = content && content !== 'Click "Generate" above to see your AI-crafted post draft appear here in real-time...';
+      var connected = facebookConnected === true;
+      btn.disabled = !(hasContent && connected);
+    }
+
+    async function publishFacebookPost() {
+      if (isPublishingFb) return;
+      var postContent = $previewBody.innerText || $previewBody.textContent || '';
+      if (!postContent || postContent === 'Click "Generate" above to see your AI-crafted post draft appear here in real-time...') {
+        toast('No post content to publish. Generate a post first.', 'error');
+        return;
+      }
+
+      if (!facebookConnected) {
+        toast('Please connect your Facebook account first.', 'error');
+        return;
+      }
+
+      if (!window.supabaseClient) {
+        toast('Database unavailable – cannot publish', 'error');
+        return;
+      }
+      var sessionRes = await window.supabaseClient.auth.getSession();
+      var session = sessionRes?.data?.session;
+      if (!session) {
+        toast('Your session has expired. Please sign in again.', 'error');
+        return;
+      }
+
+      var imageUrl = '';
+      if (!$previewMediaContainer.classList.contains('hidden') && !$previewImage.classList.contains('hidden')) {
+        imageUrl = $previewImage.src;
+      }
+
+      var btn = $('publishFacebookBtn');
+      btn.disabled = true;
+      var originalHTML = btn.innerHTML;
+      btn.innerHTML = '<span class="loader-ring animate-spin"></span> Publishing...';
+      isPublishingFb = true;
+
+      try {
+        var response = await fetch(APP_CONFIG.FACEBOOK_PUBLISH_WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: session.user.id,
+            post_content: postContent,
+            image_url: imageUrl,
+            target_platform: 'facebook',
+            fb_target: fbTarget,
+            publish_now: true
+          })
+        });
+
+        var result = null;
+        try {
+          result = await response.json();
+        } catch (_) {}
+
+        if (response.ok && result && result.success) {
+          toast('Post published to Facebook successfully!', 'success');
+          $previewBody.innerHTML = 'Click "Generate" above to see your AI-crafted post draft appear here in real-time...';
+          $previewContainer.classList.remove('draft-active');
+          $previewMediaContainer.classList.add('hidden');
+          updatePublishButtonState();
+          updateFacebookPublishButtonState();
+          await loadDashboardData();
+          await loadHistory();
+        } else {
+          var errMsg = result && result.error ? result.error : 'Publishing failed (HTTP ' + response.status + ')';
+          toast(errMsg, 'error');
+        }
+      } catch (err) {
+        var errMsg = 'Could not reach the publishing service. ';
+        if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
+          errMsg += 'Network error — check your connection.';
+        } else {
+          errMsg += err.message || 'Unknown error.';
+        }
+        toast(errMsg, 'error');
+      } finally {
+        isPublishingFb = false;
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+        updateFacebookPublishButtonState();
+      }
+    }
+
     function showPostPreview(data, topic) {
       var text = data.post_text || data.post || '';
       $previewBody.innerHTML = text.split('\n').map(function (line) {
@@ -2068,6 +2195,7 @@
 
       $previewContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
       updatePublishButtonState();
+      updateFacebookPublishButtonState();
     }
 
     function updateButtonStates() {
@@ -2596,6 +2724,20 @@
       var $publishBtn = $('publishLinkedInBtn');
       if ($publishBtn) {
         $publishBtn.addEventListener('click', publishLinkedInPost);
+      }
+
+      var $publishFbBtn = $('publishFacebookBtn');
+      if ($publishFbBtn) {
+        $publishFbBtn.addEventListener('click', publishFacebookPost);
+      }
+
+      var $fbTargetGroup = document.getElementById('fbTargetGroup');
+      if ($fbTargetGroup) {
+        $fbTargetGroup.querySelectorAll('button[data-value]').forEach(function (b) {
+          b.addEventListener('click', function () {
+            setFbTarget(b.dataset.value);
+          });
+        });
       }
 
       // Settings page Sign Out

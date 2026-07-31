@@ -16,6 +16,7 @@ const APP_CONFIG = {
     scopes: 'openid profile w_member_social email'
   },
   N8N_LINKEDIN_PUBLISH_WEBHOOK: 'https://rajahasnat.app.n8n.cloud/webhook/linkedin-publish',
+  FACEBOOK_PUBLISH_WEBHOOK: 'https://rajahasnat.app.n8n.cloud/webhook/linkedin-generate',
   FACEBOOK_CLIENT_ID: '1599897371479994',
   FACEBOOK_REDIRECT_URI: (function () {
     var host = window.location.hostname;

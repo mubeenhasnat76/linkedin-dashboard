@@ -1,0 +1,1339 @@
+{
+  "name": "AI News → LinkedIn Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "linkedin-generate",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "7c24ce24-2d45-4b5e-accc-f3873a294078",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -160,
+        144
+      ],
+      "webhookId": "c97d9582-2b07-4cb2-8180-5d63892570c7"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "profiles",
+        "limit": 1,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook').item.json.body.user_id }}"
+            }
+          ]
+        }
+      },
+      "id": "37322708-4605-4db7-a716-ddec9c09a8ac",
+      "name": "Get User Profile",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        112,
+        144
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "Bx79LBoXttDojGfp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "conn-1",
+              "leftValue": "={{ $('Get User Profile').item.json.linkedin_connected }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c14b6c4a-8360-41c8-82d6-d15a85be5541",
+      "name": "LinkedIn Connected?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        304,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "tok-1",
+              "leftValue": "={{ $('Get User Profile').item.json.linkedin_access_token }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "850d7bfa-3000-452b-a2e4-cefac18ca2a6",
+      "name": "Token Available?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Webhook').first().json;\n\n// Handle different payload formats\nlet parsedData;\n\nif (typeof input.body === \"string\") {\n  try {\n    parsedData = JSON.parse(input.body);\n  } catch (e) {\n    parsedData = input.body;\n  }\n} else if (input.body && typeof input.body === \"object\") {\n  parsedData = input.body;\n} else {\n  parsedData = input;\n}\n\n// Helper: strip a stray leading \"=\" the Poller sometimes sends (unevaluated expression)\nconst clean = (v) => (v === undefined || v === null) ? null : String(v).replace(/^=/, \"\").trim();\n\nconst topic = clean(parsedData.topic);\nconst postType = (clean(parsedData.post_type) || \"\").toLowerCase();\n\n// Normalize the image intent from BOTH supported shapes:\n//  - generate_image: true/\"true\"\n//  - post_type: \"image\"\nconst generateImage =\n  parsedData.generate_image === true ||\n  parsedData.generate_image === \"true\" ||\n  postType === \"image\";\n\nreturn [{\n  json: {\n    user_id: parsedData.user_id || null,\n    post_content: parsedData.post_content || null,\n    image_url: parsedData.image_url || null,\n    publish_now: parsedData.publish_now,\n    topic: topic || null,\n    post_type: postType || (generateImage ? \"image\" : \"text\"),\n    posts_per_day: parsedData.posts_per_day || null,\n    generate_image: generateImage,\n    raw_payload: parsedData\n  }\n}];"
+      },
+      "id": "8973eaa2-4f3f-40aa-b8dc-142e5d221e50",
+      "name": "Parse Webhook Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        864,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "settings",
+        "limit": 1,
+        "filterType": "none"
+      },
+      "id": "401758e1-9639-4bde-81bb-cdd9236eaa9c",
+      "name": "Fetch Settings (Manual)",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        32
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "Bx79LBoXttDojGfp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const webhookData = $('Parse Webhook Payload').item.json;\nconst settings = $input.first()?.json || {};\n\nconst activeTopic = webhookData.topic || settings.topic || '\"Artificial Intelligence\" OR \"DevOps\"';\n\nreturn [{\n  json: {\n    selected_topic: activeTopic,\n    search_query: activeTopic\n  }\n}];"
+      },
+      "id": "265d0e5a-9942-4248-8aec-bf338b182497",
+      "name": "Select Manual Topic",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://news.google.com/rss/search?q={{ encodeURIComponent($json.search_query) }}&hl=en-US&gl=US&ceid=US:en",
+        "options": {}
+      },
+      "id": "ceb23034-e65d-4ad8-a606-8147bd44d0e3",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1536,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "1dfb7b55-379b-4f6b-a8d1-781a83322e65",
+      "name": "XML",
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0d45f3eb-4414-47b0-941f-c7dbf985b94c",
+              "name": "rss.channel.title",
+              "value": "={{ $json.rss.channel.title }}",
+              "type": "string"
+            },
+            {
+              "id": "2d2b9daa-02bb-496c-9907-415de53122d1",
+              "name": "rss.channel.description",
+              "value": "={{ $json.rss.channel.description }}",
+              "type": "string"
+            },
+            {
+              "id": "6b268814-7ffc-43b2-9fad-bc496a9440ca",
+              "name": "rss.channel.image.link",
+              "value": "={{ $json.rss.channel.image.link }}",
+              "type": "string"
+            },
+            {
+              "id": "42fb64d8-2877-4b35-8799-f728805f2cfa",
+              "name": "rss.channel.item[0].title",
+              "value": "={{ [$json.rss.channel.item].flat()[0]?.title }}",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-item0-link-0001",
+              "name": "rss.channel.item[0].link",
+              "value": "={{ [$json.rss.channel.item].flat()[0]?.link }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5149c712-adaa-44f5-89d8-7f1b8e79a5f4",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1984,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an experienced technology leader, AI strategist, and professional LinkedIn content creator.\n\nUse the information below:\n\nTopic:\n{{ $('Parse Webhook Payload').item.json.topic }}\n\nArticle Headline:\n{{ $('Parse Webhook Payload').item.json.article_headline }}\n\nArticle URL:\n{{ $('Parse Webhook Payload').item.json.article_url }}\n\nGenerate ONLY valid JSON.\n\n{\n  \"post_text\": \"\",\n  \"image_prompt\": \"\"\n}\n\nRequirements for post_text:\n\n- 180–220 words.\n- Write for technology leaders, software engineers, architects, DevOps professionals, AI practitioners, cloud engineers, and business decision-makers.\n- Begin with a compelling hook.\n- Use natural, professional language.\n- Use short paragraphs for readability.\n- Explain why the topic matters in practice.\n- Include exactly 3–4 bullet points using:\n  •\n- Do not use Markdown.\n- Use at most 3 relevant emojis.\n- Do not invent facts beyond the provided topic and headline.\n- End with an open-ended discussion question.\n- Include exactly 5 highly relevant LinkedIn hashtags.\n\nRequirements for image_prompt:\n\n- Maximum 30 words.\n- Describe a unique visual scene that clearly represents the topic.\n- Mention technologies, environments, objects, or workflows relevant to the topic.\n- Avoid generic AI portraits unless the topic specifically requires people.\n- Professional digital illustration.\n- Modern technology aesthetic.\n- High-quality concept art.\n- No text, logos, watermarks, or UI screenshots.\n- Landscape (16:9) composition.\n\nReturn ONLY valid JSON.",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "id": "cea5ae20-e8d6-4208-ad4a-bf80422fc3d1",
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        2208,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "df095a3a-4522-42f8-8209-91ebfe158d5e",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2176,
+        256
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "d1Edp1UjXBOs6fmT",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"post_text\": \"Your professional LinkedIn post content goes here.\",\n  \"image_prompt\": \"A professional, clean, tech-focused infographic about the DevOps news topic, 4:5 aspect ratio, high resolution.\"\n}"
+      },
+      "id": "e0a1665c-7a19-46a2-8eae-8303297d16fd",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2352,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.linkedin.com/v2/userinfo",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Get User Profile').item.json.linkedin_access_token }}"
+            },
+            {
+              "name": "LinkedIn-Version",
+              "value": "202606"
+            },
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dd747ce9-ae24-43ad-b44c-ba78c31b9359",
+      "name": "Get Person URN",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2560,
+        32
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4891e8f4-9dbf-44dd-b3d4-3a2ce047fee6",
+              "leftValue": "={{ $('Parse Webhook Payload').item.json.generate_image }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "8e0bd93b-621a-4790-b08d-ce73ef14f474",
+      "name": "Generate Image?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2784,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/assets?action=registerUpload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Get User Profile').item.json.linkedin_access_token }}"
+            },
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"registerUploadRequest\": {\n    \"recipes\": [\"urn:li:digitalmediaRecipe:feedshare-image\"],\n    \"owner\": \"urn:li:person:{{ $('Get Person URN').item.json.sub }}\",\n    \"serviceRelationships\": [\n      {\n        \"relationshipType\": \"OWNER\",\n        \"identifier\": \"urn:li:userGeneratedContent\"\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "id": "32b17759-a8db-412d-bc3e-e6d5a8ec1bae",
+      "name": "Register Upload",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3008,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=You are an expert AI prompt engineer specializing in creating professional LinkedIn illustrations.\n\nThe topic is:\n\n{{ $('Parse Webhook Payload').item.json.topic }}\n\nGenerate a highly descriptive image prompt for an AI image generation model.\n\nRequirements:\n\n- The image must visually represent ONLY the provided topic.\n- Do NOT generate generic AI portraits unless the topic specifically involves people.\n- Capture the main concept, technology, industry, or process.\n- Make the image suitable for a professional LinkedIn audience.\n- Modern, clean, premium digital art style.\n- Highly detailed.\n- Corporate branding quality.\n- Cinematic lighting.\n- Vibrant but realistic colors.\n- Futuristic when appropriate.\n- Use a 16:9 composition.\n- No text.\n- No letters.\n- No captions.\n- No logos.\n- No watermarks.\n- No UI screenshots.\n- No social media icons.\n- No copyright material.\n\nIf the topic is:\n\nComputer Vision\n\nGenerate scenes containing cameras, object detection, image recognition, AI vision systems, autonomous vehicles, industrial inspection, or smart surveillance.\n\nIf the topic is:\n\nClaude AI\n\nGenerate scenes showing an advanced conversational AI assistant, enterprise productivity, intelligent workflows, natural language interaction, contextual understanding, digital interfaces, and human-AI collaboration.\n\nIf the topic is:\n\nDevOps\n\nGenerate CI/CD pipelines, Kubernetes clusters, cloud infrastructure, monitoring dashboards, automation workflows, containers, servers, and software deployment.\n\nReturn ONLY the final image prompt.",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "ce52cb25-868d-4ad5-81f8-8503fee05a6f",
+      "name": "Generate Image (Pollinations)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3232,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Register Upload').item.json.value.uploadMechanism['com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest'].uploadUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Get User Profile').item.json.linkedin_access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "2e127684-ab80-460d-b5c5-a62b1ba06c22",
+      "name": "Upload Image to LinkedIn",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3456,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/ugcPosts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Get User Profile').item.json.linkedin_access_token }}"
+            },
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ \nJSON.stringify({\n  \"author\": \"urn:li:person:\" + $('Get Person URN').item.json.sub,\n  \"lifecycleState\": \"PUBLISHED\",\n  \"specificContent\": {\n    \"com.linkedin.ugc.ShareContent\": {\n      \"shareCommentary\": {\n        \"text\": $('Basic LLM Chain').item.json.output.post_text\n      },\n      \"shareMediaCategory\": \"IMAGE\",\n      \"media\": [\n        {\n          \"status\": \"READY\",\n          \"description\": {\n            \"text\": $('Select Manual Topic').item.json.selected_topic || \"AI Automation\"\n          },\n          \"media\": $('Register Upload').item.json.value.asset,\n          \"title\": {\n            \"text\": \"Generated Image\"\n          }\n        }\n      ]\n    }\n  },\n  \"visibility\": {\n    \"com.linkedin.ugc.MemberNetworkVisibility\": \"PUBLIC\"\n  }\n})\n}}",
+        "options": {}
+      },
+      "id": "21ee046e-3379-4321-b3f6-ac839148abb0",
+      "name": "Post to LinkedIn with Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3680,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- Determine which route this execution took ---\nconst parsed = $('Parse Webhook Payload').item.json;\nconst isImagePost = parsed.generate_image === true;\n\n// --- Safely resolve the image reference ONLY if the image route ran ---\n// Referencing an unexecuted node throws, so guard with try/catch and the route flag.\nlet imageUrl = null;\nif (isImagePost) {\n  try {\n    imageUrl = $('Register Upload').item.json.value.asset || null; // LinkedIn media URN\n  } catch (e) {\n    imageUrl = null;\n  }\n}\n\nconst llmOutput = $('Basic LLM Chain').item.json.output?.post_text;\nconst topic = $('Select Manual Topic').item.json.selected_topic;\nconst item0 = ($('Edit Fields').item.json.rss?.channel?.item?.[0]) || {};\nconst linkedinResponse = $input.first()?.json || {};\n\nreturn [{\n  json: {\n    user_id: parsed.user_id || \"default-user\",\n    post_text: llmOutput || \"Automated LinkedIn Post\",\n    topic_used: topic || null,\n    article_headline: item0.title || null,\n    article_url: item0.link || null,\n    linkedin_post_id: linkedinResponse.id || null,\n    // image_url: media URN on the image route, explicit null on the text route\n    image_url: imageUrl,\n    published_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "f95191b7-d8db-4d8e-9c54-9e2077c26d9b",
+      "name": "Prepare History Record",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3904,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "tableId": "posts_history",
+        "dataToSend": "autoMapInputData"
+      },
+      "id": "12393d06-ec3e-4a0b-8fc8-7e0bfe2794a7",
+      "name": "Save to Posts History",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4128,
+        -16
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "Bx79LBoXttDojGfp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({ success: true, status: 'published', post_text: $('Prepare History Record').item.json.post_text, topic_used: $('Prepare History Record').item.json.topic_used, image_url: $('Prepare History Record').item.json.image_url, published_at: $('Prepare History Record').item.json.published_at, linkedin_post_id: $('Prepare History Record').item.json.linkedin_post_id }) }}",
+        "options": {}
+      },
+      "id": "4439b050-ae2b-4ced-af1e-5f09ed0f7163",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        4352,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/ugcPosts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Get User Profile').item.json.linkedin_access_token }}"
+            },
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "LinkedIn-Version",
+              "value": "202506"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"author\": \"urn:li:person:{{ $('Get Person URN').item.json.sub }}\",\n  \"lifecycleState\": \"PUBLISHED\",\n  \"specificContent\": {\n    \"com.linkedin.ugc.ShareContent\": {\n      \"shareCommentary\": {\n        \"text\": {{ JSON.stringify($('Basic LLM Chain').item.json.output.post_text || 'Check out our latest update!') }}\n      },\n      \"shareMediaCategory\": \"NONE\"\n    }\n  },\n  \"visibility\": {\n    \"com.linkedin.ugc.MemberNetworkVisibility\": \"PUBLIC\"\n  }\n}",
+        "options": {}
+      },
+      "id": "c57fe388-287c-4b0d-81e9-9401505647fc",
+      "name": "Post to LinkedIn",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3680,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({ success: false, error: 'LinkedIn access token missing or invalid.' }) }}",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "id": "4d72bbc4-a340-41c5-8377-b1858eec5ad0",
+      "name": "Respond: Invalid Token",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2848,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({ success: false, error: 'LinkedIn account not connected.' }) }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "600f917b-bce0-458f-a21e-c4dd8ba76a5e",
+      "name": "Respond: Not Connected",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        560,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "facebook_connections",
+        "limit": 1,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Get User Profile').item.json.id }}"
+            }
+          ]
+        }
+      },
+      "id": "f9af6e58-2e96-4813-a3b0-2c2bdcb97d27",
+      "name": "Get Facebook Connection",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -336
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "Bx79LBoXttDojGfp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fb-req-1",
+              "leftValue": "={{ $('Webhook').item.json.body.target_platform }}",
+              "rightValue": "facebook",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "fb-req-0000-0000-0000-000000000001",
+      "name": "Facebook Request?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        304,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Webhook').first().json;\n\nlet parsedData;\nif (typeof input.body === \"string\") {\n  try {\n    parsedData = JSON.parse(input.body);\n  } catch (e) {\n    parsedData = input.body;\n  }\n} else if (input.body && typeof input.body === \"object\") {\n  parsedData = input.body;\n} else {\n  parsedData = input;\n}\n\nconst clean = (v) => (v === undefined || v === null) ? null : String(v).replace(/^=/, \"\").trim();\n\nconst fbTarget = (clean(parsedData.fb_target) || \"profile\").toLowerCase() === \"page\" ? \"page\" : \"profile\";\n\nreturn [{\n  json: {\n    user_id: parsedData.user_id || null,\n    post_content: parsedData.post_content || null,\n    image_url: parsedData.image_url || null,\n    fb_target: fbTarget,\n    publish_now: parsedData.publish_now,\n    raw_payload: parsedData\n  }\n}];"
+      },
+      "id": "fb-parse-0000-0000-0000-000000000002",
+      "name": "Parse FB Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        620,
+        -336
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fb-conn-1",
+              "leftValue": "={{ $('Get Facebook Connection').first()?.json.facebook_user_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "fb-conn-0000-0000-0000-000000000003",
+      "name": "FB Connected?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        820,
+        -336
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fb = $('Get Facebook Connection').item.json;\nconst parsed = $('Parse FB Payload').item.json;\nconst target = parsed.fb_target === 'page' ? 'page' : 'profile';\n\nif (target === 'page') {\n  return [{\n    json: {\n      target: 'page',\n      node_id: fb.page_id || null,\n      token: fb.page_access_token || null\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    target: 'profile',\n    node_id: fb.facebook_user_id || 'me',\n    token: fb.access_token || null\n  }\n}];"
+      },
+      "id": "fb-tgt-0000-0000-0000-000000000004",
+      "name": "Select FB Target",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        -336
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fb-img-1",
+              "leftValue": "={{ $('Parse FB Payload').item.json.image_url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "fb-img-0000-0000-0000-000000000005",
+      "name": "FB Image?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1220,
+        -336
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Select FB Target').item.json.node_id }}/feed",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "={{ $('Parse FB Payload').item.json.post_content }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $('Select FB Target').item.json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fb-txt-0000-0000-0000-000000000006",
+      "name": "Post to Facebook Text",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1440,
+        -216
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Select FB Target').item.json.node_id }}/photos",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $('Parse FB Payload').item.json.image_url }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $('Parse FB Payload').item.json.post_content }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $('Select FB Target').item.json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fb-imgpost-0000-0000-0000-000000000007",
+      "name": "Post to Facebook with Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1440,
+        -456
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const parsed = $('Parse FB Payload').item.json;\nconst target = $('Select FB Target').item.json.target;\nconst fbResponse = $input.first()?.json || {};\n\nreturn [{\n  json: {\n    user_id: parsed.user_id || \"default-user\",\n    post_text: parsed.post_content || \"Automated Facebook Post\",\n    topic_used: null,\n    article_headline: null,\n    article_url: null,\n    linkedin_post_id: null,\n    facebook_post_id: fbResponse.id || null,\n    image_url: parsed.image_url || null,\n    published_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "fb-prep-0000-0000-0000-000000000008",
+      "name": "Prepare FB History Record",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1660,
+        -336
+      ]
+    },
+    {
+      "parameters": {
+        "tableId": "posts_history",
+        "dataToSend": "autoMapInputData"
+      },
+      "id": "fb-save-0000-0000-0000-000000000009",
+      "name": "Save FB to Posts History",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1860,
+        -336
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "Bx79LBoXttDojGfp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({ success: true, status: 'published', post_text: $('Prepare FB History Record').item.json.post_text, facebook_post_id: $('Prepare FB History Record').item.json.facebook_post_id, fb_target: $('Select FB Target').item.json.target, published_at: $('Prepare FB History Record').item.json.published_at }) }}",
+        "options": {}
+      },
+      "id": "fb-resp-0000-0000-0000-000000000010",
+      "name": "Respond to Webhook (FB)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2060,
+        -336
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({ success: false, error: 'Facebook account not connected.' }) }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "fb-nc-0000-0000-0000-000000000011",
+      "name": "Respond: FB Not Connected",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        820,
+        -136
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({ success: false, error: 'Facebook publish failed. Check access token and target permissions.' }) }}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "id": "fb-fail-0000-0000-0000-000000000012",
+      "name": "Respond: FB Publish Failed",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1660,
+        -136
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get User Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkedIn Connected?": {
+      "main": [
+        [
+          {
+            "node": "Token Available?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond: Not Connected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token Available?": {
+      "main": [
+        [
+          {
+            "node": "Parse Webhook Payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond: Invalid Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Webhook Payload": {
+      "main": [
+        [
+          {
+            "node": "Fetch Settings (Manual)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Settings (Manual)": {
+      "main": [
+        [
+          {
+            "node": "Select Manual Topic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Manual Topic": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Get Person URN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Person URN": {
+      "main": [
+        [
+          {
+            "node": "Generate Image?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond: Invalid Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image?": {
+      "main": [
+        [
+          {
+            "node": "Register Upload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post to LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Register Upload": {
+      "main": [
+        [
+          {
+            "node": "Generate Image (Pollinations)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image (Pollinations)": {
+      "main": [
+        [
+          {
+            "node": "Upload Image to LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Image to LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Post to LinkedIn with Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to LinkedIn with Image": {
+      "main": [
+        [
+          {
+            "node": "Prepare History Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare History Record": {
+      "main": [
+        [
+          {
+            "node": "Save to Posts History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Posts History": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Prepare History Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Profile": {
+      "main": [
+        [
+          {
+            "node": "Facebook Request?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook Request?": {
+      "main": [
+        [
+          {
+            "node": "Get Facebook Connection",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "LinkedIn Connected?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Facebook Connection": {
+      "main": [
+        [
+          {
+            "node": "Parse FB Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse FB Payload": {
+      "main": [
+        [
+          {
+            "node": "FB Connected?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FB Connected?": {
+      "main": [
+        [
+          {
+            "node": "Select FB Target",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond: FB Not Connected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select FB Target": {
+      "main": [
+        [
+          {
+            "node": "FB Image?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FB Image?": {
+      "main": [
+        [
+          {
+            "node": "Post to Facebook with Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post to Facebook Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Facebook Text": {
+      "main": [
+        [
+          {
+            "node": "Prepare FB History Record",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond: FB Publish Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Facebook with Image": {
+      "main": [
+        [
+          {
+            "node": "Prepare FB History Record",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond: FB Publish Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare FB History Record": {
+      "main": [
+        [
+          {
+            "node": "Save FB to Posts History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save FB to Posts History": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook (FB)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "25cabce3-1416-45e8-9ceb-d0600309b10e",
+  "meta": {
+    "instanceId": "3f86408b6b7c9d0ab092c95b989758e841153ab26401be87d079d911c588a588"
+  },
+  "nodeGroups": [],
+  "id": "ajP5xmQF2H8HGr0g",
+  "tags": []
+}
