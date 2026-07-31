@@ -899,8 +899,8 @@
                 <div class="flex items-center gap-2">
                   <span class="ln-publish-text">Facebook:</span>
                   <div class="flex gap-1" id="fbTargetGroup">
-                    <button type="button" data-value="profile" class="segmented-btn segmented-btn-active" style="padding:0.25rem 0.625rem;font-size:0.7rem;">Profile</button>
-                    <button type="button" data-value="page" class="segmented-btn segmented-btn-inactive" style="padding:0.25rem 0.625rem;font-size:0.7rem;">Page</button>
+                    <button type="button" data-value="profile" class="segmented-btn segmented-btn-inactive" style="padding:0.25rem 0.625rem;font-size:0.7rem;">Profile</button>
+                    <button type="button" data-value="page" class="segmented-btn segmented-btn-active" style="padding:0.25rem 0.625rem;font-size:0.7rem;">Page</button>
                   </div>
                 </div>
                 <button id="publishFacebookBtn" class="btn-primary text-xs !px-4 !py-2" disabled>
@@ -2092,7 +2092,7 @@
       }
     }
 
-    var fbTarget = 'profile';
+    var fbTarget = 'page';
     var isPublishingFb = false;
 
     function setFbTarget(val) {
@@ -2130,6 +2130,11 @@
 
       if (!facebookConnected) {
         toast('Please connect your Facebook account first.', 'error');
+        return;
+      }
+
+      if (fbTarget === 'profile') {
+        toast("Facebook doesn't allow posting to personal timelines for third-party apps. Select 'Page' instead.", 'error');
         return;
       }
 

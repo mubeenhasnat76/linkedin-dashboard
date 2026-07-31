@@ -890,7 +890,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ ({ success: false, error: 'Facebook publish failed. Check access token and target permissions.' }) }}",
+        "responseBody": "={{ ({ success: false, error: $('Extract FB Error').item.json.error }) }}",
         "options": {
           "responseCode": 500
         }
@@ -901,6 +901,19 @@
       "typeVersion": 1.5,
       "position": [
         1660,
+        -136
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first();\nconst rawJson = item?.json || {};\nconst err = rawJson.error;\n\nlet message = 'Unknown Facebook error';\nif (typeof err === 'string' && err) {\n  message = err;\n} else if (err && typeof err === 'object') {\n  message = err.message || err.error?.message || err.error || 'Unknown Facebook error';\n}\nif (rawJson.statusCode || rawJson.status) {\n  message = (rawJson.statusCode || rawJson.status) + ': ' + message;\n}\n\nreturn [{\n  json: {\n    error: String(message).slice(0, 500),\n    error_details: JSON.stringify(rawJson).slice(0, 2000)\n  }\n}];"
+      },
+      "id": "fb-err-0000-0000-0000-000000000020",
+      "name": "Extract FB Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1500,
         -136
       ]
     },
@@ -1490,7 +1503,7 @@
         ],
         [
           {
-            "node": "Respond: FB Publish Failed",
+            "node": "Extract FB Error",
             "type": "main",
             "index": 0
           }
@@ -1506,6 +1519,17 @@
             "index": 0
           }
         ],
+        [
+          {
+            "node": "Extract FB Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract FB Error": {
+      "main": [
         [
           {
             "node": "Respond: FB Publish Failed",

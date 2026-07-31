@@ -104,6 +104,25 @@ serve(async (req) => {
 
     const accessToken = tokenData.access_token
 
+    // Upgrade short-lived token to a long-lived token (valid ~60 days)
+    let longLivedToken = accessToken
+    try {
+      const longUrl = new URL("https://graph.facebook.com/v22.0/oauth/access_token")
+      longUrl.searchParams.set("grant_type", "fb_exchange_token")
+      longUrl.searchParams.set("client_id", FACEBOOK_APP_ID)
+      longUrl.searchParams.set("client_secret", FACEBOOK_APP_SECRET)
+      longUrl.searchParams.set("fb_exchange_token", accessToken)
+
+      const longResp = await fetch(longUrl.toString())
+      const longData = await longResp.json()
+
+      if (longResp.ok && longData.access_token) {
+        longLivedToken = longData.access_token
+      }
+    } catch (_) {
+      // Fall back to the short-lived token if the exchange fails
+    }
+
     // Fetch Facebook user profile
     const meResp = await fetch(
       `https://graph.facebook.com/v22.0/me?fields=id,name&access_token=${encodeURIComponent(accessToken)}`
@@ -136,6 +155,23 @@ serve(async (req) => {
       pageAccessToken = pagesData.data[0].access_token
     }
 
+    // If no page token came back, derive one from the long-lived user token
+    if (pagesData && pagesData.data && pagesData.data.length > 0 && !pageAccessToken) {
+      try {
+        const accountsResp = await fetch(
+          `https://graph.facebook.com/v22.0/me/accounts?access_token=${encodeURIComponent(longLivedToken)}`
+        )
+        const accountsData = await accountsResp.json()
+        if (accountsData && accountsData.data && accountsData.data.length > 0) {
+          pageAccessToken = accountsData.data[0].access_token || null
+          if (!pageId) pageId = accountsData.data[0].id || null
+          if (!pageName) pageName = accountsData.data[0].name || null
+        }
+      } catch (_) {
+        // Leave page token null; publishing to a page will surface the error
+      }
+    }
+
     // Use service role client for DB writes (bypasses RLS)
     const adminClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
       auth: {
@@ -158,7 +194,7 @@ serve(async (req) => {
         facebook_name: meData.name,
         page_id: pageId,
         page_name: pageName,
-        access_token: accessToken,
+        access_token: longLivedToken,
         page_access_token: pageAccessToken,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
