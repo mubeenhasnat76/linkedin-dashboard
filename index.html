@@ -611,7 +611,11 @@
             <p id="sidebarFullName" class="text-xs font-semibold truncate" style="color:var(--text-primary);">—</p>
             <p id="sidebarLinkedinStatus" class="text-[10px] flex items-center gap-1" style="color:var(--text-muted);">
               <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
-              <span>Not connected</span>
+              <span>LinkedIn: Not Connected</span>
+            </p>
+            <p id="sidebarFacebookStatus" class="text-[10px] flex items-center gap-1" style="color:var(--text-muted);">
+              <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+              <span>Facebook: Not Connected</span>
             </p>
           </div>
         </div>
@@ -1110,6 +1114,7 @@
                 <p id="settingsProfileOrg" class="text-xs" style="color:var(--text-muted);">—</p>
                 <p id="settingsProfileDate" class="text-xs" style="color:var(--text-muted);">—</p>
                 <p id="settingsProfileLinkedin" class="text-xs flex items-center gap-1" style="color:var(--text-muted);">—</p>
+                <p id="settingsProfileFacebook" class="text-xs flex items-center gap-1" style="color:var(--text-muted);">—</p>
               </div>
             </div>
             <div class="mt-4 pt-3" style="border-top:1px solid var(--border-color);">
@@ -1608,10 +1613,9 @@
       var isConnected = p.linkedin_connected === true;
       if (statusEl) {
         if (isConnected) {
-          var lnName = p.linkedin_name || 'LinkedIn Connected';
-          statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-green-400"></span><span>' + esc(lnName) + '</span>';
+          statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-green-400"></span><span>LinkedIn: Connected</span>';
         } else {
-          statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-400"></span><span>Not connected</span>';
+          statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-400"></span><span>LinkedIn: Not Connected</span>';
         }
       }
 
@@ -1671,6 +1675,81 @@
       }
     }
 
+    // ── Facebook status ─────────────────────────────────────────────────
+    var facebookConnected = false;
+    var facebookConnection = null;
+
+    function updateFacebookUI(connected, data) {
+      facebookConnected = !!connected;
+      if (connected) {
+        facebookConnection = data || {};
+      } else {
+        facebookConnection = null;
+      }
+      var sbStatus = document.getElementById('sidebarFacebookStatus');
+      if (sbStatus) {
+        if (facebookConnected) {
+          sbStatus.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-green-400"></span><span>Facebook: Connected</span>';
+        } else {
+          sbStatus.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-400"></span><span>Facebook: Not Connected</span>';
+        }
+      }
+      var settingsFb = document.getElementById('settingsProfileFacebook');
+      if (settingsFb) {
+        if (facebookConnected) {
+          var page = (facebookConnection && facebookConnection.page_name) || '';
+          var person = (facebookConnection && facebookConnection.facebook_name) || '';
+          var label = page ? page : (person || 'Connected');
+          if (page && person) label = page + ' · ' + person;
+          settingsFb.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Facebook: ' + esc(label);
+        } else {
+          settingsFb.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> Facebook: Not connected';
+        }
+      }
+    }
+
+    async function checkFacebookConnection() {
+      if (!window.supabaseClient) {
+        updateFacebookUI(false);
+        return { connected: false };
+      }
+      try {
+        var sessionRes = await window.supabaseClient.auth.getSession();
+        var session = sessionRes?.data?.session;
+        if (!session) {
+          updateFacebookUI(false);
+          return { connected: false, error: 'No active session. Please sign in.' };
+        }
+        var q = window.supabaseClient
+          .from('facebook_connections')
+          .select('facebook_name, page_id, page_name, created_at')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        var r = await q;
+        if (r.error) {
+          if (r.error.code === 'PGRST116' || r.error.code === '404' || r.error.message?.includes('does not exist')) {
+            updateFacebookUI(false);
+            return { connected: false };
+          }
+          throw r.error;
+        }
+        if (r.data) {
+          updateFacebookUI(true, r.data);
+          return { connected: true, data: r.data };
+        }
+        updateFacebookUI(false);
+        return { connected: false };
+      } catch (err) {
+        console.error('[Dashboard] Facebook connection check failed:', err?.message || err);
+        updateFacebookUI(false);
+        return { connected: false, error: err?.message || 'Unknown error' };
+      }
+    }
+
+    async function loadFacebookConnection() {
+      return checkFacebookConnection();
+    }
+
     // ── Supabase ops ─────────────────────────────────────────────────────
     async function loadDashboardData() {
       if (!window.supabaseClient) {
@@ -1705,6 +1784,7 @@
           console.warn('[Dashboard] Profile load failed:', err?.message || err);
         }
         renderSettingsProfile();
+        loadFacebookConnection();
       }
 
       try {
@@ -2627,12 +2707,18 @@
               if (window.facebookOAuth && window.facebookOAuth.checkConnection) {
                 window.facebookOAuth.checkConnection();
               }
+              if (typeof loadFacebookConnection === 'function') {
+                loadFacebookConnection();
+              }
             }, 500);
           } else if (event.data.type === 'facebook-error') {
             var fbErrMsg = event.data.error || 'Unable to connect to Facebook.';
             toast(fbErrMsg, 'error');
             if (window.facebookOAuth && window.facebookOAuth.updateUI) {
               window.facebookOAuth.updateUI('error', { error: fbErrMsg });
+            }
+            if (typeof loadFacebookConnection === 'function') {
+              loadFacebookConnection();
             }
           }
         });
@@ -2688,6 +2774,7 @@
                   if (schedLoaded) loadScheduled();
                   loadSchedulerToggle();
                   loadTrendingNews();
+                  loadFacebookConnection();
                 } catch (err) { console.error('[Dashboard] Auto-refresh failed:', JSON.stringify(err)); }
               }, 30000);
 
