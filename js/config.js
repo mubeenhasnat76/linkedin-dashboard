@@ -8,15 +8,15 @@ const APP_CONFIG = {
   LINKEDIN_EDGE_FUNCTION: 'https://sjjybpydkwvgqfyqliod.supabase.co/functions/v1/linkedin-token-exchange',
   LINKEDIN_SCOPES: 'openid profile w_member_social email',
   LINKEDIN_DISCONNECT_FUNCTION: 'https://sjjybpydkwvgqfyqliod.supabase.co/functions/v1/linkedin-disconnect',
-  N8N_LINKEDIN_GENERATE_WEBHOOK: 'https://rajahasnat.app.n8n.cloud/webhook/linkedin-generate',
+  N8N_LINKEDIN_GENERATE_WEBHOOK: 'https://junctiontech.app.n8n.cloud/webhook/linkedin-generate',
   linkedinOAuth: {
     clientId: '774sbtceu4nynv',
     redirectUri: APP_ORIGIN + '/linkedin-callback.html',
     authUrl: 'https://www.linkedin.com/oauth/v2/authorization',
     scopes: 'openid profile w_member_social email'
   },
-  N8N_LINKEDIN_PUBLISH_WEBHOOK: 'https://rajahasnat.app.n8n.cloud/webhook/linkedin-publish',
-  FACEBOOK_PUBLISH_WEBHOOK: 'https://rajahasnat.app.n8n.cloud/webhook/linkedin-generate',
+  N8N_LINKEDIN_PUBLISH_WEBHOOK: 'https://junctiontech.app.n8n.cloud/webhook/linkedin-publish',
+  FACEBOOK_PUBLISH_WEBHOOK: 'https://junctiontech.app.n8n.cloud/webhook/linkedin-generate',
   FACEBOOK_CLIENT_ID: '1599897371479994',
   FACEBOOK_REDIRECT_URI: (function () {
     var host = window.location.hostname;

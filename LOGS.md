@@ -177,7 +177,7 @@ CREATE TRIGGER on_auth_user_created
 
 ## n8n Webhook
 
-- **URL**: `https://technologyjunction.app.n8n.cloud/webhook/trigger-linkedin-v3`
+- **URL**: `https://junctiontech.app.n8n.cloud/webhook/linkedin-generate`
 - **Payload**: `{ topic, posts_per_day, timestamp }`
 - **Response**: `{ success, post_text, topic_used, linkedin_post_id, published_at }`
 - **Timeout**: 90 seconds (AbortController)

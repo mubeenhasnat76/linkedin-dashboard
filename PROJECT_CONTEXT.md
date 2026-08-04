@@ -20,7 +20,7 @@ A multi-user SaaS application that automates LinkedIn content creation and publi
 
 ## Infrastructure
 
-- **n8n Instance**: `technologyjunction.app.n8n.cloud` (shared instanceId across both workflows)
+- **n8n Instance**: `junctiontech.app.n8n.cloud` (shared instanceId across both workflows)
 - **Supabase Project**: `sjjybpydkwvgqfyqliod.supabase.co`
 - **Hosting**: Static files (Vercel-compatible)
 
@@ -62,8 +62,8 @@ Shared configuration:
 - LinkedIn OAuth client ID, redirect URI, scopes
 - Supabase Edge Function URLs (token-exchange, disconnect)
 - n8n webhook URLs:
-  - `N8N_LINKEDIN_GENERATE_WEBHOOK`: `https://rajahasnat.app.n8n.cloud/webhook/linkedin-generate`
-  - `N8N_LINKEDIN_PUBLISH_WEBHOOK`: `https://rajahasnat.app.n8n.cloud/webhook/linkedin-publish`
+  - `N8N_LINKEDIN_GENERATE_WEBHOOK`: `https://junctiontech.app.n8n.cloud/webhook/linkedin-generate`
+  - `N8N_LINKEDIN_PUBLISH_WEBHOOK`: `https://junctiontech.app.n8n.cloud/webhook/linkedin-publish`
 - Initializes `window.supabase` client with `persistSession: true`
 
 ### `js/auth.js`
@@ -352,5 +352,5 @@ Fields that ARE set correctly: `status`, `completed_at`, `processing_time_ms`, `
 - Static hosting (Vercel, Netlify, or any static file server)
 - Supabase RLS ensures multi-tenant data isolation via `organization_name`
 - n8n workflows must be activated in n8n Cloud for webhooks to be live
-- Both n8n workflows share the same Cloud instance (`technologyjunction.app.n8n.cloud`)
-- Frontend n8n webhook URLs point to a DIFFERENT instance (`rajahasnat.app.n8n.cloud`) — possibly a development/testing instance
+- Both n8n workflows share the same Cloud instance (`junctiontech.app.n8n.cloud`)
+- Frontend n8n webhook URLs point to the same instance (`junctiontech.app.n8n.cloud`)
